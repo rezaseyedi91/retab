@@ -1,0 +1,153 @@
+import { TTabCourseTuningInfo } from "./db-types";
+import Measure from "./Measure";
+import MeiAttribute from "./mei-modules/MeiAttribute";
+import MeiJSsonElem from "./mei-modules/MeiJsonElem";
+import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
+import Note from "./Note";
+import RezTabFile from "./RezTabFile";
+import Staff, { StaffLine } from "./Staff";
+import { TabCourseTuningInfo, TCourseInfo, TSectionInfo, TStaffInfo } from "./types";
+
+export default class Section extends MeiTag {
+    tagTitle = 'section';
+    measures: Measure[]
+    private doc: RezTabFile;
+    info:TSectionInfo = {staves: []}
+    constructor(doc: RezTabFile, measures: Measure[], info: TSectionInfo) {
+        super();
+        this.doc = doc
+        this.measures = measures;
+        this.info = info;
+    }
+    getDoc() {return this.doc}
+    getAllNotes(justTheExistingOnes = true): Note[] {
+        return this.measures.reduce((sf: Note[], m) => [...sf, ...m.getAllNotes(justTheExistingOnes)], [])
+    }
+    initializeDefaultTuning(staffIndex = 0) {
+        this.info.staves[staffIndex].tuning = [...Staff.DEFAULT_TUNING.slice(0, 6)]
+    }
+    static fromMeiFactoryArgs( doc: RezTabFile, arg: TMeiTagFactoryArgs, stavesInfo?: TStaffInfo[]) {
+        
+        const instance = new Section(doc, [], {staves: stavesInfo || [] })
+        instance.info = {
+            staves: stavesInfo || []
+        }
+        if (arg.children) instance.initializeMeasures(arg.children);
+        setTimeout(() => {
+            instance.updateChildren();
+            
+
+        }, 1000)
+        return instance;
+    }
+    setAttributes(): void {
+        // server will set the n attribute
+        // this.setAttribute(new MeiAttribute('n', '1'))
+        return;
+    }
+    setTabgroupsIncludeDurAttribute(mode: boolean) {
+        this.measures.forEach(m => m.setTabgroupsIncludeDurAttribute(mode))
+    }
+
+    getStavesInfo() {
+        return this.info.staves
+        
+        return this.info.staves.map((s, index) => ({...s,  tuning: this.measures[0].staves[index].lines.map(sl => sl.tuning)})).map(i => {
+            return <TStaffInfo>{
+                linesCount: i.linesCount,
+                tabType: i.tabType,
+                
+                // n: i.n,
+                // tuning: i.tuning.map(t => ({number: t.n, ...t})),
+                // notationType: i.notationType
+            }
+        })
+    }
+    unfreeze() {
+        this.measures.forEach(meausre => {
+            meausre.staves.forEach(staff => {
+                staff.tabGroups.forEach(tabgroup => {
+                    const currentNotes = tabgroup.notes;
+                    tabgroup.notes = staff.lines.map(l => {
+                        const c = l.courseInfo.number;
+                        return currentNotes.find(n => n.course == c) || new Note(tabgroup, {course: c})
+
+                    })
+                })
+            })
+        })
+    }
+    addLineToStaff(tuning?: TTabCourseTuningInfo, staffIndex = 0) {
+        /**fake */
+        let newLineTuning: TabCourseTuningInfo = {
+            n: tuning?.n || 0,oct: tuning?.oct, pname: tuning?.pname
+        }
+        this.measures.forEach(m => {
+            if (!newLineTuning.n) {
+                const newLine = m.staves[staffIndex].addLine()
+                newLineTuning = newLine.courseInfo.tuning!
+            } else  m.staves[staffIndex].addLine()
+        })
+        this.info.staves[staffIndex].linesCount++;
+        this.info.staves[staffIndex].tuning?.push(newLineTuning)
+        this.doc.docSettings.linesCount = this.info.staves[staffIndex].linesCount;
+        
+    }
+    initializeMeasures(measureJsonElems: TMeiTagFactoryArgs[]) {
+        this.measures = measureJsonElems.map(mje => Measure.fromMeiFactoryArgs(this, mje))
+        
+        return this;
+    }
+   setTuning(tuning: TabCourseTuningInfo[], staffIndex = 0) {
+        this.info.staves[staffIndex].tuning = tuning
+   }
+    removeLineFromStaff(staffIndex = 0, lineN: number) {
+        this.measures.forEach(m => m.staves[staffIndex].removeLine(lineN));
+        this.info.staves[staffIndex || 0].linesCount--;
+        this.doc.docSettings.linesCount = this.info.staves[staffIndex || 0].linesCount;
+        this.info.staves[staffIndex].linesCount--;
+        const t = this.doc.getTuning(staffIndex)
+        const splicedTuning = t?.splice(t.indexOf(t.find(l => l.n == lineN)!), 1)
+        this.setTuning(t!)
+    }
+    updateChildren(): MeiTag {
+        this.children = this.measures.map(m => m.updateChildren());
+        return this
+    }
+    addMeasure(index?: number): Measure {
+
+        
+        const m = new Measure(this, (index || 0) + 1 ||  this.measures[this.measures.length-1]?.n + 1 );
+        if (index == undefined) {
+            this.measures.push(m)
+        } else {
+            this.measures.splice(index, 0, m);
+        }
+        this.updateMeasuresN();
+        return m;
+    }
+    updateMeasuresN() {
+
+        this.measures.forEach((m, index) => m.setN(index + 1))
+    }
+    getMeasureFromN(n: number) {
+        return this.measures.find(m => m.n == n)
+    }
+
+    cleanupChildren() {
+        this.measures.forEach(m => m.cleanupTabGroups())
+    }
+    toJsonElem(): MeiJSsonElem {
+        this.cleanupChildren();
+        return super.toJsonElem()
+    }
+
+    removeMeasure(m: Measure) {
+        this.measures.splice(this.measures.indexOf(m), 1);
+    }
+
+
+    showRawTabGroups() {
+        return this.measures.map(m => m.staves.map(s => s.tabGroups.map(tg => tg.notes.map(n => n.course + ':' + n.fret))))
+    }
+}

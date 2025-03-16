@@ -1,0 +1,43 @@
+<meiHead>
+    <fileDesc>
+    <encodingDesc>
+    <workList>
+<music>
+    <body>
+        <mdiv>
+            <score>
+                <scoreDef>
+                    <staffGrp>
+                    	<staffDef>
+                <section>
+                    <measure>
+                        <staff>
+                            <layer>
+                                <tabGrp>
+                                    <tabDurationSymbol>
+                                    <note />
+
+
+
+
+
+
+class MeiTag {
+    xmlId?: string;
+    toJsonElem(): MeiJSsonElem 
+    selfClosing?: boolean
+    children: MeiTag[] 
+    tagTitle: string
+    attributes: MeiAttribute[]
+    setAttributes(): void;
+    updateChildren(): MeiTag;
+    textContent?: string;
+    
+    static makeTagsTree(args: TMeiTagFactoryArgs): MeiTag
+    
+    setAttribute(att: MeiAttribute): void
+    removeAttribute(key :string): void
+    getChildrenByTagName(tagname: string): MeiTag
+    getAttribute(title: string): MeiAttribute
+    getChildByTagName(tagname: string) 
+}

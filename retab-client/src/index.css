@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+
+    --va-select-dropdown-background: var(--va-info) !important
+}
+g:focus {
+    fill: green;
+}
+
+/* @apply px-3 py-2 hover:bg-opacity-40 hover:shadow-sm bg-purple-500 bg-opacity-25 cursor-pointer  rounded-sm border border-gray-800 */
+button.button {
+
+    @apply py-2 px-3 my-4 bg-sky-600 rounded-sm shadow-md font-bold cursor-pointer
+}
+
+
+input.header-input {
+    @apply px-3 py-2 focus:outline-none focus:border-red-100 opacity-90 focus:opacity-100
+}
+
+div:has(> input.header-input) {
+    @apply flex justify-between items-center gap-x-3
+}
+div:has(> input.header-input)  > label {
+    @apply font-bold
+}
