@@ -3,17 +3,12 @@ import { Router } from "express";
 import { getInstance as getVerovioToolkitInstance } from '../../modules/mei-adapters/VerovioToolkitInstance'
 import { promises, readFile } from "fs";
 import retabTestRouter from './retab'
-import getMidiRouter from './get-midi'
-import DB from "../../modules/DB";
-import { PrismaClient } from "@prisma/client";
-import { defineTuningPresets } from "./defineTuningPresets";
 const router = Router();
 
 router.get('/dbman', async (req, res) => {
 })
 router.use('/retab', retabTestRouter)
-
-router.use('/get-midi', getMidiRouter)
+// router.use('/get-midi', getMidiRouter)
  
 
 router.get('/render', async (req, res) => {
