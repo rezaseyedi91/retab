@@ -124,27 +124,12 @@ class SelectionListener {
             const listener = this.boundMethods[listenerName as keyof typeof this.boundMethods]
             document.addEventListener(listener.eventType, listener.method)
         })
-
-        // document.addEventListener('keydown', this.onCtrl.bind(this))
-        // document.addEventListener('keydown', this.onShiftkeyDown.bind(this))
-        // document.addEventListener('keyup', this.onShiftkeyUp.bind(this))
-        // document.addEventListener('selectstart', this.onSelectStart.bind(this))
-        // document.addEventListener('mousedown', this.onMouseDown.bind(this))
-        // document.addEventListener('mouseup', this.onMouseUp.bind(this))
-        // document.addEventListener('mousemove', this.onMouseMove.bind(this))
     }
     removeListeners() {
         this.boundMethodNames.initialListeners.forEach((listenerName) => {
             const listener = this.boundMethods[listenerName as keyof typeof this.boundMethods]
             document.removeEventListener(listener.eventType, listener.method)
         })
-
-        // document.removeEventListener('keydown', this.onShiftkeyDown)
-        // document.removeEventListener('keyup', this.onShiftkeyUp)
-        // document.removeEventListener('selectstart', this.onSelectStart)
-        // document.removeEventListener('mousedown', this.onMouseDown)
-        // document.removeEventListener('mouseup', this.onMouseUp)
-        // document.removeEventListener('mousemove', this.onMouseMove)
     }
 
     setSelectedNotesListeners() {
@@ -195,8 +180,6 @@ class SelectionListener {
             }
             n.updateSelectionMode(isHighlighted || isAlreadyHighlighted)
         })
-        // notes[0].isInSelectionHighliterRange(this.selectionHighlighterXYs)
-
     }
     deselectNote(n: Note) {
         const selectedIndex = this.selectedNotes.indexOf(n);
@@ -328,7 +311,6 @@ class SelectionListener {
 
     onCtrl(event: KeyboardEvent) {
         const isInTheRetabDocContainer = () => {
-            // const i = event.composedPath().indexOf(retabDocContainer.value!); return i > -1
             return !store.state.ui.showPreferencesModal
             }
         if (!isInTheRetabDocContainer()) return;

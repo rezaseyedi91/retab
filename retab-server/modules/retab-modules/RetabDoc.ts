@@ -114,8 +114,8 @@ export default class RetabDoc implements TRetabDoc {
             instruments: this.stavesInfo.map(si => si.instrument?.title) || [],
             tabType: this.stavesInfo?.map((si: any) => si.notationType)?.[0],
             tuning: this.stavesInfo?.map((si: any) => si.tuning)?.[0],
-            sectionJsonElem: this.getSection()?.toJsonElem(),
-            headJsonElem: this.getHead()?.toJsonElem(),
+            sectionJsonXmlElement: this.getSection()?.toJsonXmlElement(),
+            headJsonXmlElement: this.getHead()?.toJsonXmlElement(),
             stavesInfo: this.stavesInfo,
             settings: this.settings
         }

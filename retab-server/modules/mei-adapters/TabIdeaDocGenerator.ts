@@ -9,10 +9,10 @@ import TabNote from "../mei-tags/TabNote";
 import { MeiDocGenerator } from "./MeiDocGenerator";
 import { TTabCourseTuningInfo } from "../db-types";
 import RetabDoc from "../retab-modules/RetabDoc";
-export type TMeiJsonElemInput = {
+export type TMeiJsonXmlElementInput = {
     attributes: MeiAttribute[]
     tagTitle: string;
-    children: TMeiJsonElemInput[];
+    children: TMeiJsonXmlElementInput[];
     textContent?: string;
     selfClosing?: boolean
 }
@@ -20,8 +20,8 @@ export type TMeiJsonElemInput = {
 
 export default class TabIdeaDocGenerator extends MeiDocGenerator {
 
-    static jsonElemToSection(jsonElem: TMeiJsonElemInput) {
-        const childrenToMeiTags = jsonElem.children?.map(ch => this.meiTagInstanceFromJsonElem(ch)) || [];
+    static jsonXmlElementToSection(jsonXmlElement: TMeiJsonXmlElementInput) {
+        const childrenToMeiTags = jsonXmlElement.children?.map(ch => this.meiTagInstanceFromJsonXmlElement(ch)) || [];
         const section = new MeiTag({tagTitle: 'section'});
         section.setAttribute(new MeiAttribute('n', '1'))
         section.addChildren(...childrenToMeiTags);
@@ -29,20 +29,20 @@ export default class TabIdeaDocGenerator extends MeiDocGenerator {
         return section;
     }
 
-    static meiTagInstanceFromJsonElem(jsonElem: TMeiJsonElemInput): MeiTag {
+    static meiTagInstanceFromJsonXmlElement(jsonXmlElement: TMeiJsonXmlElementInput): MeiTag {
         let tag: MeiTag
-        switch (jsonElem.tagTitle) {
+        switch (jsonXmlElement.tagTitle) {
             case 'measure':
-                tag = new Measure(Number(jsonElem.attributes?.find(a => a.title == 'n')?.value || 1))
+                tag = new Measure(Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
                 break;
             case 'staff':
-                tag = new Staff(Number(jsonElem.attributes?.find(a => a.title == 'n')?.value || 1))
+                tag = new Staff(Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
                 break;
             case 'tabGrp':
                 tag = new TabGrp()
                 break;
             case 'note':
-                tag = new TabNote(jsonElem)
+                tag = new TabNote(jsonXmlElement)
                 break;
             case 'score':
                 tag = new Section();
@@ -55,12 +55,12 @@ export default class TabIdeaDocGenerator extends MeiDocGenerator {
                 tag = new TabDurSym();
                 break;
             default:
-                tag = new MeiTagInstance({ tagTitle: jsonElem.tagTitle, attributes: jsonElem.attributes, })//  Number(jsonElem.attributes?.find(a => a.title == 'n')?.value || 1))
+                tag = new MeiTagInstance({ tagTitle: jsonXmlElement.tagTitle, attributes: jsonXmlElement.attributes, })//  Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
                 break;
         }
 
-        jsonElem.attributes?.forEach(t => tag.pushAttribute(t))
-        jsonElem.children?.forEach(ch => tag.pushChildren(this.meiTagInstanceFromJsonElem(ch)))
+        jsonXmlElement.attributes?.forEach(t => tag.pushAttribute(t))
+        jsonXmlElement.children?.forEach(ch => tag.pushChildren(this.meiTagInstanceFromJsonXmlElement(ch)))
         return tag;
     }
 

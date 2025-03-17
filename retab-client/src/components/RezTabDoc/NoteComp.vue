@@ -12,7 +12,6 @@
     <!-- :placeholder="'c-' + note.course" 
     @focus="onFocus()"
     -->
-    <!-- {{ note.isThere() }} -->
       
     <input @keydown.space="onSpace" 
      autocomplete="false"

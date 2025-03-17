@@ -1,5 +1,5 @@
 import DB from "../../modules/DB";
-import { TMeiJsonElemInput } from "../mei-adapters/TabIdeaDocGenerator";
+import { TMeiJsonXmlElementInput } from "../mei-adapters/TabIdeaDocGenerator";
 import { TMeiAttribute, TMeiTag, TRetabDoc } from "../db-types";
 import { MeiAttribute } from "../interfaces";
 import RetabDoc from "../retab-modules/RetabDoc";
@@ -247,10 +247,10 @@ export class MeiTag implements TMeiTag {
         return this.getChildByTagName(tagname)!
     }
 
-    toJsonElem(): TMeiJsonElemInput {
+    toJsonXmlElement(): TMeiJsonXmlElementInput {
         return {
             attributes: this.attributes,
-            children: this.children.map(ch => ch.toJsonElem()),
+            children: this.children.map(ch => ch.toJsonXmlElement()),
             tagTitle: this.tagTitle,
             selfClosing: this.selfClosing,
             ...this.textContent ? { textContent: this.textContent } : {}
