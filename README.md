@@ -3,7 +3,8 @@ Vue/Express.js web application for encoding early music tablature
 
 
 ## Experience the reTab
-Try reTab on https://tab.rezaseyedi.com with a guest account:
+Try reTab 
+ with a guest account:
 or contact reza.seyedi010@gmail.com if you want to use reTab with a personal account.
 
 #### username: guest
