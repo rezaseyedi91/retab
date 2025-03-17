@@ -2,7 +2,6 @@
     
     <DevTest>
         <!-- {{ (store.state.currentDoc as RezTabFile).docSettings.proportion }} -->
-
     </DevTest>
     <div class="p-4" v-if="isLoaded" ref="retabDocContainer">
         <!-- <va-button @click="debugSL">SL</va-button> -->
@@ -32,6 +31,7 @@ const props = defineProps<{
     id: string
 }>();
 const retabDocContainer = ref<HTMLElement>();
+
 class SelectionListener {
     selectedNotes: Note[] = []
     selectedNotesDuringCurrentDrag: Note[] = [];
@@ -347,8 +347,10 @@ const isLoaded = ref(false);
 const sl = ref(new SelectionListener(retabDocContainer.value!));
 const temp = ref(sl.value.selectionHighlighterXYs)
 onMounted(async () => {
+    console.log('wanna fetch')
     if(docId.value == 'new') initNewDocStuff()
     await fetchDoc(docId.value);
+    console.log('fetched', store.state.currentDoc)
     isLoaded.value = true;
     sl.value.setListeners();
 

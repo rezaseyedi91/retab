@@ -11,13 +11,15 @@ export default class RetabUser implements TUser {
     email?: string | undefined;
     username?: string | undefined;
 
-    static async getUser(username = 'defaultUser') {
-        const infoInDB = await DB.getInstance().user.upsert({
-            where: { username },
-            create: { username, name: 'DefaultUser' },
-            update: { username }
-        });
-        return new RetabUser().setInfo(infoInDB);
+    // static async getUser(username = 'defaultUser') {
+    static async getUser(id?:number) {
+        const userData = await DB.getInstance().user.findUniqueOrThrow({where: {id}})
+        // const userData = await DB.getInstance().user.upsert({
+        //     where: { username },
+        //     create: { username, name: 'DefaultUser' },
+        //     update: { username }
+        // });
+        return new RetabUser().setInfo(userData);
     }
 
     setInfo(info: TUser) {
@@ -64,6 +66,15 @@ export default class RetabUser implements TUser {
         const totalPages = Math.ceil(totalCount / perPage)
         return {
             docsList, totalPages
+        }
+    }
+
+    getSignInfo() {
+        return {
+            id: this.id,
+            username: this.username,
+            email: this.email,
+            name: this.name
         }
     }
 }

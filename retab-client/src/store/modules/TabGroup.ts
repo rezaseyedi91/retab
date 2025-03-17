@@ -203,8 +203,8 @@ export default class TabGroup extends MeiTag {
     }
 
 
-    setFetchedNotes(noteJsonElems: TMeiTagFactoryArgs[]) {
-        noteJsonElems.forEach(nje => {
+    setFetchedNotes(noteJsonXmlElements: TMeiTagFactoryArgs[]) {
+        noteJsonXmlElements.forEach(nje => {
             let course: number | undefined = undefined, fret: number | undefined = undefined, xmlId: string | undefined
             nje.attributes?.forEach(at => {
                 if (at.title == 'tab.course') course = Number(at.value)
@@ -219,7 +219,7 @@ export default class TabGroup extends MeiTag {
                 nje.attributes?.forEach(at => sameCourse.setAttribute(new MeiAttribute(at.title, at.value)))
             }
         })
-        // this.notes = noteJsonElems.map(n => Note.fromMeiFactoryArgs(this, n))
+        // this.notes = noteJsonXmlElements.map(n => Note.fromMeiFactoryArgs(this, n))
     }
     static fromMeiFactoryArgs(staff: Staff, arg: TMeiTagFactoryArgs) {
         const instance = new TabGroup(staff);

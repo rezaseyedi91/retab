@@ -13,6 +13,8 @@
           <template #center>
             <router-link to="/doc">
               <VaNavbarItem>
+                
+                {{ store.state.currentUser?.name }}
                 Docs
               </VaNavbarItem>
 
@@ -48,4 +50,6 @@
 import ConnectionChecker from '@/components/ConnectionChecker.vue';
 import DocPreferences from '@/components/RezTabDoc/DocPreferences/index.vue';
 import ShortkeysGuid from './ShortkeysGuid.vue';
+import { useStore } from 'vuex';
+const store = useStore();
 </script>

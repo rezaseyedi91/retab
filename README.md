@@ -32,7 +32,7 @@ create .env file with these environment variables: :
 
     PORT=4000
     MODE="development"
-    TAB_CLIENT_URL="http://localhsot:8080"
+    TAB_CLIENT_URL="http://localhost:8080"
 
     DATABASE_URL="mysql://root:reza3619454@localhost:3306/retab"
 

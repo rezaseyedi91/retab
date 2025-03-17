@@ -1,5 +1,5 @@
 import { MeiTag } from ".";
-import { IMeiAttribute, IMeiTag, MeiAttribute } from "../interfaces";
+import { IMeiAttribute, IMeiTag, MeiAttribute } from "./interfaces";
 
 export default class Layer extends MeiTag {
     n: number;

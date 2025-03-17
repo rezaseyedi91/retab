@@ -8,11 +8,15 @@ import RetabDoc from "../../../modules/retab-modules/RetabDoc";
 
 const router = Router();
 
+ 
 router.get('/get-all-saved', async (req, res) => {
     const page = Number(req.query.page)
     const perPage = Number(req.query.size || 20);
     const contains = req.query.search  as string || ""
-    const user = await RetabUser.getUser();
+    //@ts-ignore
+    const userId = req.userId as number;
+    const user = await RetabUser.getUser(userId);
+    console.log(user)
     const {docsList, totalPages} = await user.getSavedDocsList(page, perPage, contains);
     return res.json({
         docsList, totalPages
@@ -38,7 +42,10 @@ router.delete('/:id', async (req, res) => {
  /**save doc */
  router.post('/:id', async (req, res) => {
     const retabDoc = new RetabDoc();
-    const user = await RetabUser.getUser()
+    //@ts-ignore
+    const userId = req.userId
+    const user = await RetabUser.getUser(userId)
+
     const docInfo = req.body.docInfo
     retabDoc.setInfo({
         id: req.params.id == 'new' ? undefined : Number(req.params.id || 0) || undefined, 

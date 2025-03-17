@@ -1,5 +1,5 @@
-import { TMeiAttribute, TMeiTag } from "./db-types"
-import { MeiTag } from "./mei-tags"
+import { TMeiAttribute, TMeiTag } from "../db-types"
+import { MeiTag } from "."
 
 export interface IMeiTag extends TMeiTag {
     

@@ -1,7 +1,7 @@
 import { TTabCourseTuningInfo } from "./db-types";
 import Measure from "./Measure";
 import MeiAttribute from "./mei-modules/MeiAttribute";
-import MeiJSsonElem from "./mei-modules/MeiJsonElem";
+import MeiJSsonElem from "./mei-modules/MeiJsonXmlElement";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import Note from "./Note";
 import RezTabFile from "./RezTabFile";
@@ -93,8 +93,8 @@ export default class Section extends MeiTag {
         this.doc.docSettings.linesCount = this.info.staves[staffIndex].linesCount;
         
     }
-    initializeMeasures(measureJsonElems: TMeiTagFactoryArgs[]) {
-        this.measures = measureJsonElems.map(mje => Measure.fromMeiFactoryArgs(this, mje))
+    initializeMeasures(measureJsonXmlElements: TMeiTagFactoryArgs[]) {
+        this.measures = measureJsonXmlElements.map(mje => Measure.fromMeiFactoryArgs(this, mje))
         
         return this;
     }
@@ -137,9 +137,9 @@ export default class Section extends MeiTag {
     cleanupChildren() {
         this.measures.forEach(m => m.cleanupTabGroups())
     }
-    toJsonElem(): MeiJSsonElem {
+    toJsonXmlElement(): MeiJSsonElem {
         this.cleanupChildren();
-        return super.toJsonElem()
+        return super.toJsonXmlElement()
     }
 
     removeMeasure(m: Measure) {

@@ -1,5 +1,5 @@
 import { TMeiTag } from "../db-types";
-import { MeiAttribute } from "../interfaces";
+import { MeiAttribute } from "./interfaces";
 import { MeiTag } from ".";
 import RetabDoc from "../retab-modules/RetabDoc";
 export enum NotePname {

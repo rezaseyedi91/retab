@@ -1,13 +1,14 @@
 <template>
-  <div>
+  <PanelLayout>
     <RezTabDoc :id="($router.currentRoute.value.params.id as string)" />
     <MeiGenerator />
     <va-button color="#a855f7" class="p-3 bg-purple-500 font-bold cursor-pointer" @click="addMeasure">Add Measure</va-button>
-  </div>
+  </PanelLayout>
 </template>
 
 <script lang="ts" setup>
 import MeiGenerator from '@/components/MeiGenerator.vue';
+import PanelLayout from '@/components/PanelLayout.vue';
 import RezTabDoc from '@/components/RezTabDoc/indexDoc.vue'
 import RezTabFile from '@/store/modules/RezTabFile';
 import { onMounted } from 'vue';

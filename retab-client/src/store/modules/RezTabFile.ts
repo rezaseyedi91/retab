@@ -87,11 +87,11 @@ export default class RezTabFile {
          */
         // this.cleanupTabGroups();
         const section = this.section
-        const jsonElem = await MeiDocGenerator.generateJsomElem(section);
+        const jsonXmlElement = await MeiDocGenerator.generateJsomElem(section);
 
-        const headJsonElem = this.head ? await MeiDocGenerator.generateJsomElem(this.head) : undefined;
+        const headJsonXmlElement = this.head ? await MeiDocGenerator.generateJsomElem(this.head) : undefined;
         // return ;
-        const jsonElemParsed = JSON.parse(JSON.stringify(jsonElem));
+        const jsonXmlElementParsed = JSON.parse(JSON.stringify(jsonXmlElement));
         const stavesInfo = this.section.getStavesInfo()
         // const options = {
         //    tuning: stavesInfo[0].tuning
@@ -114,9 +114,9 @@ export default class RezTabFile {
             ...this.info
         }
         const reqBody = {
-            sectionJsonElem: jsonElemParsed,
+            sectionJsonXmlElement: jsonXmlElementParsed,
             docId: this.id,
-            headJsonElem: headJsonElem,
+            headJsonXmlElement: headJsonXmlElement,
             docInfo,
             docSettings: this.docSettings
         }
@@ -137,8 +137,8 @@ export default class RezTabFile {
         })
         doc.id = someResponse.id;
         doc.setLinesCount(someResponse.stavesInfo[0].tuning.length)
-        doc.initializeSection(someResponse.sectionJsonElem, someResponse.stavesInfo)
-        doc.initializeHead(someResponse.headJsonElem);
+        doc.initializeSection(someResponse.sectionJsonXmlElement, someResponse.stavesInfo)
+        doc.initializeHead(someResponse.headJsonXmlElement);
         doc.unfreeze()
         if (someResponse.settings) doc.assignSettings(someResponse.settings)
         return doc

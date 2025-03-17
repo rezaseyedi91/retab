@@ -1,7 +1,7 @@
 import DB from "../../modules/DB";
 import { TMeiJsonXmlElementInput } from "../mei-adapters/TabIdeaDocGenerator";
 import { TMeiAttribute, TMeiTag, TRetabDoc } from "../db-types";
-import { MeiAttribute } from "../interfaces";
+import { MeiAttribute } from "./interfaces";
 import RetabDoc from "../retab-modules/RetabDoc";
 
 export type TMeiTagFactoryArgs = {

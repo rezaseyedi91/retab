@@ -1,6 +1,6 @@
 import { MeiTag } from ".";
 import { TMeiTag } from "../db-types";
-import { IMeiTag, MeiAttribute } from "../interfaces";
+import { IMeiTag, MeiAttribute } from "./interfaces";
 
 export default class MeiMainTag extends MeiTag implements TMeiTag {
     static XMLNS = 'http://www.music-encoding.org/ns/mei'

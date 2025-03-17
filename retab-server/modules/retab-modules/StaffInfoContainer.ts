@@ -1,6 +1,6 @@
 import DB from "../DB";
 import { TDocSettings, TInstrument, TRetabDoc, TStaffInfo, TTabCourseTuningInfo } from "../db-types";
-import { MeiAttribute } from "../interfaces";
+import { MeiAttribute } from "../mei-tags/interfaces";
 import { MeiTag } from "../mei-tags";
 import TabNote, { AccidedNotePname } from "../mei-tags/TabNote";
 

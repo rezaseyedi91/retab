@@ -1,4 +1,4 @@
-import { MeiAttribute } from "../interfaces";
+import { MeiAttribute } from "../mei-tags/interfaces";
 import { MeiTag, MeiTagInstance } from "../mei-tags";
 import Layer from "../mei-tags/Layer";
 import Measure from "../mei-tags/Measure";

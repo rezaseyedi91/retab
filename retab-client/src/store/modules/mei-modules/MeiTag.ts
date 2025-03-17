@@ -1,5 +1,5 @@
 import MeiAttribute from "./MeiAttribute";
-import MeiJSsonElem from "./MeiJsonElem";
+import MeiJSsonElem from "./MeiJsonXmlElement";
 
 
 export type TMeiTagFactoryArgs = {
@@ -11,13 +11,13 @@ export type TMeiTagFactoryArgs = {
 }
 export default abstract class MeiTag {
     xmlId?: string;
-    toJsonElem(): MeiJSsonElem {
+    toJsonXmlElement(): MeiJSsonElem {
         this.updateChildren();
         this.setAttributes();
         return new MeiJSsonElem({
             tagTitle: this.tagTitle,
             attributes: this.attributes,
-            children: this.children.map(ch => ch.toJsonElem()),
+            children: this.children.map(ch => ch.toJsonXmlElement()),
             textContent: this.textContent,
             selfClosing: this.selfClosing
         })

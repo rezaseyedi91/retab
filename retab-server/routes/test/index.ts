@@ -3,9 +3,17 @@ import { Router } from "express";
 import { getInstance as getVerovioToolkitInstance } from '../../modules/mei-adapters/VerovioToolkitInstance'
 import { promises, readFile } from "fs";
 import retabTestRouter from './retab'
+import Authenticator from "../../modules/Authenticator";
 const router = Router();
 
 router.get('/dbman', async (req, res) => {
+    const auth = new Authenticator();
+    const user = await auth.singup({
+        username: 'guest', password: 'retabguest@123',
+        name: 'Guest User', 
+    });
+
+    return res.send(user)
 })
 router.use('/retab', retabTestRouter)
 // router.use('/get-midi', getMidiRouter)

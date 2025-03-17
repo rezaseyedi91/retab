@@ -1,5 +1,5 @@
 import { MeiTag } from ".";
-import { IMeiAttribute, IMeiTag } from "../interfaces";
+import { IMeiAttribute, IMeiTag } from "./interfaces";
 import Layer from "./Layer";
 
 export default class Staff extends MeiTag {

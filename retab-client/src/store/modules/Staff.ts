@@ -2,7 +2,7 @@ import { useStore } from "vuex";
 import store from "..";
 import Measure from "./Measure"
 import MeiAttribute from "./mei-modules/MeiAttribute";
-import MeiJSsonElem from "./mei-modules/MeiJsonElem";
+import MeiJSsonElem from "./mei-modules/MeiJsonXmlElement";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import RezTabFile from "./RezTabFile";
 import TabGroup from "./TabGroup";
@@ -119,9 +119,9 @@ export default class Staff extends MeiTag {
                 return new StaffLine(this,   {number, tuning: foundTuning} )})
 
     }
-    initializeTabgroups(tabGroupJsonElems: TMeiTagFactoryArgs[]) {
+    initializeTabgroups(tabGroupJsonXmlElements: TMeiTagFactoryArgs[]) {
         if (!this.lines.length) this.initLines();
-        this.tabGroups = tabGroupJsonElems.map(tje => {
+        this.tabGroups = tabGroupJsonXmlElements.map(tje => {
             return TabGroup.fromMeiFactoryArgs(this, tje)
         })
 
@@ -170,8 +170,8 @@ export default class Staff extends MeiTag {
     cleanupTabGroups() {
         this.tabGroups.forEach(tg => tg.cleanup());
     }
-    toJsonElem(): MeiJSsonElem {
-        const superResult = super.toJsonElem();
+    toJsonXmlElement(): MeiJSsonElem {
+        const superResult = super.toJsonXmlElement();
         superResult.children = [
             new MeiJSsonElem({
                 attributes: [new MeiAttribute('n', 1)],

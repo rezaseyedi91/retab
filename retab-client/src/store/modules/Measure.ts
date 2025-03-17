@@ -37,11 +37,11 @@ export default class Measure extends MeiTag {
         this.n = n
 
     }
-    initializeStaves(staffJsonElems?: TMeiTagFactoryArgs[]) {
-        if (!staffJsonElems) this.addStaff();
+    initializeStaves(staffJsonXmlElements?: TMeiTagFactoryArgs[]) {
+        if (!staffJsonXmlElements) this.addStaff();
         else {
             
-            this.staves = staffJsonElems.map(sje => Staff.fromMeiFactoryArgs(this, sje))
+            this.staves = staffJsonXmlElements.map(sje => Staff.fromMeiFactoryArgs(this, sje))
         }
         return this;
 

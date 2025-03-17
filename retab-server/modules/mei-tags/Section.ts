@@ -1,5 +1,5 @@
 import { MeiTag } from ".";
-import { IMeiAttribute, IMeiTag, MeiAttribute } from "../interfaces";
+import { IMeiAttribute, IMeiTag, MeiAttribute } from "./interfaces";
 import Layer from "./Layer";
 import Measure from "./Measure";
 import Staff from "./Staff";

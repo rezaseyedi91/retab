@@ -24,7 +24,7 @@
 
 class MeiTag {
     xmlId?: string;
-    toJsonElem(): MeiJSsonElem 
+    toJsonXmlElement(): MeiJSsonElem 
     selfClosing?: boolean
     children: MeiTag[] 
     tagTitle: string

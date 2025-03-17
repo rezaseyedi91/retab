@@ -1,6 +1,6 @@
 import DB from "../DB";
 import { TDocSettings, TRetabDoc, TTabCourseTuningInfo, TUser } from "../db-types";
-import { MeiAttribute } from "../interfaces";
+import { MeiAttribute } from "../mei-tags/interfaces";
 import TabIdeaDocGenerator from "../mei-adapters/TabIdeaDocGenerator";
 import { MeiTag } from "../mei-tags";
 import MeiMainTag from "../mei-tags/MeiMainTag";

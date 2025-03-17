@@ -1,4 +1,9 @@
 
+    declare namespace Express {
+        export interface Request {
+            userId?: number
+        }
+ }
 export type RhythmFiguresQuery = {
     timeSig?: string // 3-4
     bars?: number;

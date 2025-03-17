@@ -1,7 +1,7 @@
 import MeiAttribute from "./MeiAttribute";
 
 
-type TMeiJsonElemInput = {
+type TMeiJsonXmlElementInput = {
     attributes: MeiAttribute[]
     tagTitle: string;
     children: MeiJSsonElem[];
@@ -15,7 +15,7 @@ export default class MeiJSsonElem {
     textContent?: string
     selfClosing?: boolean
     children: MeiJSsonElem[] = [];
-    constructor(data: TMeiJsonElemInput) {
+    constructor(data: TMeiJsonXmlElementInput) {
         this.tagTitle = data.tagTitle;
 
         this.children = data.children;

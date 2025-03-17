@@ -7,6 +7,8 @@ import ContextMenu from './store/modules/ui/ContextMenu'
 import 'vuestic-ui/styles/essential.css';
 import 'vuestic-ui/styles/typography.css';
 import { createVuestic } from 'vuestic-ui'
+import axios from 'axios'
+Object.assign(axios.defaults, { withCredentials: true });
 createApp(App).use(store).use(createVuestic({
 
     config: {

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import retabRouter from './retab'
-import loginRouter from './login'
+
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -12,8 +12,9 @@ router.get('/', async (req, res) => {
         res.send('err happened')
     }
 })
+
 router.use('/retab', retabRouter)
-router.use('/login', loginRouter)
+
 
 
 export default router

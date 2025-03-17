@@ -1,7 +1,5 @@
 <template>
     <div class="md:p-16 flex justify-center items-center">
-
-
         <va-card class="w-fit">
             <va-card-header>
                 <va-card-title>
@@ -10,8 +8,14 @@
             </va-card-header>
             <va-card-content>
                 <div class="grid gap-4 justify-center">
-                    <va-input name="email" label="email" type="email" v-model="email"></va-input>
-                    <va-input name="password" label="password" type="password" v-model="password"></va-input>
+                    <va-input name="username" label="username" type="username" v-model="username"></va-input>
+                    <VaInput v-model="password" :type="isPasswordVisible ? 'text' : 'password'"
+                        label="Password" @click-append-inner="isPasswordVisible = !isPasswordVisible">
+                        <template #appendInner>
+                            <VaIcon :name="isPasswordVisible ? 'visibility_off' : 'visibility'" size="small"
+                                color="primary" />
+                        </template>
+                    </VaInput>
                     <va-button @click="login">Login</va-button>
                 </div>
             </va-card-content>
@@ -23,20 +27,44 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useToast } from 'vuestic-ui/web-components';
 import { useStore } from 'vuex';
-
-    const email = ref('')
-    const password = ref('')
-    const store = useStore();
+const isPasswordVisible = ref(false)
+const username = ref('')
+const password = ref('')
+const store = useStore();
+const toast = useToast();
+const router = useRouter();
 async function login() {
 
     const formData = new FormData();
 
 
-    formData.append('email', email.value);
+    formData.append('username', username.value);
     formData.append('password', password.value);
-    console.log(email.value, password.value)
-    const result = await axios.post(store.state.apiUrl + '/login', formData)
+    
+    axios.post(store.state.apiUrl + '/retab/auth/login', formData, {withCredentials: true})
+    .then(r => {
+        toast.init({
+            message: 'Logged in successfully',
+            color: 'success',
+            position: 'bottom-right'
+        })
+
+        store.state.currentUser = r.data;
+        router.push({path: '/doc'})
+    })
+    .catch(err => {
+        console.log(err)
+        toast.init({
+            color: 'danger',
+            position: 'bottom-right',
+            message: err.response?.data
+        })
+    })
+
+
 }
 
 </script>
