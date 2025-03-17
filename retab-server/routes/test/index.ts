@@ -8,12 +8,18 @@ const router = Router();
 
 router.get('/dbman', async (req, res) => {
     const auth = new Authenticator();
-    const user = await auth.singup({
-        username: 'guest', password: 'retabguest@123',
-        name: 'Guest User', 
-    });
+    try {
 
-    return res.send(user)
+        const user = await auth.singup({
+            username: 'ailin.arjmand', password: 'ailin.arjmand',
+            name: 'Ailin Arjmand', 
+            
+        });
+        return res.send(user) 
+    } catch(err) {
+        console.log(err)
+        res.send('error logged')
+    }
 })
 router.use('/retab', retabTestRouter)
 // router.use('/get-midi', getMidiRouter)

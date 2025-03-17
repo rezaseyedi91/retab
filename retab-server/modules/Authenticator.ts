@@ -26,6 +26,7 @@ export default class Authenticator {
         })
         if (alreadyThere) throw new Error('user already Exists');
         const hashedPassword  = bcrypt.hashSync(info.password!, Authenticator.SALT_SIZE);
+        console.log(hashedPassword)
         const savedUser = await prisma.user.upsert({
             where :{
                 username:  info.username || info.email!,
