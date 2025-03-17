@@ -35,7 +35,7 @@ create .env file with these environment variables: :
     MODE="development"
     TAB_CLIENT_URL="http://localhsot:8080"
 
-    DATABASE_URL="mysql://root:reza3619454@localhost:3306/retab"
+    DATABASE_URL="mysql://username:password@localhost:3306/dbname"
 
 then run: 
 
