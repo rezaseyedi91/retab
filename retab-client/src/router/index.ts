@@ -7,6 +7,12 @@ const routes: Array<RouteRecordRaw> = [
     // redirect: '/first-idea'
     redirect: '/doc'
   },
+  {
+    path: '/login',
+    component: () => import('@/views/Login.vue')
+    // redirect: '/first-idea'
+    // redirect: ''
+  },
 
 
   {

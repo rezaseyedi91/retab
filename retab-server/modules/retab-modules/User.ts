@@ -3,6 +3,8 @@ import DB from "../DB";
 import { TRetabDoc, TUser } from "../db-types";
 
 export default class RetabUser implements TUser {
+
+    
     docs?: TRetabDoc[] | undefined;
     id?: number | undefined;
     name?: string | undefined;

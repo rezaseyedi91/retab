@@ -3,6 +3,8 @@ import docRouter from './doc'
 import tuningPresetsRouter from './tuning-presets'
 import DB from "../../modules/DB";
 const router = Router(); 
+import authMiddleware from '../../miiddleware/auth'
+router.use('*', authMiddleware)
 router.use('/doc', docRouter)
 router.use('/tuning-presets', tuningPresetsRouter)
 router.get('/test', async (req, res) => {
