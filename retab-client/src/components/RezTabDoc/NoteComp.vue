@@ -54,7 +54,7 @@ function onSpace() {
   }, 50)
 }
 onMounted(() => {
-  note.value.setupEl();
+  note.value?.setupEl();
 })
 onUpdated(() => {
   // 

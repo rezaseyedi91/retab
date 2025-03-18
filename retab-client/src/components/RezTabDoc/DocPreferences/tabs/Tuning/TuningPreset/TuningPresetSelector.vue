@@ -32,10 +32,9 @@ onMounted(async () => {
 })
 const store = useStore();
 async function setTuning(tuningPrest: TTuningPreset) {
-    const newLength = tuningPrest.tuning?.length || 0;
-    console.log(arguments)
+    // const newLength = tuningPrest.tuning?.length || 0;
     const doc = store.state.currentDoc as RezTabFile;
-    const oldLength = doc.section.info.staves[props.staffIndex].tuning?.length || 0;
+    // const oldLength = doc.section.info.staves[props.staffIndex].tuning?.length || 0;
     
     // if (newLength < oldLength)  {
     //     const staffLineNsToRemove =  doc.section.info.staves[props.staffIndex].tuning?.slice(newLength).map(i => i.n) || [];
@@ -45,7 +44,6 @@ async function setTuning(tuningPrest: TTuningPreset) {
     //         doc.section.removeLineFromStaff(props.staffIndex, lineN)
     //         console.log('removed')
     //     }
-    //     // staffNsToRemove?.forEach(staffN => doc.section.removeLineFromStaff(props.staffIndex, staffN))
     // }
     tuningPrest.tuning?.forEach(course => {
         const found = doc.section.info.staves[props.staffIndex].tuning?.find(staffLineTuning => staffLineTuning.n == course.n);
@@ -59,9 +57,6 @@ async function setTuning(tuningPrest: TTuningPreset) {
         }
 
     })
-
-    console.log({newLength, oldLength})
-
 
 }
 

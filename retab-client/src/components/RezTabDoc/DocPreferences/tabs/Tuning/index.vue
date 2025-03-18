@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <!-- <TuningPresetSelector :staffIndex="0" @addStaffLine="addStaffLine"/> -->
+        <TuningPresetSelector :staffIndex="0" @addStaffLine="addStaffLine"/>
         <div class="xl:w-1/2 justify-start flex-col">
             <!-- <StaffLineTuning v-for="(staffLine, index) in store.state.currentDoc.section.measures[0].staves[0].lines" -->
             <StaffLineTuning v-for="(staffLine, index) in store.state.currentDoc.section.measures[0].staves[0].lines"
