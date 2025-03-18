@@ -31,9 +31,22 @@ onMounted(async () => {
 
 })
 const store = useStore();
-function setTuning(tuningPrest: TTuningPreset) {
+async function setTuning(tuningPrest: TTuningPreset) {
+    const newLength = tuningPrest.tuning?.length || 0;
     console.log(arguments)
     const doc = store.state.currentDoc as RezTabFile;
+    const oldLength = doc.section.info.staves[props.staffIndex].tuning?.length || 0;
+    
+    // if (newLength < oldLength)  {
+    //     const staffLineNsToRemove =  doc.section.info.staves[props.staffIndex].tuning?.slice(newLength).map(i => i.n) || [];
+    //     console.log(staffLineNsToRemove);
+    //     for (const lineN of staffLineNsToRemove) {
+    //         await new Promise(r => setTimeout(r, 50))
+    //         doc.section.removeLineFromStaff(props.staffIndex, lineN)
+    //         console.log('removed')
+    //     }
+    //     // staffNsToRemove?.forEach(staffN => doc.section.removeLineFromStaff(props.staffIndex, staffN))
+    // }
     tuningPrest.tuning?.forEach(course => {
         const found = doc.section.info.staves[props.staffIndex].tuning?.find(staffLineTuning => staffLineTuning.n == course.n);
         console.log(found)
@@ -41,10 +54,14 @@ function setTuning(tuningPrest: TTuningPreset) {
             found.pname = course.pname;
             found.oct = course.oct
         } else {
-            emits('addStaffLine', tuningPrest)
+            console.log('else')
+            emits('addStaffLine', course)
         }
 
     })
+
+    console.log({newLength, oldLength})
+
 
 }
 

@@ -149,7 +149,8 @@ export default class RetabDoc implements TRetabDoc {
     }
 
     async save() {
-        const user = await RetabUser.getUser();
+        const TEMP_USER_ID_FOR_GUEST = 2
+        const user = await RetabUser.getUser(TEMP_USER_ID_FOR_GUEST);
         const savedInfo = await this.initializeFileInDb({
             userId: user.id,
             title: this.title,

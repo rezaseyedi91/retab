@@ -120,6 +120,7 @@ export default class RezTabFile {
             docInfo,
             docSettings: this.docSettings
         }
+        
         const jsonResult = await axios.post(process.env.VUE_APP_API_URL + '/retab/doc/' + (this.id || 'new'), reqBody)
         return jsonResult.data
     }

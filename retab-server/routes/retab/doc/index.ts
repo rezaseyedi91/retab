@@ -10,6 +10,7 @@ const router = Router();
 
  
 router.get('/get-all-saved', async (req, res) => {
+
     const page = Number(req.query.page)
     const perPage = Number(req.query.size || 20);
     const contains = req.query.search  as string || ""
@@ -41,9 +42,14 @@ router.delete('/:id', async (req, res) => {
 })
  /**save doc */
  router.post('/:id', async (req, res) => {
+    try {
+
+
     const retabDoc = new RetabDoc();
     //@ts-ignore
     const userId = req.userId
+    console.log({userId})
+    if (!userId) throw new Error('no user id')
     const user = await RetabUser.getUser(userId)
 
     const docInfo = req.body.docInfo
@@ -64,5 +70,10 @@ router.delete('/:id', async (req, res) => {
     retabDoc.setStavesInfo(retabDoc.stavesInfo)
     await retabDoc.save();
     return res.json({id: retabDoc.id})
+} catch(err) {
+    console.log(err)
+        //@ts-ignore
+    console.log(req.userId)
+}
  })
 export default router

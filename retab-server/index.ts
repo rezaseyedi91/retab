@@ -27,8 +27,9 @@ const app = express();
         app.use(cookieParser())
         app.use(cors({
             credentials: true,
-            origin: [process.env.TAB_CLIENT_URL!], allowedHeaders: [`Access-Control-Allow-Origin: '${process.env.TAB_CLIENT_URL!}'`]
-        }))
+            origin: [process.env.TAB_CLIENT_URL!], 
+            // allowedHeaders: [`Access-Control-Allow-Origin: '${process.env.TAB_CLIENT_URL!}'`]
+        })) 
         app.use('/test', testRouter)
         app.use('/', indexRouter)
         app.get('/', (req, res) => {

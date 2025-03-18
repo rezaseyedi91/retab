@@ -12,7 +12,8 @@ export default class RetabUser implements TUser {
     username?: string | undefined;
 
     // static async getUser(username = 'defaultUser') {
-    static async getUser(id?:number) {
+    static async getUser(id:number) {
+        
         const userData = await DB.getInstance().user.findUniqueOrThrow({where: {id}})
         // const userData = await DB.getInstance().user.upsert({
         //     where: { username },

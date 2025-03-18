@@ -106,6 +106,10 @@ export default class Section extends MeiTag {
         this.info.staves[staffIndex || 0].linesCount--;
         this.doc.docSettings.linesCount = this.info.staves[staffIndex || 0].linesCount;
         this.info.staves[staffIndex].linesCount--;
+        // const tuningInStavesInfo = this.getStavesInfo()[staffIndex].tuning?.find(si => si.n == lineN)
+        // if (tuningInStavesInfo ) {
+        //     this.info.staves[staffIndex].tuning?.splice(this.info.staves[staffIndex].tuning?.indexOf(tuningInStavesInfo),1)
+        // }
         const t = this.doc.getTuning(staffIndex)
         const splicedTuning = t?.splice(t.indexOf(t.find(l => l.n == lineN)!), 1)
         this.setTuning(t!)
