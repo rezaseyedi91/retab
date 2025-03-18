@@ -1,14 +1,14 @@
-# retab
+# ReTab
 Vue/Express.js web application for encoding early music tablature
 
 
-## Experience the reTab
-Try reTab https://tab.rezaseyedi.com
+## Experience the ReTab
+Try ReTab https://tab.rezaseyedi.com
  with a guest account:
 -    username: guest
 -    password: retabguest@123
 
-or contact reza.seyedi010@gmail.com if you want to use reTab with a personal account.
+or contact reza.seyedi010@gmail.com if you want to use ReTab with a personal account.
 
 
 
