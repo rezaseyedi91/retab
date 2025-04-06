@@ -56,7 +56,7 @@ async function login() {
         router.push({path: '/doc'})
     })
     .catch(err => {
-        console.log(err)
+        
         toast.init({
             color: 'danger',
             position: 'bottom-right',

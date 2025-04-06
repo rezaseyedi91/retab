@@ -153,7 +153,7 @@ export default class RezTabFile {
         this.docSettings.proportion.sign = (settings.proportionSign || this.docSettings.proportion.sign) as this["docSettings"]["proportion"]["sign"]
         this.docSettings.proportion.slash = (settings.proportionSlash || this.docSettings.proportion.slash) as this["docSettings"]["proportion"]["slash"]
         this.docSettings.tabgroupsIncludeDurAttribute = settings.tabgroupsIncludeDurAttribute || this.docSettings.tabgroupsIncludeDurAttribute
-        console.log(this.docSettings.proportion)
+        
     }
     getAltTitle() {
         return this.head?.__('fileDesc').__('titleStmt').__('title[type=Alternative]')?.textContent

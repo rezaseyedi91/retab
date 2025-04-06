@@ -1,5 +1,5 @@
 <template>
-    <div v-if="store.state.isDev">
+    <div class="my-5" v-if="store.state.isDev">
         <slot/>
     </div>
 </template>

@@ -10,7 +10,7 @@
             <va-input color="white" label="oct" class="w-12 text-center" type="text" v-model="tuning.oct"
                 placeholder="oct" />
             <button class="flex items-center fill-red-400 text-red-900 opacity-50 cursor-pointer hover:opacity-60"
-                @click="removeStaffLine">
+                @click="$emit('removeStaffLine', staffIndex, staffLineN)">
                 <XMarkIcon class="w-8 self-center" />
             </button>
         </div>
@@ -25,13 +25,11 @@ import { XMarkIcon } from '@heroicons/vue/24/solid';
 import { useStore } from 'vuex';
 
 const props = defineProps<{
-    tuning?: TabCourseTuningInfo, staffLineN: number
+    tuning?: TabCourseTuningInfo, staffLineN: number,
+    staffIndex: number
 }>()
 
 const store = useStore();
-function removeStaffLine() {
-    (store.state.currentDoc as RezTabFile).section.removeLineFromStaff(0, props.staffLineN)
-    store.state.currentDoc.unfreeze()
-}
+const emits = defineEmits(['removeStaffLine'])
 
 </script>

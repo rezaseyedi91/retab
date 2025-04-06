@@ -50,6 +50,7 @@ export default class Section extends MeiTag {
     }
 
     getStavesInfo() {
+        console.log('getting staves info', this.info.staves)
         return this.info.staves
         
         return this.info.staves.map((s, index) => ({...s,  tuning: this.measures[0].staves[index].lines.map(sl => sl.tuning)})).map(i => {
@@ -98,21 +99,27 @@ export default class Section extends MeiTag {
         
         return this;
     }
-   setTuning(tuning: TabCourseTuningInfo[], staffIndex = 0) {
+   setTuning(tuning: TabCourseTuningInfo[], staffIndex: number) {
         this.info.staves[staffIndex].tuning = tuning
    }
     removeLineFromStaff(staffIndex = 0, lineN: number) {
         this.measures.forEach(m => m.staves[staffIndex].removeLine(lineN));
-        this.info.staves[staffIndex || 0].linesCount--;
-        this.doc.docSettings.linesCount = this.info.staves[staffIndex || 0].linesCount;
-        this.info.staves[staffIndex].linesCount--;
+        // this.info.staves[staffIndex].linesCount--;
+        const currentTuningIndex = this.info.staves[staffIndex].tuning?.indexOf(this.info.staves[staffIndex].tuning.find(t => t.n == lineN)!);
+        console.log({currentTuningIndex})
+        if (typeof currentTuningIndex == 'number') this.info.staves[staffIndex].tuning?.splice(currentTuningIndex, 1)
+        this.info.staves[staffIndex].linesCount = this.info.staves[staffIndex].tuning?.length || this.info.staves[staffIndex].linesCount - 1 
+        this.doc.docSettings.linesCount = this.info.staves[staffIndex].linesCount;
+        this.info.staves[staffIndex].tuning = this.info.staves[staffIndex].tuning?.sort((a, b) => a.n - b.n).map((t, index) => ({...t, n: index + 1}))
+        // this.info.staves[staffIndex].linesCount--;
         // const tuningInStavesInfo = this.getStavesInfo()[staffIndex].tuning?.find(si => si.n == lineN)
         // if (tuningInStavesInfo ) {
         //     this.info.staves[staffIndex].tuning?.splice(this.info.staves[staffIndex].tuning?.indexOf(tuningInStavesInfo),1)
         // }
         const t = this.doc.getTuning(staffIndex)
-        const splicedTuning = t?.splice(t.indexOf(t.find(l => l.n == lineN)!), 1)
-        this.setTuning(t!)
+        console.log(t?.length)
+        // const splicedTuning = t?.splice(t.indexOf(t.find(l => l.n == lineN)!), 1)
+        this.setTuning(t!, staffIndex)
     }
     updateChildren(): MeiTag {
         this.children = this.measures.map(m => m.updateChildren());

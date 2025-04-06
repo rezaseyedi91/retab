@@ -77,7 +77,7 @@ function keydown(event: KeyboardEvent) {
   
 }
 function onNoteInputFocus() {
-  // console.log(props.tabGroup.showLedgerLines(props.line.courseInfo.number))
+  // 
   return;
 }
 

@@ -347,10 +347,10 @@ const isLoaded = ref(false);
 const sl = ref(new SelectionListener(retabDocContainer.value!));
 const temp = ref(sl.value.selectionHighlighterXYs)
 onMounted(async () => {
-    console.log('wanna fetch')
+    
     if(docId.value == 'new') initNewDocStuff()
     await fetchDoc(docId.value);
-    console.log('fetched', store.state.currentDoc)
+    
     isLoaded.value = true;
     sl.value.setListeners();
 

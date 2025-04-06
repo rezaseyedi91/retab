@@ -36,10 +36,10 @@ const router = createRouter({
   routes
 })
 router.beforeEach(async (to, from) => {
-  console.log(to.name)
+  
   if (to.name == 'login') return true;
   const authenticatedUser = (await axios.get(store.state.apiUrl + '/retab/auth', {withCredentials: true})).data
-  console.log(authenticatedUser)
+  
   if (!authenticatedUser) {
     // throw new Error('YOU HAVE TO LOG IN FIRST!');
     router.push('/Login')
@@ -47,7 +47,7 @@ router.beforeEach(async (to, from) => {
   else {
     Object.assign(store.state, {currentUser: authenticatedUser})
     //@ts-ignore
-    console.log(store.state.currentUser!)
+    
     return true
   }
 })
