@@ -11,8 +11,11 @@ router.get('/dbman', async (req, res) => {
     try {
 
         const user = await auth.singup({
-            username: 'ailin.arjmand', password: 'ailin.arjmand',
-            name: 'Ailin Arjmand', 
+            // username: 'ailin.arjmand', password: 'ailin.arjmand',
+            // name: 'Ailin Arjmand', 
+            
+            username: 'rez', password: 'rez',
+            name: 'Reza Seyedi', 
             
         });
         return res.send(user) 

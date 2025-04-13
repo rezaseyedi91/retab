@@ -106,8 +106,8 @@ export default class TabGroup extends MeiTag {
         if (alreadyThere) this.notes.splice(this.notes.indexOf(alreadyThere), 1, n)
         else this.notes.push(n)
     }
-    clone(): TabGroup {
-        const tg = new TabGroup(this.staff);
+    clone(staff?: Staff): TabGroup {
+        const tg = new TabGroup(staff || this.staff);
         tg.setDur(this.dur);
         this.notes.forEach((n, index, notes) => {
             if (n.isThere()) {

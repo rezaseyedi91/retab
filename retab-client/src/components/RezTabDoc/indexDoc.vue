@@ -257,7 +257,8 @@ class SelectionListener {
     }
     pasteTabgroups() {
         let anchorNote = this.getAnchorNote();
-
+        const anchorNoteMeasureN = anchorNote?.tabGroup.staff.measure.n
+        console.log(anchorNoteMeasureN)
         const cb = [...this.clipboard];
         const tabGroups = cb.map(n => n.tabGroup).filter((i, idx, arr) => arr.indexOf(i) == idx);
 
@@ -265,7 +266,7 @@ class SelectionListener {
             const tg = tabGroups.shift();
 
             // const newTg = anchorNote?.tabGroup.insertTabgroupAfter();
-            const newTg = tg?.clone();
+            const newTg = tg?.clone(anchorNote?.tabGroup.staff);
             anchorNote?.tabGroup.insertTabgroupAfter(newTg)
             // tg?.notes.filter(n => n.isThere()).forEach(n => newTg?.addNote({course: n.course, fret: n.fret}))
             anchorNote = newTg?.notes.find(n => n.isThere())

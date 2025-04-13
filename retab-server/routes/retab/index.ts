@@ -4,7 +4,7 @@ import tuningPresetsRouter from './tuning-presets'
 import DB from "../../modules/DB";
 import authRouter from './auth'
 const router = Router(); 
-import authMiddleware from '../../miiddleware/auth'
+import authMiddleware from '../../middleware/auth'
 router.use('*', authMiddleware)
 router.use('/doc', docRouter)
 router.use('/tuning-presets', tuningPresetsRouter)

@@ -9,12 +9,12 @@ router.post('/login', async (req, res) => {
     if (!userInfo.username || !userInfo.password) throw new Error('Username and password must be provided.')
         const user = await new Authenticator().login(userInfo.username, userInfo.password);
         const token = jwt.sign(user.getSignInfo(), process.env.SECRET_KEY || '');
-        console.log(user)
+        
         res.cookie('x-access-token', token).send(user);
 
     } catch(err: any) {
-        if (process.env.MODE == 'development') throw err
-        else res.status(401).send(err?.message)
+        // if (process.env.MODE == 'development') throw err  ; else 
+        res.status(401).send(err?.message)
     }
     
 

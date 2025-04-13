@@ -107,7 +107,7 @@ export default class RezTabFile {
         };
         // LOOK AT THE ABOVE!
         this.info.title = this.head?.getWorkTitle()
-
+        this.info.altTitle = this.getAltTitle()
         const docInfo: TRetabDocDBType = {
             stavesInfo: this.section.getStavesInfo(),
 
@@ -157,7 +157,6 @@ export default class RezTabFile {
     }
     getAltTitle() {
         return this.head?.__('fileDesc').__('titleStmt').__('title[type=Alternative]')?.textContent
-
     }
     setLinesCount(count: number, staffIndex = 0) {
         this.docSettings.linesCount = count;

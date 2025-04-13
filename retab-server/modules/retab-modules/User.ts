@@ -43,7 +43,7 @@ export default class RetabUser implements TUser {
 
 
                     ]
-                }]
+                }] 
             ]
         }
         const [docsList, totalCount] = await prisma.$transaction([
@@ -52,9 +52,11 @@ export default class RetabUser implements TUser {
                 select: {
                     id: true,
                     title: true,
+                    altTitle: true,
                     filename: true,
                     createdAt: true,
                     lastModifiedAt: true,
+                    
                 },
                 take: perPage,
                 skip: (page - 1) * perPage,

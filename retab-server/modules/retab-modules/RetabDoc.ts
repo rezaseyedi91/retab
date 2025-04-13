@@ -20,7 +20,7 @@ export default class RetabDoc implements TRetabDoc {
     user?: TUser | undefined;
     createdAt?: string | Date | undefined;
     filename?: string | undefined;
-
+    altTitle?: string | undefined;
     userId?: number | undefined;
 
     stavesInfo: StaffInfoContainer[] = []
@@ -40,23 +40,23 @@ export default class RetabDoc implements TRetabDoc {
         // this.mainChild?.addOrReplaceChild(head);
         this.mainChild?.appendHead(head)
     }
- 
+
     getStaffInfo(n = 1) {
         return this.stavesInfo.find(si => si.n) || this.stavesInfo[n - 1]
     }
     setStavesInfo(stavesInfo: StaffInfoContainer[]) {
-        console.log(stavesInfo)
+
         // let sic = this.getStaffInfoContainer(staffN);
         for (const staffInfo of stavesInfo) {
             const staffN = staffInfo.n || 1
-            
+
             const staffDefMeiTag = this.mainChild?.getStaffDefMeiTag(staffN)!;
             const sic = this.setTuning(staffInfo.tuning, staffInfo.n)
             sic.adjustStaffDef(staffDefMeiTag)
-            
+
             if (this.settings?.proportionInclude) sic.appendProport(
-                staffDefMeiTag, 
-                this.settings.proportionNum!, this.settings.proportionNumbase!, 
+                staffDefMeiTag,
+                this.settings.proportionNum!, this.settings.proportionNumbase!,
                 this.settings.proportionSign, this.settings.proportionSlash
             )
         }
@@ -73,8 +73,8 @@ export default class RetabDoc implements TRetabDoc {
             this.stavesInfo.push(sic)
         }
         return sic
-      
-        
+
+
     }
 
     getStaffInfoContainer(n = 1) { return this.stavesInfo.find(sic => sic.n == n); }
@@ -128,6 +128,7 @@ export default class RetabDoc implements TRetabDoc {
         return this.mainChild?.getHead()
     }
     setInfo(info: TRetabDoc) {
+        console.log(info.altTitle)
         this.id = info.id;
         this.lastModifiedAt = new Date(info.lastModifiedAt!);
         this.mainChild = new MeiMainTag(info.mainChild || undefined);
@@ -135,6 +136,7 @@ export default class RetabDoc implements TRetabDoc {
         this.stavesInfo = info.stavesInfo?.map(s => s instanceof StaffInfoContainer ? s : new StaffInfoContainer(s)) || []
         this.title = info.title
         this.user = info.user
+        this.altTitle = info.altTitle
         this.createdAt = info.createdAt
         this.filename = info.filename
         this.settings = info.settings
@@ -147,13 +149,14 @@ export default class RetabDoc implements TRetabDoc {
         const staffDef = staffGrp?.getChildrenByTagName('staffDef')?.find(ch => ch.hasSameAttributeKeyValue(new MeiAttribute('n', n)))
         return staffDef
     }
-
     async save() {
-        const TEMP_USER_ID_FOR_GUEST = 2
-        const user = await RetabUser.getUser(TEMP_USER_ID_FOR_GUEST);
+        const userId = this.user?.id || this.userId
+        if (!userId) throw new Error('User Id Must be provided to save the doc');
+        console.log('saving doc...', this.altTitle)
         const savedInfo = await this.initializeFileInDb({
-            userId: user.id,
+            userId,
             title: this.title,
+            altTitle: this.altTitle,
             id: this.id,
             settings: this.settings
         })
@@ -184,26 +187,28 @@ export default class RetabDoc implements TRetabDoc {
             where: { id: this.id || 0 },
             create: {
                 title: payload.title || '',
+                altTitle: payload.altTitle || null,
                 user: { connect: { id: payload.userId } },
                 filename: this.generateFilename(payload.title || 'unknown-title'),
                 settings: {
                     connectOrCreate: {
-                        where: {docId: this.id || 0},
+                        where: { docId: this.id || 0 },
                         create: settingsData
                     }
                 }
-
+                
             },
             update: {
                 lastModifiedAt: new Date(),
                 title: payload.title || '',
+                altTitle: payload.altTitle || null,
                 filename: this.generateFilename(payload.title || 'unknown-title'),
                 settings: {
                     upsert: {
                         where: {
                             docId: this.id || 0
                         },
-                        create:settingsData, update:settingsData
+                        create: settingsData, update: settingsData
                     }
                 }
             }
@@ -218,8 +223,8 @@ export default class RetabDoc implements TRetabDoc {
     }
 
     async remove() {
-    
-        if (!this.id) throw new Error('ID must be present; available docId is: ' + this.id );
+
+        if (!this.id) throw new Error('ID must be present; available docId is: ' + this.id);
         return await DB.getInstance().retabDoc.delete({
             where: { id: this.id },
         })

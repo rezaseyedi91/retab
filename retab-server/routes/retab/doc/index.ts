@@ -17,7 +17,7 @@ router.get('/get-all-saved', async (req, res) => {
     //@ts-ignore
     const userId = req.userId as number;
     const user = await RetabUser.getUser(userId);
-    console.log(user)
+    
     const {docsList, totalPages} = await user.getSavedDocsList(page, perPage, contains);
     return res.json({
         docsList, totalPages
@@ -48,7 +48,7 @@ router.delete('/:id', async (req, res) => {
     const retabDoc = new RetabDoc();
     //@ts-ignore
     const userId = req.userId
-    console.log({userId})
+    
     if (!userId) throw new Error('no user id')
     const user = await RetabUser.getUser(userId)
 
@@ -57,21 +57,23 @@ router.delete('/:id', async (req, res) => {
         id: req.params.id == 'new' ? undefined : Number(req.params.id || 0) || undefined, 
         filename: docInfo.filename, 
         title: docInfo.title,
+        altTitle: docInfo.altTitle,
         user: user,
     })
     retabDoc.assignDocSettings(req.body.docSettings)
     retabDoc.initializeMeiMainTag()
-    console.log(retabDoc.settings)
+    
     const section = TabIdeaDocGenerator.jsonXmlElementToSection( req.body.sectionJsonXmlElement);
     retabDoc?.appendSection(section)
     const head = req.body.headJsonXmlElement ? MeiTag.makeTagsTree(req.body.headJsonXmlElement) : undefined;
     if (head) retabDoc?.appendHead(head)
     retabDoc.stavesInfo = docInfo.stavesInfo.map((si: TStaffInfo) => new StaffInfoContainer(si))
-    retabDoc.setStavesInfo(retabDoc.stavesInfo)
+    retabDoc.setStavesInfo(retabDoc.stavesInfo);
+    retabDoc.userId = userId
     await retabDoc.save();
     return res.json({id: retabDoc.id})
 } catch(err) {
-    console.log(err)
+    
         //@ts-ignore
     console.log(req.userId)
 }

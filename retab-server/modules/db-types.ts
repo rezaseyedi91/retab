@@ -20,6 +20,7 @@ export type TRetabDoc = {
         stavesInfo?: TStaffInfo[]
         id?: number
         title?: string
+        altTitle?: string
         userId?: number
         mainChildId?: number | null
         lastModifiedAt?: Date | string

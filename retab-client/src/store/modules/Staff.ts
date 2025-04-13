@@ -68,7 +68,7 @@ export default class Staff extends MeiTag {
     sortLines() {
 
         this.lines = this.lines.sort((a, b) => {
-            console.log('sorting lines: ', a.courseInfo.tuning?.n, a.courseInfo.number)
+            
             return b.courseInfo.number - a.courseInfo.number})
             .map((line, index, arr) => {
                 line.setCourseNumber(arr.length - index);
@@ -209,7 +209,7 @@ export class StaffLine {
         // 
         this.courseInfo = courseInfo
         this.staff = staff
-        console.log({courseInfo})
+        
         this.tuning = courseInfo.tuning || Staff.getDefaultTuning(this.courseInfo.number);
         if (courseInfo.number > 6) this.isLedgerLine = true
     }

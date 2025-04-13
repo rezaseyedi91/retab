@@ -50,7 +50,7 @@ export default class Section extends MeiTag {
     }
 
     getStavesInfo() {
-        console.log('getting staves info', this.info.staves)
+        
         return this.info.staves
         
         return this.info.staves.map((s, index) => ({...s,  tuning: this.measures[0].staves[index].lines.map(sl => sl.tuning)})).map(i => {
@@ -106,7 +106,7 @@ export default class Section extends MeiTag {
         this.measures.forEach(m => m.staves[staffIndex].removeLine(lineN));
         // this.info.staves[staffIndex].linesCount--;
         const currentTuningIndex = this.info.staves[staffIndex].tuning?.indexOf(this.info.staves[staffIndex].tuning.find(t => t.n == lineN)!);
-        console.log({currentTuningIndex})
+        
         if (typeof currentTuningIndex == 'number') this.info.staves[staffIndex].tuning?.splice(currentTuningIndex, 1)
         this.info.staves[staffIndex].linesCount = this.info.staves[staffIndex].tuning?.length || this.info.staves[staffIndex].linesCount - 1 
         this.doc.docSettings.linesCount = this.info.staves[staffIndex].linesCount;
@@ -117,7 +117,7 @@ export default class Section extends MeiTag {
         //     this.info.staves[staffIndex].tuning?.splice(this.info.staves[staffIndex].tuning?.indexOf(tuningInStavesInfo),1)
         // }
         const t = this.doc.getTuning(staffIndex)
-        console.log(t?.length)
+        
         // const splicedTuning = t?.splice(t.indexOf(t.find(l => l.n == lineN)!), 1)
         this.setTuning(t!, staffIndex)
     }

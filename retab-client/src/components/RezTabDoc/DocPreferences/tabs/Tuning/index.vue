@@ -46,7 +46,7 @@ const store = useStore();
 function getSection() { return (store.state.currentDoc as RezTabFile).section }
 const updateKey = ref(Math.random());
 function updateLines() {
-    console.log('wanna update');
+    
     
     updateKey.value = Math.random()}
 function addStaffLine(tuningPreset?: TTabCourseTuningInfo) {

@@ -1457,9 +1457,9 @@ router.get('/define', async (req, res) => {
     for (const tuning of tunings) {
         result.push(await new TuningPreset(tuning.tuning, tuning.title).save())
     }
-    res.json(result)
-})
+    res.json(result) 
+}) 
 
 
 
-export default router
+export default router 

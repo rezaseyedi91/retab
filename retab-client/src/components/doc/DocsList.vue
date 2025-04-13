@@ -1,50 +1,5 @@
 <template>
-    <!-- <div>
-        <div class="va-table-responsive  w-fit">
-            <table class="va-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Filename</th>
-                        <th>Created At</th>
-                        <th>Last Modified At</th>
-                        <th>get Mei</th>
-                        <th>edit</th>
-                        <th>remove</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(doc) in list" :key="doc.id"
-                        class="hover:bg-gray-600 hover:bg-opacity-5 hover:shadow-lg">
-                        <td>{{ doc.title }}</td>
-                        <td>{{ doc.filename }}</td>
-                        <td>{{ new Date(doc.createdAt)?.toLocaleString() }}</td>
-                        <td>{{ new Date(doc.lastModifiedAt)?.toLocaleString() }}</td>
-                        <td></td>
-                        <td class="cursor-pointer z-10">
-                            <router-link :to="'/doc/' + doc.id">
 
-                                <va-icon role="button" name="edit" color="info"></va-icon>
-                            </router-link>
-                        </td>
-                        <td class="cursor-pointer" @click="remove(doc.id)">
-                            <button>
-
-                                <va-icon role="button" name="delete" color="danger"></va-icon>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-
-            </table>
-            <div class="flex justify-end pt-3">
-                <va-button color="success" @click="newDoc">
-                    <va-icon name="add" />
-                </va-button>
-            </div>
-
-        </div>
-    </div> -->
     <div>
         <div class="flex justify-between px-16 w-full">
             <va-input v-model="filterStr" label="filter" @update:model-value="getSavedDocsList" inner-label></va-input>
@@ -56,7 +11,7 @@
         </div>
         <va-data-table :items="list" :columns="[
             { key: 'title', label: 'Title', },
-            { key: 'altTitle', label: 'Alt Title', },
+            { key: 'altTitle', label: 'Alt. Title', },
             { key: 'filename', label: 'Filename', },
             { key: 'createdAt', label: 'Created At', },
             { key: 'lastModifiedAt', label: 'Last Modified At', },
@@ -113,6 +68,7 @@ async function getSavedDocsList() {
     })).data
     list.value = resData.docsList
     totalPages.value = resData.totalPages
+    console.log(list.value[0])
 }
 
 const currentPage = ref(1)

@@ -1,6 +1,7 @@
 <template>
     <div class="tab-group" :id="tabGroup.containerElId">
         <div class="flex flex-col gap-y-2 ">
+            <!-- <DevTest>{{ tabGroup.staff.measure.n }}</DevTest> -->
             <DurationSymbol :show-tab-dur-sym="tabGroup.showTabDurSym" :durNum="(tabGroup.dur as DurNum)"
                 :dots="tabGroup.durDots" @toggleShowTabDurSym="tabGroup.toggleShowTabDurSym()"
                 @change-duration="d => tabGroup.setDur(d)"
@@ -22,6 +23,7 @@ import StaffLineComp from './StaffLineComp.vue';
 
 import DurationSymbol from '@/components/RezTabDoc/DurationSymbol/index.vue'
 import { DurNum } from '@/store/modules/types';
+import DevTest from '../utils/DevTest.vue';
 const props = defineProps<{ tabGroup: TabGroup, tabgroupId: string }>();
 onUpdated(setTabgroupContainerId);
 onMounted(setTabgroupContainerId);

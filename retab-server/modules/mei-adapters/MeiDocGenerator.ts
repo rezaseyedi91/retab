@@ -15,7 +15,7 @@ export class MeiDocGenerator implements IMeiDocGenerator {
          const output = xmlFormatter(input, {forceSelfClosingEmptyTag: true, collapseContent: true});         
          return output;
           } catch (err) {
-            console.log(err)
+            
               console.error('there is some error importing XSLT DOC at prettyfy Xml file; continuing with ugly xml file for now :)')
               return input
           }

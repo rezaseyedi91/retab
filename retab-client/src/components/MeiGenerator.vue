@@ -1,5 +1,5 @@
 <template>
-    <div class="flex gap-3 my-2">
+    <div class="flex gap-x-2 my-2">
         <va-button @click="generate" class="">
             GENERATE DOC
         </va-button>
@@ -47,7 +47,7 @@ async function save() {
     })
 
 
-    console.log({wannaRefreshThepage}, doc.id)
+    
     doc.id = result.id
     doc.unfreeze();
     if (wannaRefreshThepage) {
@@ -59,6 +59,7 @@ function getDoc() { return store.state.currentDoc as RezTabFile }
 function logDoc() {
     const doc = getDoc()
     doc.setupNotesEls();
+    console.log(doc.section.measures)
     // doc.getAllNotes().forEach(n => n.tabGroup.updateSelectionMode(false))
 }
 </script>

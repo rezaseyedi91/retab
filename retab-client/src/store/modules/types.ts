@@ -4,7 +4,9 @@ export type TRezTabFileInfo = {
     filename: string,
     createdAt: Date,
     // tuning?: TabCourseTuningInfo[]
-    title?: string
+    title?: string,
+    altTitle?: string,
+    
 }
 
 

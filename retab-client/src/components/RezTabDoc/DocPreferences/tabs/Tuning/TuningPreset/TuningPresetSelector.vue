@@ -37,7 +37,7 @@ async function setTuning(tuningPreset: TTuningPreset) {
     const oldLength = doc.section.info.staves[props.staffIndex].tuning?.length;
     const newLength =  tuningPreset.tuning?.length;
 
-    console.log('wanna set tuning', {newLength, oldLength})
+    
     tuningPreset.tuning?.forEach(course => {
         const found = doc.section.info.staves[props.staffIndex].tuning?.find(staffLineTuning => staffLineTuning.n == course.n);
         if (found) {
@@ -49,7 +49,7 @@ async function setTuning(tuningPreset: TTuningPreset) {
 
     })
     if ((oldLength || 0) - (newLength||0) > 0) {
-        console.log('must remove ', oldLength! - newLength! , 'lines')
+        
         for (const courseTuning of doc.section.info.staves[props.staffIndex].tuning?.slice(newLength) || [])  {
             emits('removeStaffLine', props.staffIndex, courseTuning.n)
         }

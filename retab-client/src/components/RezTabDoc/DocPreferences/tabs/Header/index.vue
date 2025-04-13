@@ -85,7 +85,10 @@ watch(composer, val => {
     doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('composer')?.__('persName').setTextContent(val)
 })
 
-watch(altTitle, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=Alternative]').setTextContent(val));
+watch(altTitle, val => {
+    doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=Alternative]').setTextContent(val)
+    doc.info.altTitle = val
+});
 watch(description, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=desc]').setTextContent(val));
 watch(encoderName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt').__('persName').setTextContent(val))
 watch(encoderAuth, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt').__('persName').setAttribute(new MeiAttribute('xml:id', val + '')))
