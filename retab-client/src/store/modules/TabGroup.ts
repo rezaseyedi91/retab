@@ -149,6 +149,10 @@ export default class TabGroup extends MeiTag {
         const prevMeasure = thisMeasure.getNeighbour(-1);
         return prevMeasure?.staves[staffIndex].tabGroups[0]?.getNoteOnCourse(courseNumber)
     }
+    getCurrentMeasureLastTabgroup(staffIndex = 0) {
+        const thisMeasure = this.staff.measure;
+        return thisMeasure.staves[staffIndex].tabGroups.at(-1);
+    }
     getNoteOnCourse(courseNumber: number) {
         return this.notes.find((n: Note) => n.course == courseNumber)
     }

@@ -31,11 +31,13 @@
 </template>
 
 <script lang="ts" setup>
+import RezTabFile from "@/store/modules/RezTabFile";
 import { StaffLine } from "@/store/modules/Staff";
 import TabGroup from "@/store/modules/TabGroup";
 import { DurNum } from "@/store/modules/types";
 import { computed, defineProps, onMounted, onUpdated, ref, ComputedRef } from "vue";
-
+import { useStore } from "vuex";
+const store = useStore();
 const props = defineProps<{
   tabGroup: TabGroup;
   line: StaffLine;
@@ -77,7 +79,8 @@ function keydown(event: KeyboardEvent) {
   
 }
 function onNoteInputFocus() {
-  // 
+  const doc = (store.state.currentDoc as RezTabFile);
+  doc.lastFocusedNote = note.value
   return;
 }
 

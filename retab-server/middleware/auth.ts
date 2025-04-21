@@ -5,7 +5,6 @@ const router = Router();
 router.use( '*',(req, res, next) => {
     const token = req.cookies['x-access-token']
     const userData =  jwt.decode(token);
-    
     Object.assign(req, {userId: (userData as any)?.id});
     next();
 })

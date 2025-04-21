@@ -37,6 +37,7 @@ export default class RezTabFile {
     id?: number
     head?: MeiHead
     section: Section;
+    lastFocusedNote: Note | undefined;
     // measures: Measure[] = []
     constructor(info: TRezTabFileInfo) {
         this.info = info;
@@ -195,7 +196,7 @@ export default class RezTabFile {
 
     getFocusedNote() {
         const id = document.activeElement?.id
-        return !id ? undefined : this.getAllNotes(false).find(n => n.xmlId == id)
+        return (!id ? undefined : this.getAllNotes(false).find(n => n.xmlId == id)) || this.lastFocusedNote
     }
 
     // private cleanupTabGroups() {
@@ -245,13 +246,13 @@ export default class RezTabFile {
 
     }
 
-    turnOnDefaultFirstTabgroupDurSymShow() {
+    turnOnDefaultFirstTabgroupDurSymShow(options?: {resetEachMeasure: boolean}) {
+        let prev: {
+            dur: DurNum | null,
+            dots?: number
+        } | undefined = { dur: null, dots: undefined };
         this.section.measures.forEach(m => {
             m.staves.forEach(s => {
-                let prev: {
-                    dur: DurNum | null,
-                    dots?: number
-                } = { dur: null, dots: undefined };
 
                 s.tabGroups.forEach(t => {
                     let isFirst = false;
@@ -261,14 +262,15 @@ export default class RezTabFile {
                     }
                     if (!prev) isFirst = true;
                     else {
-                        isFirst = !((prev.dur == curr.dur) && (prev.dots == (curr.dots || 0)));
+                        isFirst =  !((prev.dur == curr.dur) && (prev.dots == (curr.dots || 0)));
                     }
                     prev = { dur: curr.dur, dots: curr.dots }
-                    if (isFirst == true) t.showTabDurSym = true;
-
+                    if (isFirst == true) t.showTabDurSym  = true;
+                    
 
                 })
             })
+            if (options?.resetEachMeasure) prev = undefined
         })
     }
     getTuning(staffIndex = 0) {
@@ -278,7 +280,6 @@ export default class RezTabFile {
     setupNotesEls() {
         setTimeout(() => {
             this.getAllNotes().forEach(n => /**n.xmlId && (n.el?.id == n.xmlId) || */  n.setupEl())
-
         }, 2)
     }
 }

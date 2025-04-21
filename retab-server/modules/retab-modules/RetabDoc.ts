@@ -128,7 +128,7 @@ export default class RetabDoc implements TRetabDoc {
         return this.mainChild?.getHead()
     }
     setInfo(info: TRetabDoc) {
-        console.log(info.altTitle)
+        
         this.id = info.id;
         this.lastModifiedAt = new Date(info.lastModifiedAt!);
         this.mainChild = new MeiMainTag(info.mainChild || undefined);
@@ -152,7 +152,7 @@ export default class RetabDoc implements TRetabDoc {
     async save() {
         const userId = this.user?.id || this.userId
         if (!userId) throw new Error('User Id Must be provided to save the doc');
-        console.log('saving doc...', this.altTitle)
+        
         const savedInfo = await this.initializeFileInDb({
             userId,
             title: this.title,

@@ -10,9 +10,7 @@ export default class Staff extends MeiTag {
     }
     tagTitle = 'staff';
     attributes: IMeiAttribute[] = [];
-    setAttributes(): void {
-        super.setAttributes()
-    }
+
 
     addLayer() {
         this.children.push(new Layer(this.children.filter(ch => ch instanceof Layer).length + 1));

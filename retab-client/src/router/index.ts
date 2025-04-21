@@ -38,17 +38,26 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   
   if (to.name == 'login') return true;
-  const authenticatedUser = (await axios.get(store.state.apiUrl + '/retab/auth', {withCredentials: true})).data
-  
-  if (!authenticatedUser) {
-    // throw new Error('YOU HAVE TO LOG IN FIRST!');
-    router.push('/Login')
-  }
-  else {
-    Object.assign(store.state, {currentUser: authenticatedUser})
-    //@ts-ignore
+  try {
+    const response = await axios.get(store.state.apiUrl + '/retab/auth', {withCredentials: true})
+    const authenticatedUser = response.data
+    console.log('auth');
+    console.log(response);
     
-    return true
+    if (!authenticatedUser || response.status == 403) {
+      // throw new Error('YOU HAVE TO LOG IN FIRST!');
+      router.push('/Login')
+    }
+    else {
+      Object.assign(store.state, {currentUser: authenticatedUser})
+      
+      return true
+    }
+  } catch(err: any) {
+    // if (err.status == 403) router.push('Login')
+    console.log('err.response.status');
+    console.log(err.response.status);
+    
   }
 })
 export default router

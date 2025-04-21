@@ -42,9 +42,10 @@ export default class StaffInfoContainer implements TStaffInfo {
         this.tuning = coursesInfo.sort((a, b) => a.n! - b.n!);
     }
     adjustStaffDef(el: MeiTag ) {
-        const CONSTANT_LINES_COUNT = 6
+        const CONSTANT_LINES_COUNT = 6;
+        const linesCountToSetOnStaffDeff = Math.min(this.linesCount!, CONSTANT_LINES_COUNT)
         el.setAttribute(new MeiAttribute('n', this.n!))
-        el.setAttribute(new MeiAttribute('lines', CONSTANT_LINES_COUNT)) //this.linesCount!
+        el.setAttribute(new MeiAttribute('lines', linesCountToSetOnStaffDeff)) //this.linesCount!
         el.setAttribute(new MeiAttribute('notationtype', this.notationType!))
 
         const tuningTag = el.addChildIfNotExists(new MeiTag({

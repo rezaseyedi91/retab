@@ -3,12 +3,13 @@
         <va-select label="preset" color="white" :options="presets" v-model="chosenPreset" text-by="title" @update:model-value="setTuning"
             class="w-full min-w-52 my-3">
             <template #option-content="{ option }">
-                <div v-if="option" color="white">
+                <div v-if="option" class="text-white">
                     <span class="pr-3">{{ (option as unknown as TTuningPreset).title! }}
                         <span v-if="(option as  unknown as TTuningPreset).title">:</span>    
                     </span>
                     <span v-for="(course) in (option as unknown as TTuningPreset).tuning" :key="course.n">
-                        {{ course.pname }}<sub>{{ course.oct }}</sub><span class="px-2">|</span>
+                        <AccidedPname :pname="course.pname" />
+                        <sub>{{ course.oct }}</sub><span class="px-2">|</span>
                     </span>
                     
                 </div>
@@ -17,6 +18,7 @@
     </div>
 </template>
 <script setup lang="ts">
+import AccidedPname from '@/components/utils/signs/AccidedPname.vue';
 import { TTuningPreset } from '@/store/modules/db-types';
 import RezTabFile from '@/store/modules/RezTabFile';
 import axios from 'axios';

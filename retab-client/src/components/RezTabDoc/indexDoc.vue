@@ -11,6 +11,11 @@
                 v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure" :key="index">
             </MeasureComp>
         </div>
+        <div class="my-3">
+            <va-button color="#a855f7" class="p-3 bg-purple-500 font-bold cursor-pointer" @click="addMeasure">Add Measure</va-button>
+
+        </div>
+
     </div>
 
 </template>
@@ -59,6 +64,7 @@ class SelectionListener {
             'onMouseDown',
             'onMouseUp',
             'onMouseMove',
+            // 'keypress',
         ]
     };
     boundMethods: { [x: string]: { eventType: keyof DocumentEventMap, method: any } } = {
@@ -70,8 +76,14 @@ class SelectionListener {
         'onMouseUp': { eventType: 'mouseup', method: this.onMouseUp.bind(this) },
         'onMouseMove': { eventType: 'mousemove', method: this.onMouseMove.bind(this) },
         'selectedNotesKeydownListener': { eventType: 'keydown', method: this.selectedNotesKeydownListener.bind(this) },
+        // 'keypress': { eventType: 'keydown', method: this.selectedNotesKeydownListener.bind(this) },
 
     };
+
+    onPlus(e: KeyboardEvent) {
+        console.log(e);
+        
+    }
     initSelectionHighlighterEl() {
         this.selectionEl = document.createElement('div');
         this.selectionEl.style.position = 'absolute';
@@ -329,6 +341,22 @@ class SelectionListener {
     }
 
 
+}
+
+
+async function addMeasure() {
+  const doc = store.state.currentDoc as RezTabFile;
+  const focusedNote = doc.getFocusedNote();
+  const tg = focusedNote?.tabGroup;
+  const measure = tg?.staff.measure;
+  const lastTg = tg?.getCurrentMeasureLastTabgroup();
+  const index = doc.section.measures.indexOf(measure!);
+  
+  const newMeasure = doc.section.addMeasure(index+1);
+  newMeasure.staves.forEach(staff => {
+    staff.tabGroups[0].setDur(lastTg?.dur || 4);
+    staff.tabGroups[0].setDurDots(lastTg?.getDurDots() || 0);
+  })
 }
 function initNewDocStuff() {
     const doc = (store.state.currentDoc) as RezTabFile

@@ -9,12 +9,15 @@
             </li> -->
             <li class="flex gap-3">
                 <button class="button"
-                    @click="(store.state.currentDoc as RezTabFile).turnOnDefaultFirstTabgroupDurSymShow()">set first
-                    durSyms</button>
-
+                    @click="(store.state.currentDoc as RezTabFile).turnOnDefaultFirstTabgroupDurSymShow()">
+                    set first durSyms</button>
+                <button class="button"
+                    @click="(store.state.currentDoc as RezTabFile).turnOnDefaultFirstTabgroupDurSymShow({ resetEachMeasure: true })">
+                    set first durSyms (reset each measure)</button>
+                
                 <button class="button" @click="getDoc().toggleTabgroupsIncludeDurAttribute()">
                     {{ (getDoc().docSettings.tabgroupsIncludeDurAttribute ? 'remove' : 'add') + ' Tab groups "dur" ' +
-                    'attribute' }}
+                        'attribute' }}
                 </button>
 
             </li>

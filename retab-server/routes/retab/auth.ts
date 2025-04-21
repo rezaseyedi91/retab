@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Authenticator from "../../modules/Authenticator";
 import jwt from 'jsonwebtoken'
+import RetabUser from "../../modules/retab-modules/User";
 const router = Router();
 
 router.post('/login', async (req, res) => {
@@ -25,10 +26,15 @@ router.get('/', async (req, res) => {
     
     const token = req.cookies['x-access-token']
     try {
-        const userData =  jwt.decode(token);
-        res.send(userData || false)
+
+        const userData =  jwt.decode(token) as any;
+        const foundUser = await RetabUser.getUser(userData?.id)
+        
+        
+        res.send(foundUser || false)
     } catch(err) {
-        console.log(err)
+        res.send(false)
+        
     }
     // if (!isValid) return res.send(false);
     // const userInfo = jwt.decode(token);
