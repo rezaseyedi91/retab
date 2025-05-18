@@ -3,3 +3,5 @@ node_modules
 cmd
 dist/*
 .poster-playground
+.ignored-stuff
+.ignored-stuff/*
