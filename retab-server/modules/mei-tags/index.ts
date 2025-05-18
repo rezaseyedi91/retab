@@ -3,6 +3,7 @@ import { TMeiJsonXmlElementInput } from "../mei-adapters/TabIdeaDocGenerator";
 import { TMeiAttribute, TMeiTag, TRetabDoc } from "../db-types";
 import { MeiAttribute } from "./interfaces";
 import RetabDoc from "../retab-modules/RetabDoc";
+import { Prisma } from "@prisma/client";
 
 export type TMeiTagFactoryArgs = {
     tagTitle: MeiTag["tagTitle"],
@@ -10,6 +11,8 @@ export type TMeiTagFactoryArgs = {
     children?: TMeiTagFactoryArgs[],
     selfClosing?: boolean,
     textContent?: string
+
+    id?: number
 }
 export class MeiTag implements TMeiTag {
     tagTitle: string = "";
@@ -25,8 +28,10 @@ export class MeiTag implements TMeiTag {
     private indent = 0
     constructor(payload?: TMeiTag) {
         const payloadXmlId = payload?.attributes?.find(at => at.title == 'xml:id')?.value
+        this.id = payload?.id
 
-        this.xmlId =  payloadXmlId||  this.generateId();
+
+        this.xmlId = payloadXmlId || this.generateId();
         this.tagTitle = payload?.tagTitle || this.tagTitle
         if (payload && Object.keys(payload)?.[0]) {
             // cleanup payload attributes:
@@ -56,8 +61,11 @@ export class MeiTag implements TMeiTag {
 
     }
     addOrReplaceChild(...children: MeiTag[]) {
-
         for (const child of children) {
+            if (child.tagTitle == 'section') {
+
+
+            }
             const idx = this.children.indexOf(this.children.find(ch => ch.tagTitle == child.tagTitle)!)
             if (idx > -1) {
                 this.children.splice(idx, 1);
@@ -124,6 +132,7 @@ export class MeiTag implements TMeiTag {
                 }
             }
         });
+ 
         alreadyHasThem.forEach(alreadyHasAtt => {
             const foundByTitle = this.attributes.find(at => at.title == alreadyHasAtt.title);
             if (!foundByTitle) extrasIds.push(alreadyHasAtt.id)
@@ -161,10 +170,14 @@ export class MeiTag implements TMeiTag {
     }
 
     getParentId() { return this.parentId || this.parent?.id }
+    
     async save(doc: RetabDoc) {
+
+
         this.setAttributes();
 
         const prisma = DB.getInstance();
+
         const saved = await prisma.meiTag.upsert({
             where: {
                 id: this.id || 0
@@ -177,7 +190,6 @@ export class MeiTag implements TMeiTag {
                 indexAmongSiblings: this.indexAmongSiblings || 0,
                 ...this.getParentId() ? { parent: { connect: { id: this.parent?.id || this.parentId || 0 } } } : {},
                 ...this.textContent ? { textContent: this.textContent } : {},
-
             },
             update: {
                 xmlId: this.xmlId,
@@ -191,21 +203,29 @@ export class MeiTag implements TMeiTag {
             include: {
                 children: true
             }
+
         });
 
         this.id = saved.id;
         await this.updatePrevSavedAttributes();
         //removing extra children
-        await prisma.meiTag.deleteMany({
-            where: {
-                AND: [
-                    { parentId: this.id },
-                    { id: { notIn: this.children.map(ch => ch.id!).filter(id => id) } }
-                ]
-            }
-        })
-        this.setChildrenParentId();
-        await Promise.all(this.children.map(ch => ch.save(doc)))
+        try {
+               await prisma.meiTag.deleteMany({
+                where: {
+                    AND: [
+                        { parentId: this.id },
+                        { id: { notIn: this.children.map(ch => ch.id!).filter(id => id) } }
+                    ]
+                }
+            })
+            this.setChildrenParentId();
+            await Promise.all(this.children.map(ch => ch.save(doc)));
+            return;
+
+        } catch (err) {
+
+
+        }
     }
     attributes: MeiAttribute[] = [];
     // abstract getXML(): string 
@@ -231,7 +251,7 @@ export class MeiTag implements TMeiTag {
     // }
 
     async remove() {
-        return await DB.getInstance().meiTag.delete({where: {id: this.id}})
+        return await DB.getInstance().meiTag.delete({ where: { id: this.id } })
     }
     getChildrenByTagName(tagname: string) {
         return this.children.filter(ch => ch.tagTitle == tagname)
@@ -250,6 +270,7 @@ export class MeiTag implements TMeiTag {
     toJsonXmlElement(): TMeiJsonXmlElementInput {
         return {
             attributes: this.attributes,
+            id: this.id,
             children: this.children.map(ch => ch.toJsonXmlElement()),
             tagTitle: this.tagTitle,
             selfClosing: this.selfClosing,
@@ -287,6 +308,10 @@ export class MeiTag implements TMeiTag {
     static makeTagsTree(args: TMeiTagFactoryArgs) {
         // const constructor = args.tagTitle == 'note' ? Note : MeiTagInstance;
         const newTag = new MeiTagInstance(args);
+        if (newTag.tagTitle == 'corpName') {
+            console.log('----', newTag.attributes);
+            
+        }
         newTag.selfClosing = args.selfClosing || false
         if (args.textContent) newTag.textContent = args.textContent
         return newTag
@@ -301,7 +326,20 @@ export class MeiTag implements TMeiTag {
         }
     }
 
-
+    selectTagTree(tagTitles: MeiTag["tagTitle"][]): Prisma.MeiTagFindManyArgs {
+        const simpleSelect: Prisma.MeiTagFindManyArgs = {
+            where: { tagTitle: tagTitles.shift() },
+            select: { tagTitle: true, id: true, children: true, attributes: true }
+        }
+        if (!tagTitles.length) return simpleSelect
+        else return {
+            ...simpleSelect,
+            select: {
+                ...simpleSelect.select,
+                children: this.selectTagTree(tagTitles)
+            }
+        }
+    }
 
 }
 
@@ -311,12 +349,15 @@ export class MeiTagInstance extends MeiTag {
 
     constructor(args: TMeiTagFactoryArgs) {
         super(args);
+
+
+        this.id = args.id
         // this.tagTitle = args.tagTitle
         this.textContent = args.textContent
         this.selfClosing = args.selfClosing || false
         args.attributes?.forEach(att => this.setAttribute(new MeiAttribute(att.title, att.value || "")))
         this.children = args.children?.map(ch => ch instanceof MeiTag ? ch : new MeiTagInstance(ch)) || []
-
+        // this.id = args.id
 
     }
     setAttributes(): void { return; }

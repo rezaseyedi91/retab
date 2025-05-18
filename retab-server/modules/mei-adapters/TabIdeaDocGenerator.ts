@@ -15,14 +15,17 @@ export type TMeiJsonXmlElementInput = {
     children: TMeiJsonXmlElementInput[];
     textContent?: string;
     selfClosing?: boolean
+    
+    id?: number
 }
 
 
 export default class TabIdeaDocGenerator extends MeiDocGenerator {
-
+    static XML_DECLARATION = '<?xml-model href="https://music-encoding.org/schema/5.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>\n'
     static jsonXmlElementToSection(jsonXmlElement: TMeiJsonXmlElementInput) {
         const childrenToMeiTags = jsonXmlElement.children?.map(ch => this.meiTagInstanceFromJsonXmlElement(ch)) || [];
         const section = new MeiTag({tagTitle: 'section'});
+        section.id = jsonXmlElement.id
         section.setAttribute(new MeiAttribute('n', '1'))
         section.addChildren(...childrenToMeiTags);
         section.setChildrenAsSelfClosing('note')
@@ -30,7 +33,8 @@ export default class TabIdeaDocGenerator extends MeiDocGenerator {
     }
 
     static meiTagInstanceFromJsonXmlElement(jsonXmlElement: TMeiJsonXmlElementInput): MeiTag {
-        let tag: MeiTag
+        let tag: MeiTag;
+
         switch (jsonXmlElement.tagTitle) {
             case 'measure':
                 tag = new Measure(Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
@@ -58,7 +62,7 @@ export default class TabIdeaDocGenerator extends MeiDocGenerator {
                 tag = new MeiTagInstance({ tagTitle: jsonXmlElement.tagTitle, attributes: jsonXmlElement.attributes, })//  Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
                 break;
         }
-
+        tag.id = jsonXmlElement.id
         jsonXmlElement.attributes?.forEach(t => tag.pushAttribute(t))
         jsonXmlElement.children?.forEach(ch => tag.pushChildren(this.meiTagInstanceFromJsonXmlElement(ch)))
         return tag;
@@ -70,9 +74,9 @@ export default class TabIdeaDocGenerator extends MeiDocGenerator {
 
  
         
-        this.xml = retabDoc.mainChild?.getXML() || ''
+        this.xml =  retabDoc.mainChild?.getXML() || ''
         const pretty = MeiDocGenerator.prettifyXmlFile(this.xml )
-        return pretty;
+        return TabIdeaDocGenerator.XML_DECLARATION +  pretty;
 
     }
 }

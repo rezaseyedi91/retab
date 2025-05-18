@@ -1,9 +1,10 @@
+import Layer from "./Layer";
 import Measure from "./Measure";
 import MeiAttribute from "./mei-modules/MeiAttribute";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import Note from "./Note";
 import Staff from "./Staff";
-import { DurNum, TNoteInfo } from "./types";
+import { DurNum, TabType, TNoteInfo } from "./types";
 class TabDurSym extends MeiTag {
     setAttributes(): void {
         return
@@ -12,10 +13,16 @@ class TabDurSym extends MeiTag {
         return this;
     }
     tagTitle = 'tabDurSym';
+    setId(id?: number):this {
+        this.id = id
+        return this
+    }
 }
+
+
 export default class TabGroup extends MeiTag {
     static INCLUDE_DUR_ATTRIBUTE = true
-    static initializeStatics() {this.INCLUDE_DUR_ATTRIBUTE = true}
+    static initializeStatics() { this.INCLUDE_DUR_ATTRIBUTE = true }
     durDots = 0;
     tagTitle = 'tabGrp';
     dur: DurNum = 4;
@@ -23,6 +30,9 @@ export default class TabGroup extends MeiTag {
     private includeDurAttribute = TabGroup.INCLUDE_DUR_ATTRIBUTE
     showTabDurSym = false
     containerElId?: string
+tabDurSymId?: number;
+    get staff() {return this.layer.staff}
+
     setAttributes(): void {
         if (this.includeDurAttribute) {
             this.attributes.push(new MeiAttribute('dur', this.dur))
@@ -35,7 +45,7 @@ export default class TabGroup extends MeiTag {
         if (!mode) return this.deselect()
         if ((!this.getAllNotes().find(n => !n.isSelected))) {
             this.select()
-        } else {this.deselect()}
+        } else { this.deselect() }
     }
     select() {
         this.isSelected = true
@@ -66,7 +76,7 @@ export default class TabGroup extends MeiTag {
         }
     }
     /**Hotel room numberin! meaure 3, tabgroup 2: 302*/
-    getIndexInPiece() {return this.staff.measure.n * 100 + this.staff.tabGroups.indexOf(this)}
+    getIndexInPiece() { return this.staff.measure.n * 100 + this.staff.tabGroups.indexOf(this) }
     setDur(durNum: DurNum) {
         if (durNum < 1 || durNum > 64) return;
         this.dur = durNum
@@ -77,7 +87,7 @@ export default class TabGroup extends MeiTag {
 
         if (this.showTabDurSym && !this.children.find(ch => ch instanceof TabDurSym)) {
             // add <tabDurSym/> element to the children
-            this.children.unshift(new TabDurSym())
+            this.children.unshift(new TabDurSym().setId(this.tabDurSymId))
         }
         return this;
     }
@@ -85,12 +95,12 @@ export default class TabGroup extends MeiTag {
     toggleShowTabDurSym() {
         this.showTabDurSym = !this.showTabDurSym
     }
-    staff: Staff
     notes: Note[] = [];
+    layer: Layer
 
-    constructor(staff: Staff) {
+    constructor(layer: Layer) {
         super();
-        this.staff = staff;
+        this.layer = layer;
         this.init()
     }
 
@@ -107,14 +117,14 @@ export default class TabGroup extends MeiTag {
         else this.notes.push(n)
     }
     clone(staff?: Staff): TabGroup {
-        const tg = new TabGroup(staff || this.staff);
+        const tg = new TabGroup(staff?.getLayer() || this.layer);
         tg.setDur(this.dur);
         this.notes.forEach((n, index, notes) => {
             if (n.isThere()) {
                 const noteOnCourse = tg.getNoteOnCourse(n.course!) as Note
                 noteOnCourse.fret = n.fret;
                 setTimeout(() => {
-                    
+
                     noteOnCourse.setupEl()
                 }, 1000);
             }
@@ -170,7 +180,7 @@ export default class TabGroup extends MeiTag {
 
     setDurDots(d: number) {
         this.durDots = d;
-        this.setAttribute({title: 'dots', value: this.durDots + ''})
+        this.setAttribute({ title: 'dots', value: this.durDots + '' })
     }
     dot(dotsCount?: number) {
         if (!dotsCount) dotsCount = (this.getDurDots() + 1)
@@ -197,12 +207,12 @@ export default class TabGroup extends MeiTag {
         return newOne
     }
     insertTabgroupAfter(newTg?: TabGroup) {
-        const newOne = this.staff.insertTabgroupAfter(this,  newTg);
+        const newOne = this.staff.insertTabgroupAfter(this, newTg);
         if (!newTg) {
             newOne.dur = this.dur;
             newOne.setDurDots(this.getDurDots())
         }
-   
+
         return newOne
     }
 
@@ -220,31 +230,43 @@ export default class TabGroup extends MeiTag {
             if (sameCourse) {
                 sameCourse.fret = fret
                 sameCourse.xmlId = xmlId!
+                sameCourse.id = nje.id
                 nje.attributes?.forEach(at => sameCourse.setAttribute(new MeiAttribute(at.title, at.value)))
             }
         })
         // this.notes = noteJsonXmlElements.map(n => Note.fromMeiFactoryArgs(this, n))
     }
-    static fromMeiFactoryArgs(staff: Staff, arg: TMeiTagFactoryArgs) {
-        const instance = new TabGroup(staff);
+    static fromMeiFactoryArgs(layer: Layer, arg: TMeiTagFactoryArgs) {
+        const instance = new TabGroup(layer);
+        instance.id = arg.id
         arg.attributes?.forEach(at => {
             if (at.title == 'dur') instance.setDur(Number(at.value) as DurNum)
-            else if (at.title == 'dots') instance.setDurDots(Number(at.value))
+            else if (at.title == 'dots' && Number(at.value) > 0) instance.setDurDots(Number(at.value))
             else if (at.title == 'xml:id') instance.setAttribute(at)
         })
-        
-        instance.showTabDurSym = !!arg.children?.find(ch => ch.tagTitle == 'tabDurSym')
+        const tabDurSymTag = arg.children?.find(ch => ch.tagTitle == 'tabDurSym')
+        instance.showTabDurSym = !!tabDurSymTag
+        instance.tabDurSymId = tabDurSymTag?.id
+
         // instance.setIncludeDurAttribute() 
         instance.setFetchedNotes(arg.children?.filter(ch => ch.tagTitle == 'note') || []);
 
         return instance;
     }
-
+    
 
     showLedgerLines(untillCourseNumber: number): boolean {
-        const note = this.getNoteOnCourse(untillCourseNumber);
-        const noteIsThere = note?.isThere();
-        
-        return noteIsThere || (this.staff.lines.length >= untillCourseNumber+1 && this.showLedgerLines(untillCourseNumber + 1))
+        const tabType = this.staff.getTabType();
+        if (tabType == TabType.ITALIAN) {
+
+            const note = this.getNoteOnCourse(untillCourseNumber);
+            const noteIsThere = note?.isThere();
+
+            return noteIsThere || (this.staff.lines.length >= untillCourseNumber + 1 && this.showLedgerLines(untillCourseNumber + 1))
+            // FRENCH
+        } else {
+            // if (untillCourseNumber <= 7 && this.staff.lines.length >= untillCourseNumber+1) return true
+            return false
+        }
     }
 }

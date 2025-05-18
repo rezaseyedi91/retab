@@ -14,3 +14,11 @@ export async function xmlToSvg(str: string) {
 }
 
 
+export  function includeMeiTagChildrenRecursively(n = 1): any {
+    if (n >= 20) return {
+        include: { children: { orderBy: { indexAmongSiblings: 'asc' } }, attributes: true }
+    }
+    else return {
+        include: { children: { ...includeMeiTagChildrenRecursively(n + 1), orderBy: { indexAmongSiblings: 'asc' } }, attributes: true }
+    }
+}

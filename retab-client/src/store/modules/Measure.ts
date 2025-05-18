@@ -40,7 +40,6 @@ export default class Measure extends MeiTag {
     initializeStaves(staffJsonXmlElements?: TMeiTagFactoryArgs[]) {
         if (!staffJsonXmlElements) this.addStaff();
         else {
-            
             this.staves = staffJsonXmlElements.map(sje => Staff.fromMeiFactoryArgs(this, sje))
         }
         return this;
@@ -48,6 +47,7 @@ export default class Measure extends MeiTag {
     }
     static fromMeiFactoryArgs(section: Section, arg: TMeiTagFactoryArgs) {
         const instance = new Measure(section, Number(arg.attributes?.find(a => a.title == 'n')?.value)).initializeStaves(arg.children)
+        instance.id = arg.id
           instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value || 'XMLIDNOTFOUND'))
         if (arg.children?.length) instance.initializeStaves(arg.children);
         

@@ -1,6 +1,6 @@
 export type TRezTabFileInfo = {
     instruments: Instrumnet[]
-    tabType: TabType,
+    tabType: `tab.lute.${TabType}`,
     filename: string,
     createdAt: Date,
     // tuning?: TabCourseTuningInfo[]
@@ -48,7 +48,7 @@ export type TStaffInfo = {
     linesCount: number
     tabType: TabType,
     n?: number
-    // notationType?: `tab.lute.${TabType}`
+    notationType?: `tab.lute.${TabType}`
     tuning?: TabCourseTuningInfo[]
 }
 

@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'Bravura';
+    src: url('/fonts/Bravura.woff2') format('woff2');
+  }
+
+  .lute-tab {
+    font-family: 'Bravura';
+    font-size: 3rem;
+    transform: scale(0.7);    /* Shrinks caret height visually */
+    height: 40px;             /* Adjust to maintain layout */
+    caret-color: black;
+  }
+
+  

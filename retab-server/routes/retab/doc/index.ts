@@ -5,6 +5,7 @@ import { MeiTag } from "../../../modules/mei-tags";
 import { TStaffInfo } from "../../../modules/db-types";
 import StaffInfoContainer from "../../../modules/retab-modules/StaffInfoContainer";
 import RetabDoc from "../../../modules/retab-modules/RetabDoc";
+import { writeFileSync } from "fs";
 
 const router = Router();
 
@@ -34,7 +35,6 @@ router.get('/:id', async (req, res) => {
     const retabDoc = await RetabDoc.getInstanceFromDb(docId);
 
     if (req.query.fileType == 'mei') {
-
         return res.send(await retabDoc?.toMei())
     }
     else return res.json(retabDoc?.getDataToEdit())
@@ -65,13 +65,18 @@ router.post('/:id', async (req, res) => {
             altTitle: docInfo.altTitle,
             user: user,
         })
+        
+        
         retabDoc.assignDocSettings(req.body.docSettings)
         retabDoc.initializeMeiMainTag()
 
         const section = TabIdeaDocGenerator.jsonXmlElementToSection(req.body.sectionJsonXmlElement);
+
         retabDoc?.appendSection(section)
         const head = req.body.headJsonXmlElement ? MeiTag.makeTagsTree(req.body.headJsonXmlElement) : undefined;
+        
         if (head) retabDoc?.appendHead(head)
+
         retabDoc.stavesInfo = docInfo.stavesInfo.map((si: TStaffInfo) => new StaffInfoContainer(si))
         retabDoc.setStavesInfo(retabDoc.stavesInfo);
         retabDoc.userId = userId

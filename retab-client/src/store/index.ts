@@ -17,7 +17,7 @@ export default createStore({
       createdAt: new Date(),
       filename: 'file-one.txt',
       instruments: [Instrumnet.LUTE],
-      tabType: TabType.ITALIAN
+      tabType: `tab.lute.${TabType.ITALIAN}`
     }).init(),
 
     ui: {

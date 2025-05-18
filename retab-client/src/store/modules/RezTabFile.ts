@@ -3,13 +3,14 @@ import { TDbDocSettings, TUser } from "./db-types";
 import Measure from "./Measure";
 import MeiAttribute from "./mei-modules/MeiAttribute";
 import MeiDocGenerator from "./mei-modules/MeiDocGenerator";
-import MeiHead, { HARD_CODED_HEADER_ARGS } from "./mei-modules/MeiHead";
+import MeiHead from "./mei-modules/MeiHead";
 import { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import Note from "./Note";
 import Section from "./Section";
 import { DurNum, Instrumnet, TabType, TRezTabFileInfo, TStaffInfo } from "./types";
 import axios from 'axios'
-import { generateId } from "./utils";
+import { downloadJsonDataAsFile, generateId } from "./utils";
+import { HARD_CODED_HEADER_ARGS, HARD_CODED_HEADER_EMPTY_ARGS } from "./mei-modules/head-args";
 
 
 
@@ -121,7 +122,8 @@ export default class RezTabFile {
             docInfo,
             docSettings: this.docSettings
         }
-        
+        console.log(reqBody.headJsonXmlElement?.children[0].children[0]);
+        // return;
         const jsonResult = await axios.post(process.env.VUE_APP_API_URL + '/retab/doc/' + (this.id || 'new'), reqBody)
         return jsonResult.data
     }
@@ -135,13 +137,16 @@ export default class RezTabFile {
             instruments: someResponse.instruments,
             tabType: someResponse.stavesInfo?.map((si: any) => si.notationType)?.[0],
             title: someResponse.title,
+            altTitle: someResponse.altTitle
             // tuning: someResponse.stavesInfo?.map((si: any )=> si.tuning)?.[0],
         })
         doc.id = someResponse.id;
         doc.setLinesCount(someResponse.stavesInfo[0].tuning.length)
         doc.initializeSection(someResponse.sectionJsonXmlElement, someResponse.stavesInfo)
         doc.initializeHead(someResponse.headJsonXmlElement);
-        doc.unfreeze()
+        doc.unfreeze();
+
+
         if (someResponse.settings) doc.assignSettings(someResponse.settings)
         return doc
 
@@ -154,10 +159,14 @@ export default class RezTabFile {
         this.docSettings.proportion.sign = (settings.proportionSign || this.docSettings.proportion.sign) as this["docSettings"]["proportion"]["sign"]
         this.docSettings.proportion.slash = (settings.proportionSlash || this.docSettings.proportion.slash) as this["docSettings"]["proportion"]["slash"]
         this.docSettings.tabgroupsIncludeDurAttribute = settings.tabgroupsIncludeDurAttribute || this.docSettings.tabgroupsIncludeDurAttribute
-        
+
     }
     getAltTitle() {
         return this.head?.__('fileDesc').__('titleStmt').__('title[type=Alternative]')?.textContent
+    }
+    getTitle() {
+        const title = this.info.title || this.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=main]').textContent
+        return title
     }
     setLinesCount(count: number, staffIndex = 0) {
         this.docSettings.linesCount = count;
@@ -175,8 +184,23 @@ export default class RezTabFile {
 
 
 
-    initializeHead(fetchedHead?: TMeiTagFactoryArgs) {
-        this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_ARGS)
+    async initializeHead(fetchedHead?: TMeiTagFactoryArgs) {
+        try {
+
+            if (!fetchedHead) {
+                const lastEncoderHeaders = await MeiHead.getUserEncoderHeaders();
+                fetchedHead = lastEncoderHeaders[0]?.headerTag
+            }
+            // downloadJsonDataAsFile(fetchedHead)
+            // this.initializeHead(tempTest)
+            // this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_ARGS);
+            this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_EMPTY_ARGS);
+
+        } catch (err) {
+
+            return
+        }
+
     }
 
     initializeSection(fetchedSection?: TMeiTagFactoryArgs, stavesInfo?: TStaffInfo[]) {
@@ -246,7 +270,7 @@ export default class RezTabFile {
 
     }
 
-    turnOnDefaultFirstTabgroupDurSymShow(options?: {resetEachMeasure: boolean}) {
+    turnOnDefaultFirstTabgroupDurSymShow(options?: { resetEachMeasure: boolean }) {
         let prev: {
             dur: DurNum | null,
             dots?: number
@@ -262,11 +286,11 @@ export default class RezTabFile {
                     }
                     if (!prev) isFirst = true;
                     else {
-                        isFirst =  !((prev.dur == curr.dur) && (prev.dots == (curr.dots || 0)));
+                        isFirst = !((prev.dur == curr.dur) && (prev.dots == (curr.dots || 0)));
                     }
                     prev = { dur: curr.dur, dots: curr.dots }
-                    if (isFirst == true) t.showTabDurSym  = true;
-                    
+                    if (isFirst == true) t.showTabDurSym = true;
+
 
                 })
             })
@@ -282,4 +306,44 @@ export default class RezTabFile {
             this.getAllNotes().forEach(n => /**n.xmlId && (n.el?.id == n.xmlId) || */  n.setupEl())
         }, 2)
     }
+
+
+    getTabType(): TabType {
+        return (String(this.info.tabType)).match(/\.(\w*)$/)?.[1] as TabType
+    }
+    private async changeTabType(tabType: TabType, staffIndex: number) {
+        this.info.tabType = `tab.lute.${tabType}`;
+        const staff = this.section.info.staves[staffIndex]
+        staff.tabType = tabType;
+        staff.notationType = `tab.lute.${tabType}`;
+        await this.reorderStaffLines()
+
+    }
+    async setTabType(tabType: TabType, staffIndex = 0) {
+        await this.changeTabType(tabType, staffIndex);
+        await new Promise(r => setTimeout(r, 500))
+        this.updateUI()
+
+    }
+    async reorderStaffLines(staffIndex = 0) {
+        const tt = this.getTabType()
+        for (const measure of this.section.measures) {
+            measure.staves[staffIndex].reorderLines(tt);
+
+
+        }
+    }
+    updateUI() {
+        if (store) {
+            store.state.utils.keyCoefficient++
+        }
+    }
+
+    async generateAndDownloadMei() {
+        const result = await this.generateMEI();
+        const altTitle = this.getAltTitle()
+        RezTabFile.download(result, altTitle ? altTitle + '.mei' : undefined);
+        this.unfreeze()
+    }
+
 }

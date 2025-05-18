@@ -5,7 +5,8 @@ export type TUser = {
         username?: string
         password?: string | null
         email?: string | null
-}
+        encoderHeaders?: TEncoderHeader[]
+}       
 
 export type TInstrument = {
         staves?: TStaffInfo[]
@@ -62,6 +63,7 @@ export type TMeiTag = {
         indexAmongSiblings?: number
         parentId?: number | null
         docId?: number | null
+        encoderHeaderRelated?: TEncoderHeader
 }
 
 export type TMeiAttribute = {
@@ -99,3 +101,16 @@ export type TTuningPreset = {
         id?: number
         title?: string | null
 }
+
+
+
+
+
+export type TEncoderHeader = {
+        user?: TUser
+        headerTag?: TMeiTag
+        id?: number
+        userId?: number
+        headerTagId?: number
+    }
+  

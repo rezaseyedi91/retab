@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id       Int        @id @default(autoincrement())
-  name     String
-  username String     @unique
-  password String?
-  email    String?
-  docs     RetabDoc[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  username    String       @unique
+  password    String?
+  email       String?
+  docs        RetabDoc[]
+  encoderHeaders   EncoderHeader[]
 }
 
 model Instrument {
@@ -31,7 +32,7 @@ model Instrument {
 model RetabDoc {
   id             Int          @id @default(autoincrement())
   title          String
-  altTitle      String?
+  altTitle       String?
   user           User         @relation(references: [id], fields: [userId], onDelete: Cascade, onUpdate: Cascade)
   userId         Int
   mainChild      MeiTag?      @relation(fields: [mainChildId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -83,9 +84,8 @@ model TabCourseTuningInfo {
 
 model TuningPreset {
   id     Int                   @id @default(autoincrement())
-  title  String   @unique @default(cuid())
+  title  String                @unique @default(cuid())
   tuning TabCourseTuningInfo[]
-
 }
 
 model MeiTag {
@@ -103,6 +103,7 @@ model MeiTag {
   parent             MeiTag?   @relation(fields: [parentId], references: [id], name: "MeiTagChildParent", onDelete: Cascade, onUpdate: Cascade)
   doc                RetabDoc?
   docId              Int?
+  encoderHeaderRelated EncoderHeader?
 }
 
 model MeiAttribute {
@@ -111,4 +112,14 @@ model MeiAttribute {
   value          String?
   containerTag   MeiTag  @relation(fields: [containerTagId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   containerTagId Int
+}
+
+model EncoderHeader {
+  id     Int  @id @default(autoincrement())
+  userId Int 
+  user   User @relation(fields: [userId], references: [id])
+  headerTag MeiTag    @relation(fields: [headerTagId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  headerTagId Int    @unique 
+
+  @@unique([headerTagId, userId])
 }

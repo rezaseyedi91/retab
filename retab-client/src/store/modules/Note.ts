@@ -1,10 +1,13 @@
 import MeiAttribute from "./mei-modules/MeiAttribute";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import TabGroup from "./TabGroup";
-import { DurNum, TNoteInfo } from "./types";
+import { DurNum, TabType, TNoteInfo } from "./types";
 import { generateId } from "./utils";
-
 export default class Note extends MeiTag {
+    static FRENCH_TAB_LETTERS = ['a','b','c','d','e','f','g','h','i','k','l', 'm']
+    static FRENCH_TAB_UNICODES = ['\uEBC0', '\uEBC1', '\uEBC2', '\uEBC3', '\uEBC4', '\uEBC5', '\uEBC6', '\uEBC7', '\uEBC8', '\uEBC9', '\uEBCA', '\uEBCB', '\uEBCC']
+    static FRENCH_TAB_DIAPAZONES_UNICODES = ['\uEBCD', '\uEBCE', '\uEBCF', '\uEBD0'] // 7 8 9 10
+    static ITALIAN_TAB_UNICODES = ['\uEBE0', '\uEBE1', '\uEBE2', '\uEBE3', '\uEBE4', '\uEBE5', '\uEBE6', '\uEBE7', '\uEBE8', '\uEBE9', '\uEBE1\uEBE0', '\uEBE1\uEBE1', '\uEBE1\uEBE2', '\uEBE1\uEBE3', '\uEBE1\uEBE4']
     tagTitle = 'note';
     static MAX_FRET_INPUT = 14
     setAttributes(): void {
@@ -14,11 +17,25 @@ export default class Note extends MeiTag {
     }
     isSelected = false;
     updateChildren(): MeiTag {
-        return this;
+        return this as MeiTag;
+    }
+    getFretToShow() {
+        // 
+        const tabType = this.tabGroup.staff.getTabType();
+        if (!this.fret && this.fret != 0) return ''
+        else if (tabType == TabType.FRENCH && this.course! >= 7 && this.fret == 0) return Note.FRENCH_TAB_DIAPAZONES_UNICODES[Number(this.course) - 7]
+        else if (tabType == TabType.FRENCH && this.fret != undefined) return Note.FRENCH_TAB_UNICODES[Number(this.fret)]
+        
+        else  return  Note.ITALIAN_TAB_UNICODES[Number(this.fret)] //this.fret
     }
     private _fret?: number;
-    set fret(v: number | undefined) {
-        if (!v || v && v <= Note.MAX_FRET_INPUT) this._fret = v;
+    set fret(v: number | undefined | string) {
+        const vNum = Number(v)
+        if (v == undefined || v && isNaN(vNum)) {
+            this._fret = Note.FRENCH_TAB_LETTERS.indexOf(v as string) > -1 ? Note.FRENCH_TAB_LETTERS.indexOf(v as string) : undefined
+        }else if (!v || v && vNum <= Note.MAX_FRET_INPUT) {
+            this._fret = vNum
+        }
     }
     get fret() { return this._fret }
     updateSelectionMode(mode = true) {
@@ -53,19 +70,19 @@ export default class Note extends MeiTag {
     tabGroup: TabGroup;
     // fret?: number
     
-    id: string;
+    // id: number|string;
     course?: number;
     constructor(tabGroup: TabGroup, info?: TNoteInfo) {
         super();
         this.tabGroup = tabGroup
+        this.id  = Number(info?.id) || undefined
         this.xmlId = info?.xmlId || generateId();
-        this.id = this.xmlId
+        // this.id = this.xmlId
         this.fret = info?.fret;
         this.course = info?.course;
         setTimeout(this.setupEl.bind(this), 100)
     }
     changeDuration(durnum: DurNum) {
-
         this.tabGroup.setDur(durnum);
     }
 

@@ -1,7 +1,7 @@
 import { TTabCourseTuningInfo } from "./db-types";
 import Measure from "./Measure";
 import MeiAttribute from "./mei-modules/MeiAttribute";
-import MeiJSsonElem from "./mei-modules/MeiJsonXmlElement";
+import MeiJsonElem from "./mei-modules/MeiJsonXmlElement";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import Note from "./Note";
 import RezTabFile from "./RezTabFile";
@@ -29,6 +29,7 @@ export default class Section extends MeiTag {
     static fromMeiFactoryArgs( doc: RezTabFile, arg: TMeiTagFactoryArgs, stavesInfo?: TStaffInfo[]) {
         
         const instance = new Section(doc, [], {staves: stavesInfo || [] })
+        instance.id = arg.id
         instance.info = {
             staves: stavesInfo || []
         }
@@ -148,7 +149,7 @@ export default class Section extends MeiTag {
     cleanupChildren() {
         this.measures.forEach(m => m.cleanupTabGroups())
     }
-    toJsonXmlElement(): MeiJSsonElem {
+    toJsonXmlElement(): MeiJsonElem {
         this.cleanupChildren();
         return super.toJsonXmlElement()
     }

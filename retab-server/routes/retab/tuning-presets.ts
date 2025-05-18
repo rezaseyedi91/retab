@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 
     // writeFileSync('./tuning-presets.json', JSON.stringify(options))
     res.json(options)
-})
+})  
 
 router.get('/define', async (req, res) => {
     const tunings: TTuningPreset[] = [{
@@ -57,10 +57,6 @@ router.get('/define', async (req, res) => {
     {
         title: 'Lute in G (Default)',
         tuning: [
-
-
-
-
             { n: 1, pname: "g", oct: 4, },
             { n: 2, pname: "d", oct: 4, },
             { n: 3, pname: "a", oct: 3, },

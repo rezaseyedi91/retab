@@ -1,15 +1,22 @@
 <template>
 
     <router-view />
-    <!-- <button class="button my-5" @click="test">get Doc</button> -->
+    
 
 </template>
 
 <script setup lang="ts">
 
+import axios from 'axios';
 import RezTabFile from './store/modules/RezTabFile';
+import { useStore } from 'vuex';
+import DevTest from './components/utils/DevTest.vue';
+import { useDoc } from './composables/useDoc';
+test()
 async function test() {
-  const sampleDocId = 5;
-  const doc = await RezTabFile.getInstanceFromServer(sampleDocId)
+  // const result = await axios.get(useStore().state.apiUrl + '/test/dbman')
+  
+  
+  return
 }
 </script>

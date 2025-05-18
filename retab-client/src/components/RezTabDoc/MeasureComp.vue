@@ -1,5 +1,6 @@
 <template>
     <div class="measure">
+  
         <StaffComp 
         :staff-index="index"
         v-for="(staff, index) in getMeasure()?.staves" :staffN="staff.n" :key="index * store.state.utils.keyCoefficient"
@@ -17,7 +18,7 @@ import { useStore } from 'vuex';
 import StaffComp from './StaffComp.vue';
 import RezTabFile from '@/store/modules/RezTabFile';
 const store = useStore();
-const props = defineProps<{measureN: number}>()
+const props = defineProps<{measureN: number, keyK: number}>()
 function getMeasure() {
     return (store.state.currentDoc as RezTabFile).section.getMeasureFromN(props.measureN)
 }

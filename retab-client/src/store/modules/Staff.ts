@@ -2,13 +2,14 @@ import { useStore } from "vuex";
 import store from "..";
 import Measure from "./Measure"
 import MeiAttribute from "./mei-modules/MeiAttribute";
-import MeiJSsonElem from "./mei-modules/MeiJsonXmlElement";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import RezTabFile from "./RezTabFile";
 import TabGroup from "./TabGroup";
-import { TabCourseTuningInfo, TCourseInfo } from "./types";
+import { TabCourseTuningInfo, TabType, TCourseInfo } from "./types";
 import Note from "./Note";
 import { generateId } from "./utils";
+import Layer from "./Layer";
+import { useDoc } from "@/composables/useDoc";
 
 export default class Staff extends MeiTag {
     tagTitle = 'staff';
@@ -31,7 +32,6 @@ export default class Staff extends MeiTag {
     ]
     n?: number
     measure: Measure;
-
     linesCount = 6
     constructor(measure: Measure, info?: { linesCount: number }, n = 1) {
         super();
@@ -46,6 +46,19 @@ export default class Staff extends MeiTag {
     setTabgroupsIncludeDurAttribute(mode: boolean) {
         this.tabGroups.forEach(t => t.setIncludeDurAttribute(mode))
     }
+    getLayer(index = 0) {
+        if (!this.layers[0]){
+            this.layers.push(new Layer(this))
+        }
+        return this.layers[0]
+    }
+    get tabGroups(): TabGroup[] {
+        return this.getLayer().tabGroups
+    }
+
+    set tabGroups(tgs: TabGroup[]) {
+        this.getLayer().tabGroups = tgs
+    }
     static getDefaultTuning(number: number) {
         const found =  this.DEFAULT_TUNING.find(c => c.n == number);
         if (!found) console.error(`cannot find a tuning for number: `, number, this.DEFAULT_TUNING)
@@ -53,6 +66,10 @@ export default class Staff extends MeiTag {
     }
     setLinesCount(c: number) { 
         this.linesCount = c;
+    }
+    getTabType() {
+        // when there's only one staff:
+        return this.measure.section.getDoc().getTabType();
     }
 
     removeLine(lineN: number) {
@@ -68,7 +85,6 @@ export default class Staff extends MeiTag {
     sortLines() {
 
         this.lines = this.lines.sort((a, b) => {
-            
             return b.courseInfo.number - a.courseInfo.number})
             .map((line, index, arr) => {
                 line.setCourseNumber(arr.length - index);
@@ -87,12 +103,12 @@ export default class Staff extends MeiTag {
     }
     
     lines: StaffLine[] = []
-    tabGroups: TabGroup[] = []
+    layers: Layer[] = []
     setAttributes(): void {
         if (this.n) this.attributes.push(new MeiAttribute('n', this.n!))
     }
     updateChildren(): MeiTag {
-        this.children = this.tabGroups.map(tg => tg.updateChildren());
+        this.children = this.layers.map(l => l.updateChildren());
         return this
     }
  
@@ -123,10 +139,11 @@ export default class Staff extends MeiTag {
                 return new StaffLine(this,   {number, tuning: foundTuning} )})
 
     }
+
     initializeTabgroups(tabGroupJsonXmlElements: TMeiTagFactoryArgs[]) {
         if (!this.lines.length) this.initLines();
         this.tabGroups = tabGroupJsonXmlElements.map(tje => {
-            return TabGroup.fromMeiFactoryArgs(this, tje)
+            return TabGroup.fromMeiFactoryArgs(this.getLayer(), tje)
         })
 
     }
@@ -135,28 +152,35 @@ export default class Staff extends MeiTag {
         const instance =  new Staff(measure, {
             linesCount: measure.section.getDoc().docSettings.linesCount// measure.section.info.staves[0].linesCount
         }).init();
-         instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value ||generateId()))
-        if (arg.children?.length) instance.tabGroups = arg.children
-            .filter(ch => ch.tagTitle == 'layer')
-            .reduce((sf: TMeiTagFactoryArgs[], l) => [...sf, ...l.children?.filter(ch => ch.tagTitle == 'tabGrp') || []] , [])
-            .map(tje => TabGroup.fromMeiFactoryArgs(instance, tje));
+        instance.id = arg.id
+        
+        instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value || generateId()))
+        if (arg.children?.length) instance.layers = arg.children
+            .map(lje => Layer.fromMeiFactoryArgs(instance, lje));
         
         return instance;
     }
+
+
+
     init() {
         // this.linesCount = this.info.staves[0].linesCount
         this.initLines()
         //ITALIAN:
         this.addTabGroup();
+        this.reorderLines(this.getTabType())
         return this;
     }
 
 
     addTabGroup(index?: number, tgToAdd?: TabGroup) {
-        const newOne = tgToAdd ||  new TabGroup(this)
+        const newOne = tgToAdd ||  new TabGroup(this.getLayer())
+        
         if (!index && index != 0) this.tabGroups.push(newOne);
         else this.tabGroups.splice(index, 0, newOne)
+        
         this.updateChildren();
+        this.measure.section.getDoc().updateUI()
         return newOne
     }
 
@@ -174,17 +198,17 @@ export default class Staff extends MeiTag {
     cleanupTabGroups() {
         this.tabGroups.forEach(tg => tg.cleanup());
     }
-    toJsonXmlElement(): MeiJSsonElem {
-        const superResult = super.toJsonXmlElement();
-        superResult.children = [
-            new MeiJSsonElem({
-                attributes: [new MeiAttribute('n', 1)],
-                children: superResult.children,
-                tagTitle: 'layer'
-            })
-        ]
-        return superResult;
-    }
+    // toJsonXmlElement(): MeiJsonElem {
+    //     const superResult = super.toJsonXmlElement();
+    //     // superResult.children = [
+    //     //     new MeiJsonElem({
+    //     //         attributes: [new MeiAttribute('n', 1)],
+    //     //         children: superResult.children,
+    //     //         tagTitle: 'layer',
+    //     //     })
+    //     // ]
+    //     return superResult;
+    // }
     insertTabgroupBefore(tg: TabGroup, tgToAdd?: TabGroup) {
         let index = this.tabGroups.indexOf(tg)
 
@@ -193,10 +217,18 @@ export default class Staff extends MeiTag {
     }
 
     insertTabgroupAfter(tg: TabGroup, tgToAdd?: TabGroup) {
+        
         let index = this.tabGroups.indexOf(tg)
+        
         if (index < 0) index = 0
         return this.addTabGroup(index + 1, tgToAdd)
     }
+    reorderLines(tabType: TabType) {
+        if (tabType == TabType.ITALIAN) this.lines = this.lines.sort((a, b) => b.courseInfo.number - a.courseInfo.number)
+            else if (tabType == TabType.FRENCH) this.lines = this.lines.sort((a, b) => a.courseInfo.number - b.courseInfo.number)
+                
+    }
+
 
 }
 
@@ -226,7 +258,6 @@ export class StaffLine {
             this.courseInfo.tuning = this.tuning
         } 
     }
-
 
 }
 

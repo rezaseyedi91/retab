@@ -7,6 +7,8 @@ import MeiMainTag from "../mei-tags/MeiMainTag";
 import Section from "../mei-tags/Section";
 import StaffInfoContainer from "./StaffInfoContainer";
 import RetabUser from "./User";
+import { writeFileSync } from "fs";
+import { includeMeiTagChildrenRecursively } from "../../utils";
 
 
 
@@ -33,7 +35,7 @@ export default class RetabDoc implements TRetabDoc {
     }
     initializeMeiMainTag() {
         // 
-        this.mainChild = new MeiMainTag({})
+        this.mainChild = new MeiMainTag({docId: this.id})
     }
 
     appendHead(head: MeiTag) {
@@ -88,7 +90,7 @@ export default class RetabDoc implements TRetabDoc {
                 where: { id },
                 include: {
                     user: true,
-                    mainChild: includeChildrenRecursively(),
+                    mainChild: includeMeiTagChildrenRecursively(),
                     stavesInfo: {
                         include: {
                             tuning: true
@@ -102,9 +104,9 @@ export default class RetabDoc implements TRetabDoc {
             return instance;
         } catch (error) {
             console.log('Err: No Doc Record Found.')
-        }
+        } 
 
-    }
+    } 
     getDataToEdit() {
         return {
             id: this.id,
@@ -128,7 +130,7 @@ export default class RetabDoc implements TRetabDoc {
         return this.mainChild?.getHead()
     }
     setInfo(info: TRetabDoc) {
-        
+        // writeFileSync('./temp.json', JSON.stringify(info))
         this.id = info.id;
         this.lastModifiedAt = new Date(info.lastModifiedAt!);
         this.mainChild = new MeiMainTag(info.mainChild || undefined);
@@ -164,6 +166,13 @@ export default class RetabDoc implements TRetabDoc {
 
         await this.saveStavesInfo();
         await this.mainChild?.save(this);
+        
+        // const header = this.mainChild?.getHead();
+            
+        const user = await RetabUser.getUser(userId);
+        //commented for debug
+        await user.saveEncoderHeader({headerTagId: await this.mainChild?.getHeadId()})
+        
 
     }
     async saveStavesInfo() {
@@ -249,14 +258,3 @@ export default class RetabDoc implements TRetabDoc {
 }
 
 
-function includeChildrenRecursively(n = 1): any {
-    if (n >= 20) return {
-        include: { children: { orderBy: { indexAmongSiblings: 'asc' } }, attributes: true }
-    }
-    else return {
-        include: { children: { ...includeChildrenRecursively(n + 1), orderBy: { indexAmongSiblings: 'asc' } }, attributes: true }
-    }
-
-
-
-}

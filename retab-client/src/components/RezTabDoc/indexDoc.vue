@@ -1,20 +1,23 @@
 <template>
     
-    <DevTest>
-        <!-- {{ (store.state.currentDoc as RezTabFile).docSettings.proportion }} -->
-    </DevTest>
+ 
     <div class="p-4" v-if="isLoaded" ref="retabDocContainer">
         <!-- <va-button @click="debugSL">SL</va-button> -->
-        <h2 class="mb-5 va-h6">{{ (store.state.currentDoc as RezTabFile).getAltTitle() }}</h2>
-        <div class="section flex max-w-full overflow-x-auto">
+         <DocTitle :key="store.state.utils.keyCoefficient"/>
+        <div class="section flex max-w-full overflow-x-auto overflow-y-hidden">
             <MeasureComp :measure-n="(measure as Measure).n"
-                v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure" :key="index">
+                v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure" 
+                :key="(index + 1) * store.state.utils.keyCoefficient *10"
+                :keyK="(index + 1) * store.state.utils.keyCoefficient *10"
+                >
             </MeasureComp>
+            <div class="px-2">
+                <va-button icon="add" color="color1" :outline="true" class="opacity-80" @click="addMeasure"></va-button>
+            </div>
         </div>
-        <div class="my-3">
+        <!-- <div class="my-3">
             <va-button color="#a855f7" class="p-3 bg-purple-500 font-bold cursor-pointer" @click="addMeasure">Add Measure</va-button>
-
-        </div>
+        </div> -->
 
     </div>
 
@@ -30,8 +33,9 @@ import { Instrumnet, TabType } from '@/store/modules/types';
 import Note from '@/store/modules/Note';
 import TabGroup from '@/store/modules/TabGroup';
 import DevTest from '../utils/DevTest.vue';
+import { useDoc } from '@/composables/useDoc';
+import DocTitle from './DocTitle.vue';
 const store = useStore();
-
 const props = defineProps<{
     id: string
 }>();
@@ -168,12 +172,19 @@ class SelectionListener {
 
     /**for Selected Notes */
     deleteSelectedNotes(deleteTabgroups = false) {
+        console.log({deleteTabgroups});
+        
         if (!deleteTabgroups) {
-            this.selectedNotes.forEach(n => { n.tabGroup.updateSelectionMode(false); n.softDelete();})
-            this.cancelSelection()
+            this.selectedNotes.forEach(n => { 
+                n.tabGroup.updateSelectionMode(false); 
+                n.softDelete();
+            })
+            this.cancelSelection();
+            this.selectedNotes = []
         }
         else this.selectedNotes.forEach(n => n.tabGroup?.remove());
-            this.selectedNotes= []
+        
+        useDoc().updateUI()
         return
     }
 
@@ -270,7 +281,8 @@ class SelectionListener {
     pasteTabgroups() {
         let anchorNote = this.getAnchorNote();
         const anchorNoteMeasureN = anchorNote?.tabGroup.staff.measure.n
-        console.log(anchorNoteMeasureN)
+        
+        
         const cb = [...this.clipboard];
         const tabGroups = cb.map(n => n.tabGroup).filter((i, idx, arr) => arr.indexOf(i) == idx);
 
@@ -360,7 +372,7 @@ async function addMeasure() {
 }
 function initNewDocStuff() {
     const doc = (store.state.currentDoc) as RezTabFile
-    store.state.ui.showPreferencesModal = true
+    // store.state.ui.showPreferencesModal = true
     TabGroup.initializeStatics();
 }
 let { id: docId } = toRefs(props)
@@ -369,7 +381,7 @@ async function fetchDoc(id: any) {
         createdAt: new Date(),
         filename: 'file-one.txt',
         instruments: [Instrumnet.LUTE],
-        tabType: TabType.ITALIAN
+        tabType: `tab.lute.${TabType.ITALIAN}`
     }).init() : await RezTabFile.getInstanceFromServer(id);
 }
 const isLoaded = ref(false);
@@ -378,11 +390,11 @@ const temp = ref(sl.value.selectionHighlighterXYs)
 onMounted(async () => {
     
     if(docId.value == 'new') initNewDocStuff()
+
     await fetchDoc(docId.value);
-    
     isLoaded.value = true;
     sl.value.setListeners();
-
+setTimeout(useDoc().updateUI, 100)
 
 
 });

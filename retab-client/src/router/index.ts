@@ -41,8 +41,8 @@ router.beforeEach(async (to, from) => {
   try {
     const response = await axios.get(store.state.apiUrl + '/retab/auth', {withCredentials: true})
     const authenticatedUser = response.data
-    console.log('auth');
-    console.log(response);
+    
+    
     
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
@@ -55,7 +55,6 @@ router.beforeEach(async (to, from) => {
     }
   } catch(err: any) {
     // if (err.status == 403) router.push('Login')
-    console.log('err.response.status');
     console.log(err.response.status);
     
   }

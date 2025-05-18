@@ -43,6 +43,7 @@ export default class TabNote extends MeiTag {
     tagTitle = 'note'; 
     constructor(payload?:TMeiTag ) {
         super(payload)
+
     }
     setAttributes() {
         this.attributes = this.attributes || [];

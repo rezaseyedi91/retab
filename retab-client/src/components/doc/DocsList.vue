@@ -68,7 +68,7 @@ async function getSavedDocsList() {
     })).data
     list.value = resData.docsList
     totalPages.value = resData.totalPages
-    console.log(list.value[0])
+    
 }
 
 const currentPage = ref(1)

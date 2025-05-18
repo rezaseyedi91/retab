@@ -31,7 +31,7 @@ export default class StaffInfoContainer implements TStaffInfo {
     }
 
     constructor(info: TStaffInfo) {
-
+        
         this.n = info.n || StaffInfoContainer.DEFAULT_INFO.n
         this.linesCount = info.linesCount || StaffInfoContainer.DEFAULT_INFO.linesCount
         this.notationType = info.notationType || StaffInfoContainer.DEFAULT_INFO.notationType

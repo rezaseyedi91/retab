@@ -12,3 +12,14 @@ export function generateId(): string {
     }
     return str;
 }
+
+export function downloadJsonDataAsFile(json: any) {
+    const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json))
+    const anchorEl = document.createElement('a');
+    document.body.appendChild(anchorEl);
+    anchorEl.setAttribute('href', str);
+    anchorEl.innerHTML = 'hey ther'
+    anchorEl.setAttribute('download', 'temp.json');
+    anchorEl.click();
+    anchorEl.remove()
+}

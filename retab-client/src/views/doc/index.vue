@@ -1,11 +1,11 @@
 <template>
-    <div>
+  <div>
 
-          <PanelLayout >
-        <RouterView/>
-        <DocsList />
-          </PanelLayout >
-    </div>
+    <PanelLayout>
+      <RouterView />
+      <DocsList />
+    </PanelLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

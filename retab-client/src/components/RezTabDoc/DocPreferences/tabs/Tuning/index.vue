@@ -1,5 +1,6 @@
 <template>
     <div class="w-full">
+        <TabTypeToggler />
         <TuningPresetSelector :staffIndex="0" 
         @addStaffLine="addStaffLine"
         @remove-staff-line="removeStaffLine"
@@ -22,11 +23,7 @@
                 
             </div>
 
-            <DevTest>
-                <va-button @click="() => console.log(getSection().info.staves[0].tuning)">
-                    log tunings
-                </va-button>
-            </DevTest>
+        
 
     </div>
 
@@ -41,7 +38,7 @@ import TuningPresetSelector from './TuningPreset/TuningPresetSelector.vue';
 import { TTabCourseTuningInfo, TTuningPreset } from '@/store/modules/db-types';
 import { ref } from 'vue';
 import { TabCourseTuningInfo } from '@/store/modules/types';
-import DevTest from '@/components/utils/DevTest.vue';
+import TabTypeToggler from './TabTypeToggler.vue';
 const store = useStore();
 function getSection() { return (store.state.currentDoc as RezTabFile).section }
 const updateKey = ref(Math.random());

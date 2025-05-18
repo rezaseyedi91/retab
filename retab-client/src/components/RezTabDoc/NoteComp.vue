@@ -8,44 +8,75 @@
       {{ note?.fret || 0 }} 
     </div>-->
   <!--  v-else -->
+
+
   <div v-if="note">
     <!-- :placeholder="'c-' + note.course" 
     @focus="onFocus()"
     -->
-      
-    <input @keydown.space="onSpace" 
-     autocomplete="false"
-    @paste="(e) => {e.preventDefault()}" 
-    @keyup="keyup" 
-    @keydown="keydown" 
-    @keypress="keypress"
-    @focus="onNoteInputFocus"
-      class="note-input p-1 w-8 border-1 border-red border-solid" 
-      maxlength="2" 
-      type="string" 
-      v-model="note.fret"
-      :id="note.xmlId"
-      
-      />
+    <input @keydown.space="onSpace" autocomplete="false" @paste="(e) => { e.preventDefault() }" @keyup="keyup"
+      @keydown="keydown" @keypress="keypress" @focus="onNoteInputFocus"
+      class="note-input lute-tab p-1 w-9 border-1 border-red border-solid" maxlength="2" type="string" v-model="fret"
+      :id="note.xmlId" />
+    <!-- v-model="note.fret" -->
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useDoc } from "@/composables/useDoc";
+import Note from "@/store/modules/Note";
 import RezTabFile from "@/store/modules/RezTabFile";
 import { StaffLine } from "@/store/modules/Staff";
 import TabGroup from "@/store/modules/TabGroup";
-import { DurNum } from "@/store/modules/types";
-import { computed, defineProps, onMounted, onUpdated, ref, ComputedRef } from "vue";
+import { DurNum, TabType } from "@/store/modules/types";
+import { computed, defineProps, onMounted, onUpdated, ref, ComputedRef, watch, shallowRef } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
 const props = defineProps<{
   tabGroup: TabGroup;
   line: StaffLine;
+  tabType: TabType
 }>();
 
-
 // props.tabGroup.notes.find(n => n.course == props.line.courseInfo.number)!)
-const note = computed( () => props.tabGroup.getNoteOnCourse(props.line.courseInfo.number)!);
+const note = computed(() => props.tabGroup.getNoteOnCourse(props.line.courseInfo.number)!);
+const fret = ref<string | number | undefined>(note.value.getFretToShow());
+
+watch(fret, val => {
+  if (/^[\u0080-\uFFFF]+$/.test(val + '')) return
+  setFret(val)
+})
+function setFret(val: any) {//: string | number) {
+  // test if the second digit has been added
+  const exec = /^[\u0080-\uFFFF](\d)/.exec(val)
+  
+  if (!exec) {
+    
+    if (val == '')  {
+      
+      val = undefined
+      return
+    }
+    note.value.fret = val;
+    const toShow = note.value.getFretToShow();
+    
+    if (fret.value != toShow) fret.value = toShow
+  } else {
+    const firstDigit = note.value.fret
+    const secondDigit = exec[1];
+    const twoDigitFret = Number(firstDigit + '' + secondDigit);
+    if (twoDigitFret <= Note.MAX_FRET_INPUT) {
+      note.value.fret = twoDigitFret
+      fret.value = note.value.getFretToShow();
+    } else {
+      fret.value = note.value.getFretToShow();
+    }
+    
+  }
+}
+
+
+
 function onSpace() {
   event?.preventDefault();
   const newTabGroup = props.tabGroup.staff.addTabGroup();
@@ -55,6 +86,9 @@ function onSpace() {
     newNoteOnTheSameCourse?.focus()
   }, 50)
 }
+
+
+
 onMounted(() => {
   note.value?.setupEl();
 })
@@ -72,11 +106,11 @@ function keydown(event: KeyboardEvent) {
 
     event.stopPropagation()
     event.preventDefault();
-    
+
     note.value.tabGroup.dot()
     return false
   }
-  
+
 }
 function onNoteInputFocus() {
   const doc = (store.state.currentDoc as RezTabFile);
@@ -105,7 +139,7 @@ function keyup(event: KeyboardEvent) {
       note.value.tabGroup.remove();
       prevNoteToFocus?.focus();
       return false;
-      
+
     } else if (event.key == 'Insert') {
       event.preventDefault()
       note.value.tabGroup.insertTabgroupBefore();
@@ -124,8 +158,9 @@ function keyup(event: KeyboardEvent) {
 
     }
   } else {
-    const otherNote = event.key == "ArrowUp" ? note.value.getAboveNote()
-      : event.key == "ArrowDown" ? note.value.getBelowNote()
+    const tabType = useDoc().getTabType();
+    const otherNote = event.key == "ArrowUp" ? tabType == TabType.FRENCH ? note.value.getBelowNote() : note.value.getAboveNote()
+      : event.key == "ArrowDown" ? tabType == TabType.FRENCH ? note.value.getAboveNote() : note.value.getBelowNote()
         : event.key == "ArrowRight" ? note.value.getRightNote()
           : event.key == "ArrowLeft" ? note.value.getLeftNote()
             : undefined;
@@ -143,7 +178,9 @@ function keyup(event: KeyboardEvent) {
 .note-input:hover {
   background-color: rgba(0, 0, 0, 0.089) !important;
 }
+
 .note-input {
+
   background-color: unset !important;
   outline: red;
 }

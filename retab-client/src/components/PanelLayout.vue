@@ -5,15 +5,15 @@
         <VaNavbar color="primary">
           <template #left>
             <VaNavbarItem>
-              <span class="font-bold text-2xl">
+              <Logo />
+              <!-- <span class="font-bold text-2xl">
                 reTab
-              </span>
+              </span> -->
             </VaNavbarItem>
           </template>
           <template #center>
             <router-link to="/doc">
               <VaNavbarItem>
-                
                 {{ store.state.currentUser?.name }}
                 Docs
               </VaNavbarItem>
@@ -21,16 +21,32 @@
             </router-link>
           </template>
           <template #right>
-            <div class="flex items-baseline gap-x-3">
+            <div class="flex items-baseline gap-x-0">
 
               <VaNavbarItem>
-                <DocPreferences />
+                <va-button  class="p-0" @click="save">
+                  <va-icon name="save" size="2rem"/>
+                </va-button>
               </VaNavbarItem>
               <VaNavbarItem>
+                <va-button  @click="() => useDoc().generateAndDownloadMei()">
+                  <div class="cursor-pointer">
+                    <img src="/logos/mei-logo-simple-dark.png" class="w-14" alt="MEI LOGO">
+                  </div>
+                </va-button>
+              </VaNavbarItem>
+              <VaNavbarItem>
+                <va-button>
+                  <DocPreferences />
+                </va-button>
+              </VaNavbarItem>
+              <VaNavbarItem>
+                     <va-button>
                 <ShortkeysGuid/>
+                      </va-button>
               </VaNavbarItem>
               <VaNavbarItem>
-                <ConnectionChecker />
+                <ConnectionChecker class="mx-2"/>
               </VaNavbarItem>
             </div>
 
@@ -51,5 +67,31 @@ import ConnectionChecker from '@/components/ConnectionChecker.vue';
 import DocPreferences from '@/components/RezTabDoc/DocPreferences/index.vue';
 import ShortkeysGuid from './ShortkeysGuid.vue';
 import { useStore } from 'vuex';
+import Logo from './utils/Logo.vue';
+import { useDoc } from '@/composables/useDoc';
+import RezTabFile from '@/store/modules/RezTabFile';
+import { useToast } from 'vuestic-ui/web-components';
+import { useRouter } from 'vue-router';
 const store = useStore();
+
+const toast = useToast();
+const router = useRouter();
+async function save() {
+    const doc = useDoc();
+    let wannaRefreshThepage = !doc.id;
+    const result = await doc.save();
+    toast.init({
+        color: 'success', message: 'Saved Successfully.',
+        position: 'bottom-right'
+    })
+
+
+    
+    doc.id = result.id
+    doc.unfreeze();
+    if (wannaRefreshThepage) {
+        return  router.push({ path: '/doc/' + doc.id }), 1000
+    } else return doc.unfreeze();
+    
+}
 </script>
