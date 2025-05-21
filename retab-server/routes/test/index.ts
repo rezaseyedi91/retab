@@ -7,48 +7,43 @@ import Authenticator from "../../modules/Authenticator";
 import DB from "../../modules/DB";
 import RetabUser from "../../modules/retab-modules/User";
 import authMiddleware from '../../middleware/auth'
+import RetabDoc from "../../modules/retab-modules/RetabDoc";
 const router = Router();
 
 
 router.get('/dbman', authMiddleware, async (req, res) => {
     const prisma = DB.getInstance();
-    const result = await prisma.$connect();
     //@ts-ignore
-    const user = await RetabUser.getUser(req.userId!);
-    const header = await prisma.meiTag.findUnique({
-        where: { id: 7144 },
+    // const user = await RetabUser.getUser(req.userId!);
+    // const doc = await RetabDoc.getInstanceFromDb(412);
+    // const result = doc
+    // const firstResult = await prisma.meiTag.findMany({
+    //     where :{
+    //         parentId: {gt: 0}
+    //     },
+    //     select: {
+    //         id: true, parentId: true
+    //     }
+    // })
+    // const result = await prisma.$transaction(firstResult.map(t => prisma.meiTag.update({
+    //     where: {id: t.id},
+    //     data: {
+    //         parents: {
+    //             connect: [{id: t.parentId!}]
+    //         }
+    //     }
+    // })))
+    
+    const result = await prisma.meiTag.findMany({
+        where: {
+            // xmlId: 'v3x6k3o0b8s5',
+            parents: {some: {id: 96957}}
+        },
         include: {
-            attributes: true,
-            children: {
-                include: {
-                    attributes: true,
-                    children: {
-                        include: {
-                            attributes: true,
-                            children: {
-                                include: {
-                                    attributes: true,
-                                    children: {
-                                        include: {
-                                            attributes: true,
-                                            children: {
-
-                                            }
-
-                                        }
-                                    }
-
-                                }
-                            }
-
-                        }
-                    }
-
-                }
-            },
+            children: true
         }
     })
-    return res.json(header)
+    return res.json(result)
 })
 router.get('/del', authMiddleware, async (req, res) => {
     const prisma = DB.getInstance();

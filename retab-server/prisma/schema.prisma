@@ -100,10 +100,13 @@ model MeiTag {
   indexAmongSiblings Int       @default(0)
   parentId           Int?
   children           MeiTag[]  @relation(name: "MeiTagChildParent")
-  parent             MeiTag?   @relation(fields: [parentId], references: [id], name: "MeiTagChildParent", onDelete: Cascade, onUpdate: Cascade)
+  // parent             MeiTag?   @relation(fields: [parentId], references: [id], name: "MeiTagChildParent", onDelete: Cascade, onUpdate: Cascade)
+  parents         MeiTag[]  @relation(name: "MeiTagChildParent")
   doc                RetabDoc?
   docId              Int?
   encoderHeaderRelated EncoderHeader?
+
+
 }
 
 model MeiAttribute {

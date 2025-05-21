@@ -12,7 +12,7 @@
                 >
             </MeasureComp>
             <div class="px-2">
-                <va-button icon="add" color="color1" :outline="true" class="opacity-80" @click="addMeasure"></va-button>
+                <va-button icon="add" :outline="true" class="opacity-80" @click="addMeasure"></va-button>
             </div>
         </div>
         <!-- <div class="my-3">

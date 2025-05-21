@@ -53,7 +53,8 @@ export type TTabCourseTuningInfo = {
 export type TMeiTag = {
         attributes?: TMeiAttribute[]
         children?: TMeiTag[]
-        parent?: TMeiTag | null
+        // parent?: TMeiTag | null
+        parents?: TMeiTag[] 
         doc?: TRetabDoc | null
         id?: number
         tagTitle?: string

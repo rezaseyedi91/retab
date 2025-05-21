@@ -52,6 +52,7 @@ export default class RezTabFile {
         this.docSettings.tabgroupsIncludeDurAttribute = !this.docSettings.tabgroupsIncludeDurAttribute;
 
         this.setTabgroupsIncludeDurAttribute(this.docSettings.tabgroupsIncludeDurAttribute);
+    
     }
     setTabgroupsIncludeDurAttribute(mode: boolean) {
         this.section.setTabgroupsIncludeDurAttribute(mode);
@@ -90,7 +91,7 @@ export default class RezTabFile {
         // this.cleanupTabGroups();
         const section = this.section
         const jsonXmlElement = await MeiDocGenerator.generateJsomElem(section);
-
+        this.head?.removeEmptyChildren()
         const headJsonXmlElement = this.head ? await MeiDocGenerator.generateJsomElem(this.head) : undefined;
         // return ;
         const jsonXmlElementParsed = JSON.parse(JSON.stringify(jsonXmlElement));
@@ -122,7 +123,7 @@ export default class RezTabFile {
             docInfo,
             docSettings: this.docSettings
         }
-        console.log(reqBody.headJsonXmlElement?.children[0].children[0]);
+        // console.log(reqBody.sectionJsonXmlElement);
         // return;
         const jsonResult = await axios.post(process.env.VUE_APP_API_URL + '/retab/doc/' + (this.id || 'new'), reqBody)
         return jsonResult.data
@@ -146,7 +147,8 @@ export default class RezTabFile {
         doc.initializeHead(someResponse.headJsonXmlElement);
         doc.unfreeze();
 
-
+        console.log(doc);
+        
         if (someResponse.settings) doc.assignSettings(someResponse.settings)
         return doc
 

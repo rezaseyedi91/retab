@@ -51,11 +51,8 @@ function setFret(val: any) {//: string | number) {
   const exec = /^[\u0080-\uFFFF](\d)/.exec(val)
   
   if (!exec) {
-    
     if (val == '')  {
-      
       val = undefined
-      return
     }
     note.value.fret = val;
     const toShow = note.value.getFretToShow();

@@ -71,6 +71,7 @@ tabDurSymId?: number;
         if (!this.includeDurAttribute) {
             const att = this.attributes.find(a => a.title == 'dur');
             if (att) this.attributes.splice(this.attributes.indexOf(att), 1);
+            this.showTabDurSym = false
         } else {
             this.setAttribute(new MeiAttribute('dur', this.dur))
         }

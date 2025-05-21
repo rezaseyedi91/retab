@@ -21,7 +21,7 @@ export class MeiTag implements TMeiTag {
     doc?: TRetabDoc | undefined;
     docId?: number | undefined;
     indexAmongSiblings?: number | undefined;
-    parent?: TMeiTag | undefined;
+    parents?: TMeiTag[] | undefined;
     relatedChildId?: number | undefined;
     xmlId: string;
     selfClosing = false;
@@ -132,7 +132,7 @@ export class MeiTag implements TMeiTag {
                 }
             }
         });
- 
+
         alreadyHasThem.forEach(alreadyHasAtt => {
             const foundByTitle = this.attributes.find(at => at.title == alreadyHasAtt.title);
             if (!foundByTitle) extrasIds.push(alreadyHasAtt.id)
@@ -169,13 +169,21 @@ export class MeiTag implements TMeiTag {
         })).map(a => new MeiAttribute(a.title, a.value || ''))
     }
 
-    getParentId() { return this.parentId || this.parent?.id }
-    
+    // getParentId() { return this.parentId || this.parent?.id }
+
     async save(doc: RetabDoc) {
 
+        
+    
+        if (this.parents?.find(p => p.tagTitle == 'tuning')) {
+            console.log('tuning child', this.id)
+        }
 
         this.setAttributes();
-
+        // if (this.tagTitle == 'tuning') {
+        //     console.log('==========')
+        //     console.log(this.children)
+        // }
         const prisma = DB.getInstance();
 
         const saved = await prisma.meiTag.upsert({
@@ -188,7 +196,10 @@ export class MeiTag implements TMeiTag {
                 ...this.tagTitle == 'mei' ? { doc: { connect: { id: doc.id } } } : {},
                 tagTitle: this.tagTitle,
                 indexAmongSiblings: this.indexAmongSiblings || 0,
-                ...this.getParentId() ? { parent: { connect: { id: this.parent?.id || this.parentId || 0 } } } : {},
+                // ...this.getParentId() ? { parent: { connect: { id: this.parent?.id || this.parentId || 0 } } } : {},
+                parents: {
+                    connect: this.parents?.map(p => ({id: p.id}))
+                },
                 ...this.textContent ? { textContent: this.textContent } : {},
             },
             update: {
@@ -197,6 +208,9 @@ export class MeiTag implements TMeiTag {
                 ...this.tagTitle == 'mei' ? { doc: { connect: { id: doc.id } } } : {},
                 tagTitle: this.tagTitle,
                 indexAmongSiblings: this.indexAmongSiblings || 0,
+                  parents: {
+                    connect: this.parents?.map(p => ({id: p.id}))
+                },
                 ...this.textContent ? { textContent: this.textContent } : {},
 
             },
@@ -210,15 +224,31 @@ export class MeiTag implements TMeiTag {
         await this.updatePrevSavedAttributes();
         //removing extra children
         try {
-               await prisma.meiTag.deleteMany({
+            const updatedChildrenIds = this.children.map(ch => ch.id!).filter(id => id);
+            const extraChidlren = await prisma.meiTag.findMany({
                 where: {
                     AND: [
-                        { parentId: this.id },
-                        { id: { notIn: this.children.map(ch => ch.id!).filter(id => id) } }
+                        { parents: { some: { id: this.id } } },
+                        { id: { notIn: updatedChildrenIds } }
                     ]
-                }
+                },
             })
+            await prisma.$transaction(extraChidlren.map(ch => prisma.meiTag.update({
+                where: {id: ch.id},
+                data: {parents: {disconnect: {id: this.id}}}
+
+            })))
+          
+            // await prisma.meiTag.deleteMany({
+            //     where: {
+            //         AND: [
+            //             { parentId: this.id },
+            //             { id: { notIn: this.children.map(ch => ch.id!).filter(id => id) } }
+            //         ]
+            //     }
+            // })
             this.setChildrenParentId();
+            
             await Promise.all(this.children.map(ch => ch.save(doc)));
             return;
 
@@ -236,9 +266,11 @@ export class MeiTag implements TMeiTag {
     setChildrenParentId() {
         if (!this.id) throw new Error('WE HAVE NO ID HERE!');
         this.children.forEach((ch, index) => {
-            ch.parentId = this.id
+            // ch.parentId = this.id
             ch.indexAmongSiblings = ch.indexAmongSiblings || index
-            ch.parent = this
+            ch.parents = ch.parents || [];
+            ch.parents?.push(this)
+
         })
     }
 
@@ -310,7 +342,7 @@ export class MeiTag implements TMeiTag {
         const newTag = new MeiTagInstance(args);
         if (newTag.tagTitle == 'corpName') {
             console.log('----', newTag.attributes);
-            
+
         }
         newTag.selfClosing = args.selfClosing || false
         if (args.textContent) newTag.textContent = args.textContent
@@ -319,6 +351,10 @@ export class MeiTag implements TMeiTag {
     getAttributesJoint(): string {
 
         return this.attributes.map(att => att.toString()).join(' ')
+    }
+
+    getAttribute(key: string) {
+        return this.attributes.find(at => at.title == key)
     }
     pushAttribute(att: MeiAttribute) {
         if (!this.hasSameAttributeKeyValue(att)) {

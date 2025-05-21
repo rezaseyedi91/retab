@@ -136,6 +136,7 @@ export default class RetabUser implements TUser {
 
     async saveEncoderHeader(enHeader: TEncoderHeader) {
         try {
+            
             const saveResult = await DB.getInstance().encoderHeader.upsert({
                 where: {
                     headerTagId_userId: {

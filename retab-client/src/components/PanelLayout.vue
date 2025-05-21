@@ -2,7 +2,7 @@
   <div>
     <va-layout>
       <template #top>
-        <VaNavbar color="primary">
+        <VaNavbar color="primary" class="items-center">
           <template #left>
             <VaNavbarItem>
               <Logo />
@@ -24,12 +24,12 @@
             <div class="flex items-baseline gap-x-0">
 
               <VaNavbarItem>
-                <va-button  class="p-0" @click="save">
-                  <va-icon name="save" size="2rem"/>
+                <va-button class="p-0" @click="save">
+                  <va-icon name="save" size="2rem" />
                 </va-button>
               </VaNavbarItem>
               <VaNavbarItem>
-                <va-button  @click="() => useDoc().generateAndDownloadMei()">
+                <va-button @click="() => useDoc().generateAndDownloadMei()">
                   <div class="cursor-pointer">
                     <img src="/logos/mei-logo-simple-dark.png" class="w-14" alt="MEI LOGO">
                   </div>
@@ -41,13 +41,21 @@
                 </va-button>
               </VaNavbarItem>
               <VaNavbarItem>
-                     <va-button>
-                <ShortkeysGuid/>
-                      </va-button>
+                <va-button>
+                  <ShortkeysGuid />
+                </va-button>
               </VaNavbarItem>
-              <VaNavbarItem>
-                <ConnectionChecker class="mx-2"/>
+              <VaNavbarItem class="self-center">
+                <router-link class="h-full" to="/doc/new" target="_blank">
+                  <va-button color="info" >
+                    <va-icon name="add">
+                    </va-icon>
+                  </va-button>
+                </router-link>
               </VaNavbarItem>
+              <!-- <VaNavbarItem>
+                <ConnectionChecker class="mx-2" />
+              </VaNavbarItem> -->
             </div>
 
           </template>
@@ -77,21 +85,21 @@ const store = useStore();
 const toast = useToast();
 const router = useRouter();
 async function save() {
-    const doc = useDoc();
-    let wannaRefreshThepage = !doc.id;
-    const result = await doc.save();
-    toast.init({
-        color: 'success', message: 'Saved Successfully.',
-        position: 'bottom-right'
-    })
+  const doc = useDoc();
+  let wannaRefreshThepage = !doc.id;
+  const result = await doc.save();
+  toast.init({
+    color: 'success', message: 'Saved Successfully.',
+    position: 'bottom-right'
+  })
 
 
-    
-    doc.id = result.id
-    doc.unfreeze();
-    if (wannaRefreshThepage) {
-        return  router.push({ path: '/doc/' + doc.id }), 1000
-    } else return doc.unfreeze();
-    
+
+  doc.id = result.id
+  doc.unfreeze();
+  if (wannaRefreshThepage) {
+    return router.push({ path: '/doc/' + doc.id }), 1000
+  } else return doc.unfreeze();
+
 }
 </script>

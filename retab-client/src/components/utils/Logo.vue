@@ -21,10 +21,10 @@
 </div>
 </template>
 <script setup lang="ts">
-const floodColor =   '#bce1f0'
+const floodColor =   '#1f1f1f'
 </script>
 <style scoped>
-.cls-1 {
+.cls-1 {    
     filter: url(#drop-shadow-2);
 }
 

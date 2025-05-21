@@ -96,7 +96,7 @@ const workCreationCountry = shallowRef(doc.head?.__('workList').__('work').__('c
     {
         title: 'Encoder',
         inputs: [
-            {label: "encoderName", vModel: encoderName},
+            {label: "encoder Name", vModel: encoderName},
             {label: "encoder Auth", vModel: encoderAuth},
             {label: "encoder Auth Uri", vModel: encoderAuthUri},
             {label: "encoder Xml Id", vModel: encoderXmlId},
@@ -105,45 +105,45 @@ const workCreationCountry = shallowRef(doc.head?.__('workList').__('work').__('c
             {label: "locus Folio To", vModel: locusFolioTo},
             {label: "locus Folio Content", vModel: locusFolioContent},
             {label: "term Genre", vModel: termGenre},
-            {label: "projectDescHead", vModel: projectDescHead},
-            {label: "projectDescP", vModel: projectDescP},
+            {label: "project DescHead", vModel: projectDescHead},
+            {label: "project Desc P", vModel: projectDescP},
             
         ]
     }, {
         title: 'Encoder Corporation Name and Address',
         inputs: [
-            {label: "corpOneName", vModel: corpOneName},
-            {label: "corpTwoName", vModel: corpTwoName},
+            {label: "corp One Name", vModel: corpOneName},
+            {label: "corp Two Name", vModel: corpTwoName},
             {label: "street", vModel: street},
-            {label: "postBox", vModel: postBox},
-            {label: "postCode", vModel: postCode},
+            {label: "post Box", vModel: postBox},
+            {label: "post Code", vModel: postCode},
             {label: "settlement", vModel: settlement},
             {label: "country", vModel: country},
         ]
     }, {
         title: 'Funder',
         inputs: [
-            {label: "funderCorpOneName", vModel: funderCorpOneName},
-            {label: "funcderCorpTwoName", vModel: funcderCorpTwoName},
-            {label: "funcderCorpTwoAuth", vModel: funcderCorpTwoAuth},
-            {label: "funcderCorpTwoUri", vModel: funcderCorpTwoUri},
+            {label: "funder Corp One Name", vModel: funderCorpOneName},
+            {label: "funcder Corp Two Name", vModel: funcderCorpTwoName},
+            {label: "funcder Corp Two Auth", vModel: funcderCorpTwoAuth},
+            {label: "funcder Corp Two Uri", vModel: funcderCorpTwoUri},
         ]
         
     }, {
         title: 'work Creation Information',
         inputs: [
-            {label: "workCreationDateFrom", vModel: workCreationDateFrom},
-            {label: "workCreationDateTo", vModel: workCreationDateTo},
-            {label: "workCreationDateSpan", vModel: workCreationDateSpan},
-            {label: "workCreationSettlement", vModel: workCreationSettlement},
-            {label: "workCreationCountry", vModel: workCreationCountry},
+            {label: "work Creation Date From", vModel: workCreationDateFrom},
+            {label: "work Creation Date To", vModel: workCreationDateTo},
+            {label: "work Creation Date Span", vModel: workCreationDateSpan},
+            {label: "work Creation Settlement", vModel: workCreationSettlement},
+            {label: "work Creation Country", vModel: workCreationCountry},
             
         ]
     }, {
         title: 'Publication Information', 
         inputs: [
-            {label: "pubAvailability", vModel: pubAvailability},
-            {label: "physLocRepoCorpName", vModel: physLocRepoCorpName},
+            {label: "pub Availability", vModel: pubAvailability},
+            {label: "phys Loc Repo CorpName", vModel: physLocRepoCorpName},
 
         ]
     }

@@ -17,7 +17,7 @@ export default abstract class MeiTag {
     toJsonXmlElement(): MeiJsonElem {
         this.updateChildren();
         this.setAttributes();
-   
+
         return new MeiJsonElem({
             indexAmongSiblings: this.indexAmongSiblings,
             tagTitle: this.tagTitle,
@@ -56,7 +56,7 @@ export default abstract class MeiTag {
         const found = this.children.find(ch => ch.tagTitle == child.tagTitle)
         return found ? found instanceof MeiTag ? found : new MeiTagInstance(found) : this.addChildIfNotExists(child, index)
     }
-    hasTheSameAttributeAndValue({ title, value }: { title: string, value: string|undefined }) {
+    hasTheSameAttributeAndValue({ title, value }: { title: string, value: string | undefined }) {
         if (value == undefined) return !!this.attributes.find(a => a.title == title)
         return !!this.attributes.find(a => a.title == title && a.value == value)
     }
@@ -65,10 +65,10 @@ export default abstract class MeiTag {
         return this.attributes.find(att => att.title == title)
     }
     getChildByTagName(tagname: string) {
-        
+
         const testAtts = /(((?!\[).)*)\[((((?!=).)*)=(((?!\]).)*))\]/.exec(tagname);
-        const attTofind = { title:<string> '', value:<string|undefined> '' }
-        
+        const attTofind = { title: <string>'', value: <string | undefined>'' }
+
         if (testAtts) {
             tagname = testAtts[1]
             attTofind.title = testAtts[4]
@@ -77,10 +77,10 @@ export default abstract class MeiTag {
             const testJustAttTitle = /(((?!\[).)*)\[((((?!\]).)*)\])/.exec(tagname)
             if (testJustAttTitle) {
                 tagname = testJustAttTitle[1]
-                attTofind.title = testJustAttTitle[4] 
+                attTofind.title = testJustAttTitle[4]
                 attTofind.value = undefined
             }
-            
+
         }
 
         return this.children.find(ch => (ch.tagTitle == tagname && (!attTofind.title || attTofind.title && ch.hasTheSameAttributeAndValue(attTofind))))
@@ -102,6 +102,23 @@ export default abstract class MeiTag {
     }
     pushChild(args: TMeiTagFactoryArgs) { this.children.push(MeiTag.makeTagsTree(args)) }
     removeChildByIndex(idx: number) { this.children.splice(idx, 1) }
+
+
+    removeEmptyChildren() {
+        const indexesToRemove: number[] = []
+        this.children.forEach((ch, index) => {
+
+            const doesntHaveChildren = ch.children.length == 0
+            const doesntHaveTextContent = ch.textContent == ''
+            const doestHaveAttributes = ch.attributes.filter(at => at.value).length == this.attributes.length;
+            const inNotSelfClosing = !(ch.selfClosing == true)
+            if (doesntHaveChildren && doesntHaveTextContent && doestHaveAttributes && inNotSelfClosing) indexesToRemove.push(index)
+            else ch.removeEmptyChildren()
+
+
+        })
+        this.children = this.children.filter((ch, index) => !indexesToRemove.includes(index));
+    }
 }
 
 export class MeiTagInstance extends MeiTag {
@@ -119,5 +136,9 @@ export class MeiTagInstance extends MeiTag {
     updateChildren(): MeiTag {
         return this;
     }
+
+
+
+
 
 }
