@@ -8,6 +8,8 @@ import DB from "../../modules/DB";
 import RetabUser from "../../modules/retab-modules/User";
 import authMiddleware from '../../middleware/auth'
 import RetabDoc from "../../modules/retab-modules/RetabDoc";
+import { log } from "console";
+import { TMeiTag } from "../../modules/db-types";
 const router = Router();
 
 
@@ -21,22 +23,67 @@ router.get('/dbman', authMiddleware, async (req, res) => {
     // const doc = await RetabDoc.getInstanceFromDb(412);
     // const result = doc
     const firstResult = await prisma.meiTag.findMany({
-        where :{
-            parentId: {gt: 0}
+        where: {
+            parentId: { gt: 0 }
         },
         select: {
             id: true, parentId: true
         }
     })
-    const result = await prisma.$transaction(firstResult.map(t => prisma.meiTag.update({
-        where: {id: t.id},
-        data: {
-            parents: {
-                connect: [{id: t.parentId!}]
+    async function doIt(t?: TMeiTag) {
+        if (!t) return
+        await prisma.meiTag.update({
+            where: { id: t.id },
+            data: {
+                parents: {
+                    connect: [{ id: t.parentId! }]
+                }
             }
-        }
-    })))
-    
+        })
+    }
+    while (firstResult.length) {
+
+        await Promise.all([
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+            doIt(firstResult.pop()),
+        ])
+        console.log(firstResult.length);
+        
+    }
+
+
+
     // const result = await prisma.meiTag.findMany({
     //     where: {
     //         // xmlId: 'v3x6k3o0b8s5',
@@ -46,7 +93,7 @@ router.get('/dbman', authMiddleware, async (req, res) => {
     //         children: true
     //     }
     // })
-    return res.json(result)
+    return res.json('done!')
 })
 // router.get('/del', authMiddleware, async (req, res) => {
 //     const prisma = DB.getInstance();
