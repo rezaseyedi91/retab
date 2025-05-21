@@ -11,51 +11,54 @@ import RetabDoc from "../../modules/retab-modules/RetabDoc";
 const router = Router();
 
 
+router.get('/', authMiddleware, async (req, res) => {
+    return res.json('/test')
+})
 router.get('/dbman', authMiddleware, async (req, res) => {
     const prisma = DB.getInstance();
     //@ts-ignore
     // const user = await RetabUser.getUser(req.userId!);
     // const doc = await RetabDoc.getInstanceFromDb(412);
     // const result = doc
-    // const firstResult = await prisma.meiTag.findMany({
-    //     where :{
-    //         parentId: {gt: 0}
-    //     },
-    //     select: {
-    //         id: true, parentId: true
-    //     }
-    // })
-    // const result = await prisma.$transaction(firstResult.map(t => prisma.meiTag.update({
-    //     where: {id: t.id},
-    //     data: {
-    //         parents: {
-    //             connect: [{id: t.parentId!}]
-    //         }
-    //     }
-    // })))
-    
-    const result = await prisma.meiTag.findMany({
-        where: {
-            // xmlId: 'v3x6k3o0b8s5',
-            parents: {some: {id: 96957}}
+    const firstResult = await prisma.meiTag.findMany({
+        where :{
+            parentId: {gt: 0}
         },
-        include: {
-            children: true
+        select: {
+            id: true, parentId: true
         }
     })
+    const result = await prisma.$transaction(firstResult.map(t => prisma.meiTag.update({
+        where: {id: t.id},
+        data: {
+            parents: {
+                connect: [{id: t.parentId!}]
+            }
+        }
+    })))
+    
+    // const result = await prisma.meiTag.findMany({
+    //     where: {
+    //         // xmlId: 'v3x6k3o0b8s5',
+    //         parents: {some: {id: 96957}}
+    //     },
+    //     include: {
+    //         children: true
+    //     }
+    // })
     return res.json(result)
 })
-router.get('/del', authMiddleware, async (req, res) => {
-    const prisma = DB.getInstance();
-    const result = await prisma.$transaction([
-        prisma.encoderHeader.deleteMany({}),
-        prisma.staffInfo.deleteMany({}),
-        prisma.meiTag.deleteMany({}),
-        prisma.meiAttribute.deleteMany({}),
-        prisma.retabDoc.deleteMany({}),
-    ])
-    return res.json(result)
-})
+// router.get('/del', authMiddleware, async (req, res) => {
+//     const prisma = DB.getInstance();
+//     const result = await prisma.$transaction([
+//         prisma.encoderHeader.deleteMany({}),
+//         prisma.staffInfo.deleteMany({}),
+//         prisma.meiTag.deleteMany({}),
+//         prisma.meiAttribute.deleteMany({}),
+//         prisma.retabDoc.deleteMany({}),
+//     ])
+//     return res.json(result)
+// })
 router.use('/retab', retabTestRouter)
 // router.use('/get-midi', getMidiRouter)
 
