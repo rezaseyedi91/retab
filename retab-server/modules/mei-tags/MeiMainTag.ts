@@ -103,25 +103,25 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
             // coursesTunings.forEach((course, index) => {
             //     tuningChild.addChildIfNotExists(new MeiTagInstance(course as TMeiTagFactoryArgs), index)
             // })
-            console.log(tuningChild.children);
-
+            console.log('tuning before forEach');
+            
             tuningChild.children.forEach(ch => {
                 const child_pname = ch.getAttribute('pname')?.value
                 const child_n = ch.getAttribute('n')?.value
                 const child_oct = ch.getAttribute('oct')?.value
                 const child_accid = ch.getAttribute('accid')?.value
-
+                
                 const savedBefore = coursesTunings.find((ct: MeiTag) => {
                     return ct.getAttribute('pname')?.value == child_pname
-                        && ct.getAttribute('n')?.value == child_n
-                        && ct.getAttribute('oct')?.value == child_oct
-                        && ct.getAttribute('accid')?.value == child_accid
-
+                    && ct.getAttribute('n')?.value == child_n
+                    && ct.getAttribute('oct')?.value == child_oct
+                    && ct.getAttribute('accid')?.value == child_accid
+                    
                 });
                 if (savedBefore) ch.id = savedBefore.id
             })
-            console.log(tuningChild.children.map(ch => [ch.getAttribute('n'), ch.getAttribute('oct'), ch.getAttribute('pname')]));
-
+            
+            console.log('tuning after forEach');
 
 
             // this.id = undefined//?.mainChildId || undefined;
@@ -147,7 +147,7 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
             },
             select: { id: true }
         })
-        console.log({ head });
+        
 
         return (head)?.id
     }

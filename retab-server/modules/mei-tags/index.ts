@@ -340,10 +340,7 @@ export class MeiTag implements TMeiTag {
     static makeTagsTree(args: TMeiTagFactoryArgs) {
         // const constructor = args.tagTitle == 'note' ? Note : MeiTagInstance;
         const newTag = new MeiTagInstance(args);
-        if (newTag.tagTitle == 'corpName') {
-            console.log('----', newTag.attributes);
-
-        }
+  
         newTag.selfClosing = args.selfClosing || false
         if (args.textContent) newTag.textContent = args.textContent
         return newTag

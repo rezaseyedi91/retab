@@ -23,9 +23,13 @@
           <template #right>
             <div class="flex items-baseline gap-x-0">
 
-              <VaNavbarItem>
-                <va-button class="p-0" @click="save">
-                  <va-icon name="save" size="2rem" />
+              <VaNavbarItem class="self-center">
+                <va-button class="p-0 flex justify-center w-10" @click="save">
+                  <span class="w-full flex justify-center">
+                    <va-inner-loading color="white"   loading v-if=" isSaving"/>
+                    <va-icon name="save" size="1.8rem" v-else/>
+
+                  </span>
                 </va-button>
               </VaNavbarItem>
               <VaNavbarItem>
@@ -80,11 +84,14 @@ import { useDoc } from '@/composables/useDoc';
 import RezTabFile from '@/store/modules/RezTabFile';
 import { useToast } from 'vuestic-ui/web-components';
 import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 const store = useStore();
-
+const isSaving = ref(false)
 const toast = useToast();
 const router = useRouter();
+const saveButtonIconName = ref('save')
 async function save() {
+  isSaving.value = true
   const doc = useDoc();
   let wannaRefreshThepage = !doc.id;
   const result = await doc.save();
@@ -92,11 +99,12 @@ async function save() {
     color: 'success', message: 'Saved Successfully.',
     position: 'bottom-right'
   })
-
+  
 
 
   doc.id = result.id
   doc.unfreeze();
+  isSaving.value = false
   if (wannaRefreshThepage) {
     return router.push({ path: '/doc/' + doc.id }), 1000
   } else return doc.unfreeze();

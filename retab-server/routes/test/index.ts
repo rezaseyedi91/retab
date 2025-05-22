@@ -22,65 +22,64 @@ router.get('/dbman', authMiddleware, async (req, res) => {
     // const user = await RetabUser.getUser(req.userId!);
     // const doc = await RetabDoc.getInstanceFromDb(412);
     // const result = doc
-    const firstResult = await prisma.meiTag.findMany({
-        where: {
-            parentId: { gt: 0 }
-        },
-        select: {
-            id: true, parentId: true
-        }
-    })
-    async function doIt(t?: TMeiTag) {
-        if (!t) return
-        await prisma.meiTag.update({
-            where: { id: t.id },
-            data: {
-                parents: {
-                    connect: [{ id: t.parentId! }]
-                }
-            }
-        })
-    }
-    while (firstResult.length) {
+    // const firstResult = await prisma.meiTag.findMany({
+    //     where: {
+    //         parentId: { gt: 0 }
+    //     },
+    //     select: {
+    //         id: true, parentId: true
+    //     }
+    // })
+    // async function doIt(t?: TMeiTag) {
+    //     if (!t) return
+    //     await prisma.meiTag.update({
+    //         where: { id: t.id },
+    //         data: {
+    //             parents: {
+    //                 connect: [{ id: t.parentId! }]
+    //             }
+    //         }
+    //     })
+    // }
+    // while (firstResult.length) {
 
-        await Promise.all([
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-            doIt(firstResult.pop()),
-        ])
-        console.log(firstResult.length);
+    //     await Promise.all([
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //         doIt(firstResult.pop()),
+    //     ])
         
-    }
+    // }
 
 
 
