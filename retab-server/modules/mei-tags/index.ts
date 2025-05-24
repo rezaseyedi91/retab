@@ -173,14 +173,16 @@ export class MeiTag implements TMeiTag {
 
     async save(doc: RetabDoc) {
 
-        console.log('saving ' + this.tagTitle)
+        console.log('------ saving ' + this.tagTitle)
         this.setAttributes();
         // if (this.tagTitle == 'tuning') {
         //     console.log('==========')
         //     console.log(this.children)
         // }
         const prisma = DB.getInstance();
-
+        console.log('before upsert');
+        
+        
         const saved = await prisma.meiTag.upsert({
             where: {
                 id: this.id || 0
@@ -214,9 +216,10 @@ export class MeiTag implements TMeiTag {
             }
 
         });
-
+        console.log('after upsert, before saving attributes');
         this.id = saved.id;
         await this.updatePrevSavedAttributes();
+        console.log('after saving attributes');
         //removing extra children
         try {
             const updatedChildrenIds = this.children.map(ch => ch.id!).filter(id => id);
@@ -242,6 +245,7 @@ export class MeiTag implements TMeiTag {
             //         ]
             //     }
             // })
+            console.log('setChildrenParentId');
             this.setChildrenParentId();
             
             await Promise.all(this.children.map(ch => ch.save(doc)));
