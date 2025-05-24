@@ -219,10 +219,11 @@ export class MeiTag implements TMeiTag {
         console.log('after upsert, before saving attributes');
         this.id = saved.id;
         await this.updatePrevSavedAttributes();
-        console.log('after saving attributes');
+        console.log('after saving attributes, before findMany chidlren');
         //removing extra children
         try {
             const updatedChildrenIds = this.children.map(ch => ch.id!).filter(id => id);
+            
             const extraChidlren = await prisma.meiTag.findMany({
                 where: {
                     AND: [
@@ -231,6 +232,7 @@ export class MeiTag implements TMeiTag {
                     ]
                 },
             })
+            console.log('after findMany chidlren, before transaction children');
             await prisma.$transaction(extraChidlren.map(ch => prisma.meiTag.update({
                 where: {id: ch.id},
                 data: {parents: {disconnect: {id: this.id}}}
