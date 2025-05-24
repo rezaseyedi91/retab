@@ -173,12 +173,7 @@ export class MeiTag implements TMeiTag {
 
     async save(doc: RetabDoc) {
 
-        
-    
-        if (this.parents?.find(p => p.tagTitle == 'tuning')) {
-            console.log('tuning child', this.id)
-        }
-
+        console.log('saving ' + this.tagTitle)
         this.setAttributes();
         // if (this.tagTitle == 'tuning') {
         //     console.log('==========')
