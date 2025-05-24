@@ -224,20 +224,31 @@ export class MeiTag implements TMeiTag {
         try {
             const updatedChildrenIds = this.children.map(ch => ch.id!).filter(id => id);
             
-            const extraChidlren = await prisma.meiTag.findMany({
-                where: {
-                    AND: [
-                        { parents: { some: { id: this.id } } },
-                        { id: { notIn: updatedChildrenIds } }
-                    ]
-                },
-            })
-            console.log('after findMany chidlren, before transaction children');
-            await prisma.$transaction(extraChidlren.map(ch => prisma.meiTag.update({
-                where: {id: ch.id},
-                data: {parents: {disconnect: {id: this.id}}}
 
-            })))
+            const extraChidlren = (await prisma.meiTag.findUnique({
+                where: { id: this.id},
+                select: {
+                    children: {
+                        where: {
+                            id: {notIn: updatedChildrenIds}
+                        },
+                        select: {
+                            id: true
+                        }
+                    }
+                }
+            }))?.children;
+            await prisma.meiTag.update({
+                where: {id: this.id},
+                data: {
+                    children: {
+                        disconnect: extraChidlren
+                    }
+                }
+            })
+            
+
+
           
             // await prisma.meiTag.deleteMany({
             //     where: {
