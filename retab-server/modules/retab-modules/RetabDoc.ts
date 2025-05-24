@@ -165,9 +165,9 @@ export default class RetabDoc implements TRetabDoc {
         this.id = savedInfo.id
 
         await this.saveStavesInfo();
-        console.log('wanna save main child');
+        
         await this.mainChild?.save(this);
-        console.log('main child saved');
+        
         
         // const header = this.mainChild?.getHead();
             

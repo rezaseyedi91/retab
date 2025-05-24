@@ -103,7 +103,7 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
             // coursesTunings.forEach((course, index) => {
             //     tuningChild.addChildIfNotExists(new MeiTagInstance(course as TMeiTagFactoryArgs), index)
             // })
-            console.log('tuning before forEach');
+            
             
             tuningChild.children.forEach(ch => {
                 const child_pname = ch.getAttribute('pname')?.value
@@ -121,7 +121,7 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
                 if (savedBefore) ch.id = savedBefore.id
             })
             
-            console.log('tuning after forEach');
+            
 
 
             // this.id = undefined//?.mainChildId || undefined;
