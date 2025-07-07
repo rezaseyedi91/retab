@@ -1,5 +1,5 @@
 <template>
-    <div class="md:p-16 flex justify-center items-center">
+    <div class="md:p-16 flex flex-col  justify-center items-center">
         <va-card class="w-fit">
             <va-card-header>
                 <va-card-title>
@@ -18,6 +18,26 @@
                     </VaInput>
                     <va-button @click="login">Login</va-button>
                 </div>
+            </va-card-content>
+        </va-card>
+        <hr>
+        <va-divider></va-divider>
+        <va-card color="info">
+            <va-card-content>
+                Try ReTab https://tab.rezaseyedi.com with a guest account:
+                <br>
+                <strong>
+                    username: 
+                </strong>
+                guest
+                <br>
+                <strong>
+                    password: 
+                    
+                </strong>
+                retabguest@123
+                <br>
+or contact reza.seyedi010@gmail.com if you want to use ReTab with a personal account.
             </va-card-content>
         </va-card>
     </div>
