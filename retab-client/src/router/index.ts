@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import DocsIndex from '@/views/doc/index.vue'
+import ImportIndex from '@/views/import/index.vue'
 import axios from 'axios'
 import store from '@/store'
 
@@ -26,8 +27,13 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/doc/:id',
     component: () => import('@/views/doc/[id].vue')
-  }
-
+  },
+  
+  {
+    path: '/import',
+    name: 'import',
+    component: ImportIndex,
+  },
 
 ]
 

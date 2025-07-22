@@ -377,6 +377,7 @@ function initNewDocStuff() {
 }
 let { id: docId } = toRefs(props)
 async function fetchDoc(id: any) {
+    if (id == 'imported') return;
     store.state.currentDoc = id == 'new' ? new RezTabFile({
         createdAt: new Date(),
         filename: 'file-one.txt',
@@ -400,8 +401,7 @@ setTimeout(useDoc().updateUI, 100)
 });
 onUnmounted(() => sl.value.removeListeners());
 
-
-(store.state.currentDoc as RezTabFile).section.addMeasure()
+if ((store.state.currentDoc as RezTabFile).section.measures.length == 0) (store.state.currentDoc as RezTabFile).section.addMeasure()
 // const props = defineProps<{
 //     instance: RezTabFile
 // }>() 

@@ -1,3 +1,4 @@
+import { generateId } from "../utils";
 import MeiAttribute from "./MeiAttribute";
 import MeiJsonElem from "./MeiJsonXmlElement";
 
@@ -13,7 +14,24 @@ export type TMeiTagFactoryArgs = {
 export default abstract class MeiTag {
     xmlId?: string;
     indexAmongSiblings?: number
-    id?: number
+    id?: number;
+
+    static instanceFromXmlElement(el: Element, indexAmongSiblings = 0): MeiTag {
+        const instance = MeiTag.makeTagsTree({
+            tagTitle: el.tagName,
+            attributes: Array.from(el.attributes).map(at => ({ title: at.name, value: at.value })),
+            children: Array.from(el.children).map((ch, index) => MeiTag.instanceFromXmlElement(ch, index)),
+            selfClosing: el.children.length == 0 && !el.textContent,
+            textContent: el.children.length == 0 ?  el.textContent?.trim() : undefined,
+        })
+        
+        instance.indexAmongSiblings = indexAmongSiblings;
+        instance.xmlId = el.getAttribute('xml:id')|| undefined
+
+        return instance;
+
+    }
+
     toJsonXmlElement(): MeiJsonElem {
         this.updateChildren();
         this.setAttributes();

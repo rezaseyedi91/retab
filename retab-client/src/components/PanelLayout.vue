@@ -22,12 +22,17 @@
           </template>
           <template #right>
             <div class="flex items-baseline gap-x-0">
+              <VaNavbarItem>
+                <router-link :to="'/import'">
+                  <DocumentArrowUpIcon class="fill-white w-8"/>
 
+                </router-link>
+              </VaNavbarItem>
               <VaNavbarItem class="self-center">
                 <va-button class="p-0 flex justify-center w-10" @click="save">
                   <span class="w-full flex justify-center">
-                    <va-inner-loading color="white"   loading v-if=" isSaving"/>
-                    <va-icon name="save" size="1.8rem" v-else/>
+                    <va-inner-loading color="white" loading v-if="isSaving" />
+                    <va-icon name="save" size="1.8rem" v-else />
 
                   </span>
                 </va-button>
@@ -51,12 +56,13 @@
               </VaNavbarItem>
               <VaNavbarItem class="self-center">
                 <router-link class="h-full" to="/doc/new" target="_blank">
-                  <va-button color="info" >
+                  <va-button color="info">
                     <va-icon name="add">
                     </va-icon>
                   </va-button>
                 </router-link>
               </VaNavbarItem>
+
               <!-- <VaNavbarItem>
                 <ConnectionChecker class="mx-2" />
               </VaNavbarItem> -->
@@ -85,6 +91,7 @@ import RezTabFile from '@/store/modules/RezTabFile';
 import { useToast } from 'vuestic-ui/web-components';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import { DocumentArrowUpIcon } from '@heroicons/vue/24/solid';
 const store = useStore();
 const isSaving = ref(false)
 const toast = useToast();
@@ -99,7 +106,7 @@ async function save() {
     color: 'success', message: 'Saved Successfully.',
     position: 'bottom-right'
   })
-  
+
 
 
   doc.id = result.id
