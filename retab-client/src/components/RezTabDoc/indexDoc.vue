@@ -159,6 +159,7 @@ class SelectionListener {
     }
     selectedNotesKeydownListener(event: KeyboardEvent) {
         event.preventDefault();
+        
         const shift = event.shiftKey;
         const ctrl = event.ctrlKey;
         if (event.key == 'Delete') {

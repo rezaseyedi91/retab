@@ -317,6 +317,8 @@ export default class RezTabFile {
   //         }
   // }
   static download(text: string, filename = "result.mei") {
+    console.log('wanna download');
+    
     const xml = text; // const xml = this.prettifyXmlFile(text)
     const element = document.createElement("a");
     element.setAttribute(
@@ -328,6 +330,8 @@ export default class RezTabFile {
     document.body.appendChild(element);
 
     element.click();
+    console.log(element,filename);
+    
     // document.body.removeChild(element)
   }
 

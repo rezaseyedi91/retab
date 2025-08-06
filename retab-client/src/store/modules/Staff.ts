@@ -185,14 +185,17 @@ export default class Staff extends MeiTag {
     }
 
     removeTabgroup(tg: TabGroup) {
+
         const index = this.tabGroups.indexOf(tg)
         this.tabGroups.splice(index, 1)
-
         // this.tabGroups.splice(1, 1);
         // this.updateChildren();
         
         if (this.tabGroups.length == 0) this.measure.remove();
-        this.measure.section.getDoc().setupNotesEls();
+        const doc = this.measure.section.getDoc()
+        doc.setupNotesEls();
+        doc.updateUI();
+
     }
 
     cleanupTabGroups() {

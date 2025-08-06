@@ -133,6 +133,8 @@ function keyup(event: KeyboardEvent) {
     if (event.key == 'Delete') {
       event.preventDefault()
       const prevNoteToFocus = note.value.getLeftNote();
+      console.log(note.value.el, note.value.tabGroup);
+      
       note.value.tabGroup.remove();
       prevNoteToFocus?.focus();
       return false;

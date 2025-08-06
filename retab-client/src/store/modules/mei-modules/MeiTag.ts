@@ -50,7 +50,12 @@ export default abstract class MeiTag {
     children: MeiTag[] = []
     abstract tagTitle: string
     attributes: MeiAttribute[] = [];
-    abstract setAttributes(): void;
+    // abstract setAttributes(): void;
+    setAttributes(): void {
+        if (this.xmlId) {
+            this.setAttribute(new MeiAttribute('xml:id', this.xmlId))
+        }
+    }
     abstract updateChildren(): MeiTag;
     textContent?: string;
     setAttribute(att: MeiAttribute) {

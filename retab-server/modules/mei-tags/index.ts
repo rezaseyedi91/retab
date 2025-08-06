@@ -27,7 +27,7 @@ export class MeiTag implements TMeiTag {
     selfClosing = false;
     private indent = 0
     constructor(payload?: TMeiTag) {
-        const payloadXmlId = payload?.attributes?.find(at => at.title == 'xml:id')?.value
+        const payloadXmlId = payload?.attributes?.find(at => at.title == 'xml:id')?.value || payload?.xmlId
         this.id = payload?.id
 
 
@@ -267,6 +267,10 @@ export class MeiTag implements TMeiTag {
     attributes: MeiAttribute[] = [];
     // abstract getXML(): string 
     setAttributes(): void {
+        // console.log(this.xmlId);
+        
+        // this.xmlId = this.xmlId || this.generateId();
+        this.setAttribute(new MeiAttribute('xml:id', this.xmlId ));
         return
     }
 
@@ -400,7 +404,7 @@ export class MeiTagInstance extends MeiTag {
         // this.id = args.id
 
     }
-    setAttributes(): void { return; }
+    // setAttributes(): void { return; }
     updateChildren(): MeiTag {
         return this;
     }

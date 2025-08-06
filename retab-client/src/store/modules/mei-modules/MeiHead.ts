@@ -8,14 +8,17 @@ import { TEncoderHeader, TMeiTag } from "../db-types";
 export default class MeiHead extends MeiTag {
     constructor(info: TMeiTagFactoryArgs) {
         super()
+        console.log(info);
+        
         this.id = info.id
+        this.xmlId = info.attributes?.find(at => at.title == 'xml:id')?.value
         this.children = info.children?.map(ch => ch instanceof MeiTag ? ch : MeiTag.makeTagsTree(ch)) || []
         this.textContent = info.textContent
     }
     tagTitle = 'meiHead';
-    setAttributes(): void {
-        return
-    }
+    // setAttributes(): void {
+    //     return
+    // }
     updateChildren(): MeiTag {
         return this
     }
