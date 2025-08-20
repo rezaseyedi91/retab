@@ -82,7 +82,7 @@ export default class RetabUser implements TUser {
     }
 
 
-    async getEncoderHeaders(count = 1): Promise<TEncoderHeader[]> {
+    async getEncoderHeaders(count = 100): Promise<TEncoderHeader[]> {
         try {
 
             function selectNested(remainingLevel = 20): any {

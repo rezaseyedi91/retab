@@ -236,13 +236,15 @@ export default class RezTabFile {
   async initializeHead(fetchedHead?: TMeiTagFactoryArgs) {
     try {
       if (!fetchedHead) {
-        const lastEncoderHeaders = await MeiHead.getUserEncoderHeaders();
-        fetchedHead = lastEncoderHeaders[0]?.headerTag;
+        // const lastEncoderHeaders = await MeiHead.getUserEncoderHeaders();
+        // fetchedHead = lastEncoderHeaders[0]?.headerTag;
       }
       // downloadJsonDataAsFile(fetchedHead)
       // this.initializeHead(tempTest)
       // this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_ARGS);
       this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_EMPTY_ARGS);
+      console.log(this.head);
+      
     } catch (err) {
       return;
     }
@@ -317,8 +319,6 @@ export default class RezTabFile {
   //         }
   // }
   static download(text: string, filename = "result.mei") {
-    console.log('wanna download');
-    
     const xml = text; // const xml = this.prettifyXmlFile(text)
     const element = document.createElement("a");
     element.setAttribute(

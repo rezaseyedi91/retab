@@ -3,6 +3,7 @@ import DocsIndex from '@/views/doc/index.vue'
 import ImportIndex from '@/views/import/index.vue'
 import axios from 'axios'
 import store from '@/store'
+import TestRoute from '@/views/TestRoute.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -34,6 +35,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'import',
     component: ImportIndex,
   },
+  {
+    path: '/dev-test',
+    name: 'dev-test',
+    component: TestRoute
+  }
 
 ]
 

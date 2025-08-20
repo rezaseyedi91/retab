@@ -32,7 +32,7 @@
                 </div>
                 <div class="flex items-center justify-center w-full ">
        
-                        <Component :is="currentTab.component" />
+                        <Component :is="currentTab.component" :key="store.state.utils.keyCoefficient"/>
                 </div>
             </div>
         </template>

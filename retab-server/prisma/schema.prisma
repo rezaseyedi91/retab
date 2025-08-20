@@ -106,7 +106,7 @@ model MeiTag {
   docId              Int?
   encoderHeaderRelated EncoderHeader?
 
-
+  
 }
 
 model MeiAttribute {

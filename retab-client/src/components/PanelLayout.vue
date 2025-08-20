@@ -22,6 +22,15 @@
           </template>
           <template #right>
             <div class="flex items-baseline gap-x-0">
+              <DevTest>
+                <VaNavbarItem>
+                  <router-link :to="'/dev-test'">
+                    <CodeBracketSquareIcon class="fill-white w-8"/>
+                    
+                  </router-link>
+                </VaNavbarItem>
+                
+              </DevTest>
               <VaNavbarItem>
                 <router-link :to="'/import'">
                   <DocumentArrowUpIcon class="fill-white w-8"/>
@@ -62,6 +71,7 @@
                   </va-button>
                 </router-link>
               </VaNavbarItem>
+   
 
               <!-- <VaNavbarItem>
                 <ConnectionChecker class="mx-2" />
@@ -91,7 +101,8 @@ import RezTabFile from '@/store/modules/RezTabFile';
 import { useToast } from 'vuestic-ui/web-components';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { DocumentArrowUpIcon } from '@heroicons/vue/24/solid';
+import { DocumentArrowUpIcon, CodeBracketSquareIcon} from '@heroicons/vue/24/solid';
+import DevTest from './utils/DevTest.vue';
 const store = useStore();
 const isSaving = ref(false)
 const toast = useToast();

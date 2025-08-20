@@ -1,5 +1,5 @@
 <template>
-    <div class="my-5 border-brown-100 rounded-lg border-2 p-5" 
+    <div class="" 
     v-if="store.state.isDev" >
         <slot/>
     </div>

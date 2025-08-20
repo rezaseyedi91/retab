@@ -1,5 +1,5 @@
 import DB from "../DB";
-import { TDocSettings, TRetabDoc, TTabCourseTuningInfo, TUser } from "../db-types";
+import { TDocSettings, TMeiTag, TRetabDoc, TTabCourseTuningInfo, TUser } from "../db-types";
 import { MeiAttribute } from "../mei-tags/interfaces";
 import TabIdeaDocGenerator from "../mei-adapters/TabIdeaDocGenerator";
 import { MeiTag } from "../mei-tags";
@@ -234,11 +234,47 @@ export default class RetabDoc implements TRetabDoc {
     }
 
     async remove() {
-
+        const prisma = DB.getInstance();
         if (!this.id) throw new Error('ID must be present; available docId is: ' + this.id);
-        return await DB.getInstance().retabDoc.delete({
+        const deleteResult =  await prisma.retabDoc.delete({
             where: { id: this.id },
+            select: {
+                mainChildId: true
+            }
+        });
+
+        const nestedTags = await prisma.meiTag.findFirst({
+            where: {
+                id: deleteResult.mainChildId || 0
+            },
+            ...includeMeiTagChildrenRecursively()
+        });
+        
+
+        const idsToDelete: number[] = [nestedTags?.id!];
+
+        
+        function pushChildrenIds(tag: TMeiTag) {
+            const ids = tag.children?.map(ch => ch.id as number) || [];
+            idsToDelete.push(...ids)
+            if (!tag.children?.length) return;
+            else tag.children?.forEach(ch => pushChildrenIds(ch))
+        }
+        if (nestedTags) pushChildrenIds(nestedTags)
+            else console.log('no meiTag found');
+            
+        await prisma.meiTag.deleteMany({
+           where:{
+            AND: [
+                {id: {in: idsToDelete}},
+                {parents: {none: {
+                    id: {notIn: idsToDelete}
+                }}}
+            ] 
+        },
         })
+        
+        return;
     }
     assignDocSettings(docStetings: {
         defaultFirstTabgrpDurSymShow: boolean,

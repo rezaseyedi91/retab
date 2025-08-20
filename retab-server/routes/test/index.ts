@@ -10,6 +10,8 @@ import authMiddleware from '../../middleware/auth'
 import RetabDoc from "../../modules/retab-modules/RetabDoc";
 import { log } from "console";
 import { TMeiTag } from "../../modules/db-types";
+import { some } from "lodash";
+import { includeMeiTagChildrenRecursively } from "../../utils";
 const router = Router();
 
 
@@ -19,100 +21,191 @@ router.get('/', authMiddleware, async (req, res) => {
 router.get('/dbman', authMiddleware, async (req, res) => {
     const prisma = DB.getInstance();
     //@ts-ignore
-    // const user = await RetabUser.getUser(req.userId!);
-    // const doc = await RetabDoc.getInstanceFromDb(412);
-    // const result = doc
-    // const firstResult = await prisma.meiTag.findMany({
+    const user = await RetabUser.getUser(req.userId!);
+
+    const IMPORTED_FILE_MAIN_CHILD_ID = 109718;
+
+    const meiMainTagsAfter = await prisma.meiTag.findMany({
+        where: {
+            AND: [
+                {
+                    id: { gte: IMPORTED_FILE_MAIN_CHILD_ID }
+
+                },
+                { tagTitle: 'mei' }
+            ]
+        }, include: {
+            doc: true
+        },
+        orderBy: {
+            doc: { id: 'desc' }
+        }
+    })
+
+
+
+
+    /*to remove extra mainTags 
+        const mainTagsWithoutDoc = await prisma.meiTag.findMany({
+        where: {
+            AND: [
+                { tagTitle: 'mei' },
+                { doc: null }
+            ]
+        },
+
+        ...includeMeiTagChildrenRecursively()
+    });
+
+    
+    const mainTags = await prisma.meiTag.findMany({
+        where: {
+            AND: [
+                { tagTitle: 'mei' },
+            ]
+
+        },
+        select: {
+            doc: true
+        }
+    })
+
+    const idsToDelete: number[] = [...mainTagsWithoutDoc.map(i => i.id)];
+
+
+    function pushChildrenIds(tag: TMeiTag) {
+
+        const ids = tag.children?.map(ch => ch.id as number) || [];
+        idsToDelete.push(...ids)
+        if (!tag.children?.length) return;
+        else tag.children?.forEach(ch => pushChildrenIds(ch))
+    }
+
+    mainTagsWithoutDoc.forEach(mainTag => pushChildrenIds(mainTag))
+
+    const finalIdsToDelete = await prisma.meiTag.findMany({
+        where: {
+            AND: [
+                { 
+                    id: { in: idsToDelete } 
+                }, 
+                // {
+                //     parents: {
+                //      every:{
+                //         AND: [
+                //             {id: {in: idsToDelete}}
+                //         ]
+                //      }
+                //     }
+                // }
+            ]
+        },
+        select: {
+            id: true,
+            parents: {select :{id: true}}
+        }
+    })
+
+
+    const tagsMustBeDeleted = await prisma.meiTag.deleteMany({
+        where:{
+            AND: [
+                {id: {in: finalIdsToDelete.map(i => i.id)}},
+              
+            ] 
+        },
+        // select: {
+        //     parents: true
+        // }
+    })
+
+
+    */
+   
+    const weirdHeads = [110366,110548,110848,110963,111093,111302,111704,111820,112413,112751,112940,113136,113327,113525,113790,114276,114496,114685,115008,115331,115664,115866,116072,116286,116476,116663,116880,117088,117284,117488,117821,118019,118230,118353,118572,118774,118969,119165]
+    //    const luteConvs = await prisma.meiTag.findMany({
     //     where: {
-    //         parentId: { gt: 0 }
+    //         AND: [
+    //             {xmlId: 'luteconv'},
+    //             {
+    //                 parents:{
+    //                     every: {
+    //                         parents: {
+    //                             every: {
+    //                                 parents: {
+    //                                     every: {
+    //                                         parents: {
+    //                                             none: {
+    //                                                 doc: null
+    //                                             }
+    //                                         }
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+
+    //         ]
     //     },
     //     select: {
-    //         id: true, parentId: true
-    //     }
-    // })
-    // async function doIt(t?: TMeiTag) {
-    //     if (!t) return
-    //     await prisma.meiTag.update({
-    //         where: { id: t.id },
-    //         data: {
-    //             parents: {
-    //                 connect: [{ id: t.parentId! }]
+    //         id: true,
+    //         parents: {
+    //             select: {
+    //                 parents: {
+    //                     select: {
+    //                         parents: {
+    //                             select: {
+    //                                 id: true,
+    //                                 tagTitle: true,
+    //                                 parents: {
+                                     
+    //                                     select: {
+    //                                         id: true,
+    //                                         tagTitle: true,
+    //                                         doc: true
+
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
     //             }
     //         }
-    //     })
-    // }
-    // while (firstResult.length) {
-
-    //     await Promise.all([
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //         doIt(firstResult.pop()),
-    //     ])
-        
-    // }
-
-
-
-    // const result = await prisma.meiTag.findMany({
-    //     where: {
-    //         // xmlId: 'v3x6k3o0b8s5',
-    //         parents: {some: {id: 96957}}
-    //     },
-    //     include: {
-    //         children: true
     //     }
     // })
+
+
+
+
+    const docsInfected = [475,476,477,478,479,480,481,482,483,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513]
+    const lastHealthyDoc = await prisma.retabDoc.findFirst({
+        where: {
+            id: {lt: Math.min(...docsInfected)},
+        },
+        orderBy: {id: 'desc'}
+    })
+
+    
+   return res.json([
+    // luteConvs.map(t => t.parents[0].parents[0].parents[0].id)
+    // luteConvs,
+    docsInfected.length,
+
+    lastHealthyDoc
+    // docsNotInfected
+   ])
     return res.json('done!')
 })
-// router.get('/del', authMiddleware, async (req, res) => {
-//     const prisma = DB.getInstance();
-//     const result = await prisma.$transaction([
-//         prisma.encoderHeader.deleteMany({}),
-//         prisma.staffInfo.deleteMany({}),
-//         prisma.meiTag.deleteMany({}),
-//         prisma.meiAttribute.deleteMany({}),
-//         prisma.retabDoc.deleteMany({}),
-//     ])
-//     return res.json(result)
-// })
+
 router.use('/retab', retabTestRouter)
 // router.use('/get-midi', getMidiRouter)
 
 
 router.get('/render', async (req, res) => {
     try {
-
-
         const query = req.query;
         const filename = query.filename;
         if (!filename) return res.json({ msg: 'filename query must be provided' });
