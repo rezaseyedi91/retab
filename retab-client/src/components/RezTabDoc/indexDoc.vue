@@ -18,7 +18,17 @@
         <!-- <div class="my-3">
             <va-button color="#a855f7" class="p-3 bg-purple-500 font-bold cursor-pointer" @click="addMeasure">Add Measure</va-button>
         </div> -->
+        <DevTest>
+            <div class="grid grid-cols-3 gap-3">
+                <va-button @click="() => {
+                    console.log(useDoc().getTuning())
+                }">Test</va-button>
+                <va-button @click="() => useDoc().snapshot()">Snap shot</va-button>
+                <va-button @click="() => useDoc().undo()">UNDO</va-button>
+                <va-button @click="() => useDoc().redo()">REDO</va-button>
+            </div>
 
+        </DevTest>
     </div>
 
 </template>

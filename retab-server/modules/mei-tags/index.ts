@@ -27,9 +27,12 @@ export class MeiTag implements TMeiTag {
     selfClosing = false;
     private indent = 0
     constructor(payload?: TMeiTag) {
+        
         const payloadXmlId = payload?.attributes?.find(at => at.title == 'xml:id')?.value || payload?.xmlId
-        this.id = payload?.id
+        if (payload?.tagTitle == 'measure') console.log('payload');
+        
 
+        this.id = payload?.id
 
         this.xmlId = payloadXmlId || this.generateId();
         this.tagTitle = payload?.tagTitle || this.tagTitle
@@ -393,7 +396,6 @@ export class MeiTagInstance extends MeiTag {
 
     constructor(args: TMeiTagFactoryArgs) {
         super(args);
-
 
         this.id = args.id
         // this.tagTitle = args.tagTitle

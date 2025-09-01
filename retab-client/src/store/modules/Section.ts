@@ -97,7 +97,6 @@ export default class Section extends MeiTag {
     }
     initializeMeasures(measureJsonXmlElements: TMeiTagFactoryArgs[]) {
         this.measures = measureJsonXmlElements.map(mje => Measure.fromMeiFactoryArgs(this, mje))
-        
         return this;
     }
    setTuning(tuning: TabCourseTuningInfo[], staffIndex: number) {

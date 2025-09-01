@@ -40,11 +40,13 @@ const props = defineProps<{
 
 // props.tabGroup.notes.find(n => n.course == props.line.courseInfo.number)!)
 const note = computed(() => props.tabGroup.getNoteOnCourse(props.line.courseInfo.number)!);
-const fret = ref<string | number | undefined>(note.value.getFretToShow());
+const fret = ref<string | number | undefined>(note.value?.getFretToShow());
 
 watch(fret, val => {
   if (/^[\u0080-\uFFFF]+$/.test(val + '')) return
-  setFret(val)
+  setFret(val);
+  useDoc().snapshot();
+  note.value.focus();
 })
 function setFret(val: any) {//: string | number) {
   // test if the second digit has been added
@@ -98,13 +100,13 @@ function keypress(event: KeyboardEvent) {
 
 }
 function keydown(event: KeyboardEvent) {
-
   if (event.key == '.' || event.key == 'p') {
-
+    
     event.stopPropagation()
     event.preventDefault();
-
+    
     note.value.tabGroup.dot()
+    useDoc().snapshot();
     return false
   }
 

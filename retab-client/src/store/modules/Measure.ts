@@ -47,8 +47,10 @@ export default class Measure extends MeiTag {
     }
     static fromMeiFactoryArgs(section: Section, arg: TMeiTagFactoryArgs) {
         const instance = new Measure(section, Number(arg.attributes?.find(a => a.title == 'n')?.value)).initializeStaves(arg.children)
-        instance.id = arg.id
-          instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value || 'XMLIDNOTFOUND'))
+        instance.id = arg.id;
+        const argXmlId = arg.attributes?.find(a => a.title == 'xml:id')?.value || 'XMLIDNOTFOUND'
+        instance.xmlId = argXmlId
+          instance.setAttribute(new MeiAttribute('xml:id', argXmlId))
         if (arg.children?.length) instance.initializeStaves(arg.children);
         
         return instance;

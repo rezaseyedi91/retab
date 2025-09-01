@@ -15,7 +15,7 @@ export type TMeiJsonXmlElementInput = {
     children: TMeiJsonXmlElementInput[];
     textContent?: string;
     selfClosing?: boolean
-    
+    xmlId?: string;
     id?: number
 }
 
@@ -34,34 +34,36 @@ export default class TabIdeaDocGenerator extends MeiDocGenerator {
 
     static meiTagInstanceFromJsonXmlElement(jsonXmlElement: TMeiJsonXmlElementInput): MeiTag {
         let tag: MeiTag;
-
+        jsonXmlElement.xmlId = jsonXmlElement.xmlId || jsonXmlElement.attributes.find(at => at.title == 'xml:id')?.value || undefined
+        
         switch (jsonXmlElement.tagTitle) {
             case 'measure':
-                tag = new Measure(Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
+                tag = new Measure(jsonXmlElement)
                 break;
             case 'staff':
                 tag = new Staff(Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
                 break;
             case 'tabGrp':
-                tag = new TabGrp()
+                tag = new TabGrp(jsonXmlElement)
                 break;
             case 'note':
                 tag = new TabNote(jsonXmlElement)
                 break;
             case 'score':
-                tag = new Section();
+                tag = new Section(jsonXmlElement);
 
                 break;
             case 'layer':
-                tag = new Layer();
+                tag = new Layer(jsonXmlElement);
                 break;
             case 'tabDurSym':
-                tag = new TabDurSym();
+                tag = new TabDurSym(jsonXmlElement);
                 break;
             default:
                 tag = new MeiTagInstance({ tagTitle: jsonXmlElement.tagTitle, attributes: jsonXmlElement.attributes, })//  Number(jsonXmlElement.attributes?.find(a => a.title == 'n')?.value || 1))
                 break;
         }
+        if ((tag)?.tagTitle == 'measure') console.log(tag.xmlId);
         tag.id = jsonXmlElement.id
         jsonXmlElement.attributes?.forEach(t => tag.pushAttribute(t))
         jsonXmlElement.children?.forEach(ch => tag.pushChildren(this.meiTagInstanceFromJsonXmlElement(ch)))

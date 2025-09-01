@@ -36,6 +36,9 @@ type DocSetttings = {
 };
 
 export default class RezTabFile {
+  private undoStack: string[] = [];
+  private redoStack: string[] = [];
+
   info: TRezTabFileInfo;
   docSettings: DocSetttings = {
     linesCount: 6,
@@ -94,6 +97,8 @@ export default class RezTabFile {
         });
       });
     });
+
+    
   }
   init() {
     /**just testing for now */
@@ -112,12 +117,15 @@ export default class RezTabFile {
     // this.cleanupTabGroups();
     const section = this.section;
     const jsonXmlElement = await MeiDocGenerator.generateJsomElem(section);
+    console.log(this.section.measures.map(m => m.xmlId));
+    console.log(jsonXmlElement.children[0].attributes.map(a => a.title + ': ' + a.value) , jsonXmlElement.children[0].tagTitle)
     this.head?.removeEmptyChildren();
     const headJsonXmlElement = this.head
       ? await MeiDocGenerator.generateJsomElem(this.head)
       : undefined;
     // return ;
     const jsonXmlElementParsed = JSON.parse(JSON.stringify(jsonXmlElement));
+
     const stavesInfo = this.section.getStavesInfo();
     // const options = {
     //    tuning: stavesInfo[0].tuning
@@ -176,7 +184,7 @@ export default class RezTabFile {
     );
     doc.initializeHead(someResponse.headJsonXmlElement);
     doc.unfreeze();
-
+    
     console.log(doc);
 
     if (someResponse.settings) doc.assignSettings(someResponse.settings);
@@ -244,7 +252,7 @@ export default class RezTabFile {
       // this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_ARGS);
       this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_EMPTY_ARGS);
       console.log(this.head);
-      
+
     } catch (err) {
       return;
     }
@@ -330,8 +338,8 @@ export default class RezTabFile {
     document.body.appendChild(element);
 
     element.click();
-    console.log(element,filename);
-    
+    console.log(element, filename);
+
     // document.body.removeChild(element)
   }
 
@@ -426,7 +434,7 @@ export default class RezTabFile {
       title,
       createdAt: new Date(),
       filename: '',
-      instruments:[ Instrumnet.LUTE],
+      instruments: [Instrumnet.LUTE],
       tabType,
       altTitle,
     })
@@ -438,8 +446,8 @@ export default class RezTabFile {
       n: 1,
       notationType: tabType,
       tuning: (Array.from(parsed.querySelector('tuning')?.children || []) || []).map(el => ({
-        n: Number(el.getAttribute('n')|| 0),
-        pname: el.getAttribute('pname') + (el.getAttribute('accid')||''),
+        n: Number(el.getAttribute('n') || 0),
+        pname: el.getAttribute('pname') + (el.getAttribute('accid') || ''),
         oct: Number(el.getAttribute('oct') || 0),
       }))
     }])
@@ -453,5 +461,64 @@ export default class RezTabFile {
       const xml = parser.parseFromString(readResult, "text/xml");
       return xml;
     }
+  }
+
+    
+  snapshot() {
+    return;
+    const focusedNote = this.getFocusedNote();
+    console.log('\n----');
+    console.log('taking snapshot...');
+    this.redoStack = [];
+    this.undoStack.push(this.serialize())
+    this.updateUI();
+    this.unfreeze();
+    const newNote = this.getNoteById(focusedNote?.xmlId)?.focus();
+    console.log(
+      focusedNote?.toJsonXmlElement(), newNote, 
+    );
+    
+  }
+  getNoteById(xmlId?: string) {
+    return this.getAllNotes().find(n => n.xmlId == xmlId)
+
+  }
+  private serialize() {
+     const head = this.head?.toJsonXmlElement();
+    const section = this.section.toJsonXmlElement();
+    const sectionInfo = this.section.info
+    const docSettings = this.docSettings
+    const info = this.info;
+    const state = JSON.stringify({
+      head, section, docSettings, info, sectionInfo
+    })
+    return state;
+  }
+  undo() {
+    if (this.undoStack.length == 0) return;
+    const prevState = this.undoStack.pop();
+    this.redoStack.push(this.serialize());
+
+    this.restore(prevState!);
+    this.updateUI();
+  }
+  private async restore(serialized: string) {
+    const parsed = JSON.parse(serialized);
+    this.info = parsed.info;
+    this.docSettings = parsed.docSettings;
+    await this.initializeHead(parsed.head)
+    this.initializeSection(parsed.section, parsed.sectionInfo?.staves);
+
+
+  }
+
+  redo() {
+    if (this.redoStack.length === 0) return;
+
+    const nextState = this.redoStack.pop()!;
+    this.undoStack.push(this.serialize());
+
+    this.restore(nextState);
+    this.updateUI();
   }
 }
