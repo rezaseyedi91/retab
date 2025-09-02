@@ -8,7 +8,8 @@ type TMeiJsonXmlElementInput = {
     textContent?: string,
     selfClosing?: boolean,
     indexAmongSiblings?: number
-    id?: number
+    id?: number,
+    xmlId?: string
 }
 
 export default class MeiJsonElem {
@@ -18,7 +19,8 @@ export default class MeiJsonElem {
     selfClosing?: boolean
     children: MeiJsonElem[] = [];
     indexAmongSiblings?: number
-    id?: number
+    id?: number;
+    xmlId?: string
 
     constructor(data: TMeiJsonXmlElementInput) {
         this.tagTitle = data.tagTitle;
@@ -28,6 +30,7 @@ export default class MeiJsonElem {
         this.attributes = data.attributes
         this.textContent = data.textContent
         this.selfClosing = data.selfClosing
+        this.xmlId = data.xmlId
     }
     pushChildren(...children: MeiJsonElem[]) {
         this.children.push(...children)

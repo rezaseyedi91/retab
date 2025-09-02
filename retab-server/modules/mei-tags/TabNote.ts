@@ -1,6 +1,6 @@
 import { TMeiTag } from "../db-types";
 import { MeiAttribute } from "./interfaces";
-import { MeiTag } from ".";
+import { MeiTag, TMeiTagConstructorOptions } from ".";
 import RetabDoc from "../retab-modules/RetabDoc";
 export enum NotePname {
     c = "c",
@@ -41,8 +41,8 @@ export type Accidental = 's' | 'f' | '' | 'n' //'#' | 'b' | ''
 
 export default class TabNote extends MeiTag {
     tagTitle = 'note'; 
-    constructor(payload?:TMeiTag ) {
-        super(payload)
+    constructor(payload?:TMeiTag ,  options?: TMeiTagConstructorOptions) {
+        super(payload, options)
 
     }
     setAttributes() {

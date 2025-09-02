@@ -43,7 +43,8 @@ export default abstract class MeiTag {
             children: this.children.map(ch => ch.toJsonXmlElement()),
             textContent: this.textContent,
             selfClosing: this.selfClosing,
-            id: this.id
+            id: this.id,
+            xmlId: this.xmlId
         })
     }
     selfClosing?: boolean

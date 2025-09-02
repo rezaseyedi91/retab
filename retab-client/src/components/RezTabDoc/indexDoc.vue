@@ -4,6 +4,7 @@
     <div class="p-4" v-if="isLoaded" ref="retabDocContainer">
         <!-- <va-button @click="debugSL">SL</va-button> -->
          <DocTitle :key="store.state.utils.keyCoefficient"/>
+         <DevTest>{{ 'fe' +  useDoc().section.getChildrenByTagName('staffDef').map(f => f.attributes) }} - {{ useDoc().section.xmlId }}</DevTest>
         <div class="section flex max-w-full overflow-x-auto overflow-y-hidden">
             <MeasureComp :measure-n="(measure as Measure).n"
                 v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure" 

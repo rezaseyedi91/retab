@@ -20,15 +20,13 @@ export type TTabCourseTuningInfo = {
     n: number
     pname: string
     oct: number
+    relatedXmlId?: string
 }
 export type TTuningPreset = {
     tuning?: TTabCourseTuningInfo[]
     id?: number
     title?: string | null
 }
-
-
-
 /**====================================================== */
 export type TUser = {
     docs?: TRetabDoc[]
@@ -38,7 +36,7 @@ export type TUser = {
     password?: string | null
     email?: string | null
     encoderHeaders?: TEncoderHeader[]
-}       
+}
 
 export type TInstrument = {
     staves?: TStaffInfo[]

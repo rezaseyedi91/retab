@@ -5,16 +5,21 @@ import * as bcrypt from 'bcrypt';
 export default class Authenticator {
     static SALT_SIZE = 10;
     async login(username: string, password: string): Promise<RetabUser> {
-        const existingUser = await DB.getInstance().user.findUnique({
-            where: {username},
+        try {
 
-        })
-        if (!existingUser) throw new Error('No such user');
-        const isPasswordCorrect = await bcrypt.compare(password, existingUser.password!);
-        if (!isPasswordCorrect) throw new Error('Password is not correct');
-        existingUser.password = ''
-        const user = new RetabUser().setInfo(existingUser)
-        return user
+            const existingUser = await DB.getInstance().user.findUnique({
+                where: {username},
+                
+            })
+            if (!existingUser) throw new Error('No such user');
+            const isPasswordCorrect = await bcrypt.compare(password, existingUser.password!);
+            if (!isPasswordCorrect) throw new Error('Password is not correct');
+            existingUser.password = ''
+            const user = new RetabUser().setInfo(existingUser)
+            return user
+        } catch(mostLikelyConnectionError) {
+            throw new Error('No Connection To Database')
+        }
     }
 
     async singup(info: TUser) {

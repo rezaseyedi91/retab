@@ -11,7 +11,6 @@
             <va-button @click="logDoc" class=" font-bold cursor-pointer">
                 Log Doc
             </va-button>
-            <va-button @click="() => console.log(useDoc().head?.children[0])">Log Head Children Attributes </va-button>
 
         </DevTest>
         <div>{{ getDoc().section.info.staves[0] }}</div>

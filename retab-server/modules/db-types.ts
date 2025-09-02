@@ -48,6 +48,7 @@ export type TTabCourseTuningInfo = {
         n: number
         pname: string
         oct: number
+        relatedXmlId?: string
 }
 
 export type TMeiTag = {

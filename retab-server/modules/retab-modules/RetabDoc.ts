@@ -7,8 +7,8 @@ import MeiMainTag from "../mei-tags/MeiMainTag";
 import Section from "../mei-tags/Section";
 import StaffInfoContainer from "./StaffInfoContainer";
 import RetabUser from "./User";
-import { writeFileSync } from "fs";
-import { includeMeiTagChildrenRecursively } from "../../utils";
+import { debug, includeMeiTagChildrenRecursively } from "../../utils";
+import Course from "../mei-tags/Course";
 
 
 
@@ -33,9 +33,9 @@ export default class RetabDoc implements TRetabDoc {
         if (!id) return instance;
         else return this.getInstanceFromDb(id) || new RetabDoc()
     }
-    initializeMeiMainTag() {
-        // 
-        this.mainChild = new MeiMainTag({docId: this.id})
+
+    async initializeMeiMainTag() {
+        this.mainChild = await new MeiMainTag({ docId: this.id }).init()
     }
 
     appendHead(head: MeiTag) {
@@ -47,15 +47,12 @@ export default class RetabDoc implements TRetabDoc {
         return this.stavesInfo.find(si => si.n) || this.stavesInfo[n - 1]
     }
     setStavesInfo(stavesInfo: StaffInfoContainer[]) {
-
         // let sic = this.getStaffInfoContainer(staffN);
         for (const staffInfo of stavesInfo) {
             const staffN = staffInfo.n || 1
-
             const staffDefMeiTag = this.mainChild?.getStaffDefMeiTag(staffN)!;
             const sic = this.setTuning(staffInfo.tuning, staffInfo.n)
             sic.adjustStaffDef(staffDefMeiTag)
-
             if (this.settings?.proportionInclude) sic.appendProport(
                 staffDefMeiTag,
                 this.settings.proportionNum!, this.settings.proportionNumbase!,
@@ -81,8 +78,7 @@ export default class RetabDoc implements TRetabDoc {
 
     getStaffInfoContainer(n = 1) { return this.stavesInfo.find(sic => sic.n == n); }
     appendSection(section: MeiTag | Section) {
-
-        (this.mainChild as MeiMainTag).appendSection(section as MeiTag)
+        (this.mainChild as MeiMainTag).appendSection(section as MeiTag);
     }
     static async getInstanceFromDb(id: number) {
         try {
@@ -104,9 +100,9 @@ export default class RetabDoc implements TRetabDoc {
             return instance;
         } catch (error) {
             console.log('Err: No Doc Record Found.')
-        } 
+        }
 
-    } 
+    }
     getDataToEdit() {
         return {
             id: this.id,
@@ -154,7 +150,7 @@ export default class RetabDoc implements TRetabDoc {
     async save() {
         const userId = this.user?.id || this.userId
         if (!userId) throw new Error('User Id Must be provided to save the doc');
-        
+
         const savedInfo = await this.initializeFileInDb({
             userId,
             title: this.title,
@@ -165,21 +161,24 @@ export default class RetabDoc implements TRetabDoc {
         this.id = savedInfo.id
 
         await this.saveStavesInfo();
-        
-        await this.mainChild?.save(this);
-        
-        
-        // const header = this.mainChild?.getHead();
-            
-        const user = await RetabUser.getUser(userId);
-        //commented for debug
-        await user.saveEncoderHeader({headerTagId: await this.mainChild?.getHeadId()})
-        
 
+        await this.mainChild?.save(this);
+        // const header = this.mainChild?.getHead();
+        const user = await RetabUser.getUser(userId);
+        // commented for debug
+        await user.saveEncoderHeader({ headerTagId: await this.mainChild?.getHeadId() })
     }
     async saveStavesInfo() {
         if (!this.id) throw new Error('RetabDoc Must be savedFirst')
         const saveResults = await Promise.all(this.stavesInfo.map(si => si.save(this.id!)))
+        const relatedXmlIdsCoursesUnNested = saveResults.map(si => si.tuning).reduce((sf, c) => [...sf, ...c] , []) as TTabCourseTuningInfo[]
+        for (const staffIndex in this.stavesInfo) {
+            this.mainChild?.getStaffDefMeiTag(Number(staffIndex || 0) + 1)
+            const courses = this.mainChild?.getTuningTag(Number(staffIndex || 0) + 1).children.filter(ch => ch instanceof Course) as Course[];
+            courses?.forEach(c => c.correctXmlId(relatedXmlIdsCoursesUnNested))
+        }
+        
+
     }
 
     generateFilename(title: string) { return `${title || 'unknownTitle'}-${this.user?.name}-${Date.now()}.mei` }
@@ -207,7 +206,7 @@ export default class RetabDoc implements TRetabDoc {
                         create: settingsData
                     }
                 }
-                
+
             },
             update: {
                 lastModifiedAt: new Date(),
@@ -236,7 +235,7 @@ export default class RetabDoc implements TRetabDoc {
     async remove() {
         const prisma = DB.getInstance();
         if (!this.id) throw new Error('ID must be present; available docId is: ' + this.id);
-        const deleteResult =  await prisma.retabDoc.delete({
+        const deleteResult = await prisma.retabDoc.delete({
             where: { id: this.id },
             select: {
                 mainChildId: true
@@ -249,11 +248,11 @@ export default class RetabDoc implements TRetabDoc {
             },
             ...includeMeiTagChildrenRecursively()
         });
-        
+
 
         const idsToDelete: number[] = [nestedTags?.id!];
 
-        
+
         function pushChildrenIds(tag: TMeiTag) {
             const ids = tag.children?.map(ch => ch.id as number) || [];
             idsToDelete.push(...ids)
@@ -261,19 +260,23 @@ export default class RetabDoc implements TRetabDoc {
             else tag.children?.forEach(ch => pushChildrenIds(ch))
         }
         if (nestedTags) pushChildrenIds(nestedTags)
-            else console.log('no meiTag found');
-            
+        else console.log('no meiTag found');
+
         await prisma.meiTag.deleteMany({
-           where:{
-            AND: [
-                {id: {in: idsToDelete}},
-                {parents: {none: {
-                    id: {notIn: idsToDelete}
-                }}}
-            ] 
-        },
+            where: {
+                AND: [
+                    { id: { in: idsToDelete } },
+                    {
+                        parents: {
+                            none: {
+                                id: { notIn: idsToDelete }
+                            }
+                        }
+                    }
+                ]
+            },
         })
-        
+
         return;
     }
     assignDocSettings(docStetings: {

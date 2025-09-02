@@ -39,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/dev-test',
     name: 'dev-test',
     component: TestRoute
+  },
+  {
+    path: '/error/500',
+    name: '500',
+    component: () => import('@/views/error/500.vue')
   }
 
 ]
@@ -48,8 +53,7 @@ const router = createRouter({
   routes
 })
 router.beforeEach(async (to, from) => {
-  
-  if (to.name == 'login') return true;
+  if (to.name == 'login' || to.path.startsWith('/error')) return true;
   try {
     const response = await axios.get(store.state.apiUrl + '/retab/auth', {withCredentials: true})
     const authenticatedUser = response.data
@@ -66,8 +70,8 @@ router.beforeEach(async (to, from) => {
       return true
     }
   } catch(err: any) {
+    if (!err.response) router.push('/error/500')
     // if (err.status == 403) router.push('Login')
-    console.log(err.response.status);
     
   }
 })

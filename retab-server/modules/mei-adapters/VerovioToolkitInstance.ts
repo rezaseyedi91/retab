@@ -7,6 +7,7 @@ export function initVerovio() {
             verovioToolkit = new verovio.toolkit(); 
         }
         
+        
     } catch (error) {
         console.log('verovio errored')
     }

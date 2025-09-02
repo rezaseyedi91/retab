@@ -78,6 +78,7 @@ model TabCourseTuningInfo {
   oct     Int
   staves  StaffInfo[]
   presets TuningPreset[]
+  relatedXmlId String?  // JUST AN IDEA!
 
   @@unique([n, pname, oct])
 }

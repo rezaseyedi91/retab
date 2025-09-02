@@ -116,12 +116,10 @@ export default class RezTabFile {
      */
     // this.cleanupTabGroups();
     const section = this.section;
-    const jsonXmlElement = await MeiDocGenerator.generateJsomElem(section);
-    console.log(this.section.measures.map(m => m.xmlId));
-    console.log(jsonXmlElement.children[0].attributes.map(a => a.title + ': ' + a.value) , jsonXmlElement.children[0].tagTitle)
+    const jsonXmlElement = await MeiDocGenerator.generateJsonElem(section);
     this.head?.removeEmptyChildren();
     const headJsonXmlElement = this.head
-      ? await MeiDocGenerator.generateJsomElem(this.head)
+      ? await MeiDocGenerator.generateJsonElem(this.head)
       : undefined;
     // return ;
     const jsonXmlElementParsed = JSON.parse(JSON.stringify(jsonXmlElement));
@@ -144,7 +142,6 @@ export default class RezTabFile {
     this.info.altTitle = this.getAltTitle();
     const docInfo: TRetabDocDBType = {
       stavesInfo: this.section.getStavesInfo(),
-
       ...this.info,
     };
     const reqBody = {
@@ -154,7 +151,8 @@ export default class RezTabFile {
       docInfo,
       docSettings: this.docSettings,
     };
-    // console.log(reqBody.sectionJsonXmlElement);
+
+    console.log(reqBody);
     // return;
     const jsonResult = await axios.post(
       process.env.VUE_APP_API_URL + "/retab/doc/" + (this.id || "new"),

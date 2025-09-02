@@ -1,3 +1,4 @@
+import { debug } from "../../utils";
 import DB from "../DB";
 import { TTabCourseTuningInfo, TTuningPreset } from "../db-types";
 
@@ -14,7 +15,7 @@ export default class TuningPreset implements TTuningPreset {
         this.tuning = tuning;
     }
     async save() {
-
+       
         const prisma = DB.getInstance();
         if (!this.tuning?.length) return
         const coursesIds = await prisma.$transaction(this.tuning?.map(c => {

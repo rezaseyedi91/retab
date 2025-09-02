@@ -2,6 +2,7 @@
     <div>
         <!-- increase <span class="text-xl font-bold cursor-pointer"  @click="store.state.currentDoc.staves[props.staffIndex]?.addMeasure()">+</span> -->
         <div class="flex">
+            {{ {staffXmlId: getStaff()?.xmlId,staffN: staffN} }}
              <TabGroupComp class="inline-block" :tabGroup="tabGroup" v-for="(tabGroup, index) in getStaff()?.tabGroups
              " :key="index" :tabgroupId="`${measureN}-${staffN}-${index}`"/>
             

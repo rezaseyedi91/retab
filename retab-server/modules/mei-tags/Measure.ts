@@ -1,4 +1,4 @@
-import { MeiTag } from ".";
+import { MeiTag, TMeiTagConstructorOptions } from ".";
 import { TMeiJsonXmlElementInput } from "../mei-adapters/TabIdeaDocGenerator";
 import { IMeiAttribute, IMeiTag, MeiAttribute } from "./interfaces";
 import Layer from "./Layer";
@@ -26,13 +26,14 @@ export default class Measure extends MeiTag {
 
     
     
-    constructor(n: number | TMeiJsonXmlElementInput) {
-        super(typeof n == 'number' ? undefined : n)
+    constructor(n: number | TMeiJsonXmlElementInput, options?: TMeiTagConstructorOptions) {
+        super(typeof n == 'number' ? undefined : n, options)
         if (typeof n == 'number') {
             this.n = n;
         } else {
             this.n = Number(n.attributes.find(at => at.title == 'n')?.value || 1)
         }
+        
     }
     
 }
