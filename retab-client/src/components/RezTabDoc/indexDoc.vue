@@ -1,10 +1,8 @@
 <template>
-    
- 
     <div class="p-4" v-if="isLoaded" ref="retabDocContainer">
         <!-- <va-button @click="debugSL">SL</va-button> -->
+        <Toolbar />
          <DocTitle :key="store.state.utils.keyCoefficient"/>
-         <DevTest>{{ 'fe' +  useDoc().section.getChildrenByTagName('staffDef').map(f => f.attributes) }} - {{ useDoc().section.xmlId }}</DevTest>
         <div class="section flex max-w-full overflow-x-auto overflow-y-hidden">
             <MeasureComp :measure-n="(measure as Measure).n"
                 v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure" 
@@ -21,12 +19,13 @@
         </div> -->
         <DevTest>
             <div class="grid grid-cols-3 gap-3">
-                <va-button @click="() => {
+                <!-- <va-button @click="() => {
                     console.log(useDoc().getTuning())
                 }">Test</va-button>
-                <va-button @click="() => useDoc().snapshot()">Snap shot</va-button>
-                <va-button @click="() => useDoc().undo()">UNDO</va-button>
-                <va-button @click="() => useDoc().redo()">REDO</va-button>
+                <va-button @click="() => useDoc().redo()">REDO</va-button>-->
+                <va-button @click="() => useDoc().snapshot()">Snapshot</va-button>
+                <va-button @click="() => useDoc().redo()">redo</va-button>
+                <va-button @click="() => useDoc().unfreeze()">unfreeze</va-button>
             </div>
 
         </DevTest>
@@ -46,10 +45,13 @@ import TabGroup from '@/store/modules/TabGroup';
 import DevTest from '../utils/DevTest.vue';
 import { useDoc } from '@/composables/useDoc';
 import DocTitle from './DocTitle.vue';
+import Toolbar from './Toolbar.vue';
 const store = useStore();
 const props = defineProps<{
     id: string
 }>();
+
+
 const retabDocContainer = ref<HTMLElement>();
 
 class SelectionListener {
@@ -111,7 +113,6 @@ class SelectionListener {
         return this.selectionEl || document.querySelector('#' + SelectionListener.HIGHLIGH_ELEMENT_ID)!
     }
     cancelSelection() {
-
         const el = this.getSelectionEl();
         el.remove();
         this.getRetabDoc().getAllNotes().map(n => n.updateSelectionMode(false))
@@ -184,8 +185,6 @@ class SelectionListener {
 
     /**for Selected Notes */
     deleteSelectedNotes(deleteTabgroups = false) {
-        console.log({deleteTabgroups});
-        
         if (!deleteTabgroups) {
             this.selectedNotes.forEach(n => { 
                 n.tabGroup.updateSelectionMode(false); 
@@ -337,6 +336,7 @@ class SelectionListener {
     }
 
     onCtrlV() {
+        useDoc().snapshot()
         // this.pasteNotes();
         this.pasteTabgroups();
     }
@@ -369,7 +369,10 @@ class SelectionListener {
 
 
 async function addMeasure() {
-  const doc = store.state.currentDoc as RezTabFile;
+
+  const doc = useDoc();
+  doc.snapshot()
+
   const focusedNote = doc.getFocusedNote();
   const tg = focusedNote?.tabGroup;
   const measure = tg?.staff.measure;

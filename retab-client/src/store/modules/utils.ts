@@ -23,3 +23,4 @@ export function downloadJsonDataAsFile(json: any) {
     anchorEl.click();
     anchorEl.remove()
 }
+

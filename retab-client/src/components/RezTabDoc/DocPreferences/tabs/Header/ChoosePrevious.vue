@@ -30,7 +30,6 @@ import { onMounted, ref } from 'vue';
     const heads = ref<MeiHead[]>();
     onMounted(async () => {
         encoderHeaders.value = await MeiHead.getUserEncoderHeaders();
-        console.log(encoderHeaders.value);
         heads.value = encoderHeaders.value?.map(eh => {
             return new MeiHead(eh.headerTag as TMeiTagFactoryArgs)
         })
@@ -39,9 +38,6 @@ import { onMounted, ref } from 'vue';
     
     async function updateDocHead(head: MeiHead) {
         await useDoc().initializeHead(head)
-            console.log(selectedHead.value?.getWorkTitle());
-            console.log(useDoc().head?.getWorkTitle());
-            
             useDoc().updateUI()
     }
 </script>

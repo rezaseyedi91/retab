@@ -1,24 +1,9 @@
 <template>
-  <!-- <div v-if="note"
-      class="align-middle cursor-crosshair"
-      
-      @click="store.state.ui.editingNote = note!"
-      :class="{ 'text-green-600': store.state.ui.editingNote?.id == note?.id }"
-    >
-      {{ note?.fret || 0 }} 
-    </div>-->
-  <!--  v-else -->
-
-
   <div v-if="note">
-    <!-- :placeholder="'c-' + note.course" 
-    @focus="onFocus()"
-    -->
     <input @keydown.space="onSpace" autocomplete="false" @paste="(e) => { e.preventDefault() }" @keyup="keyup"
       @keydown="keydown" @keypress="keypress" @focus="onNoteInputFocus"
       class="note-input lute-tab p-1 w-9 border-1 border-red border-solid" maxlength="2" type="string" v-model="fret"
       :id="note.xmlId" />
-    <!-- v-model="note.fret" -->
   </div>
 </template>
 
@@ -31,6 +16,7 @@ import TabGroup from "@/store/modules/TabGroup";
 import { DurNum, TabType } from "@/store/modules/types";
 import { computed, defineProps, onMounted, onUpdated, ref, ComputedRef, watch, shallowRef } from "vue";
 import { useStore } from "vuex";
+import DevTest from "../utils/DevTest.vue";
 const store = useStore();
 const props = defineProps<{
   tabGroup: TabGroup;
@@ -43,14 +29,22 @@ const note = computed(() => props.tabGroup.getNoteOnCourse(props.line.courseInfo
 const fret = ref<string | number | undefined>(note.value?.getFretToShow());
 
 watch(fret, val => {
-  if (/^[\u0080-\uFFFF]+$/.test(val + '')) return
-  setFret(val);
+  
+  if (/^[\u0080-\uFFFF]+$/.test(val + '')) {
+    if (note.value.getFretToShow().includes(val + '') ) {
+      useDoc().snapshot();
+      val = note.value.fret?.toString().slice(0, val?.toString().length)
+    } else return;
+    
+  }
   useDoc().snapshot();
+  setFret(val);
   note.value.focus();
 })
 function setFret(val: any) {//: string | number) {
   // test if the second digit has been added
   const exec = /^[\u0080-\uFFFF](\d)/.exec(val)
+  console.log({val}, exec);
   
   if (!exec) {
     if (val == '')  {
@@ -77,7 +71,9 @@ function setFret(val: any) {//: string | number) {
 
 
 function onSpace() {
+  useDoc().snapshot();
   event?.preventDefault();
+  // useDoc().snapshot();
   const newTabGroup = props.tabGroup.staff.addTabGroup();
   newTabGroup.setDur(props.tabGroup.dur)
   const newNoteOnTheSameCourse = newTabGroup.notes.find(n => n.course == note.value.course)
@@ -101,12 +97,14 @@ function keypress(event: KeyboardEvent) {
 }
 function keydown(event: KeyboardEvent) {
   if (event.key == '.' || event.key == 'p') {
+    useDoc().snapshot();
     
     event.stopPropagation()
     event.preventDefault();
     
     note.value.tabGroup.dot()
-    useDoc().snapshot();
+    
+    
     return false
   }
 
@@ -135,7 +133,6 @@ function keyup(event: KeyboardEvent) {
     if (event.key == 'Delete') {
       event.preventDefault()
       const prevNoteToFocus = note.value.getLeftNote();
-      console.log(note.value.el, note.value.tabGroup);
       
       note.value.tabGroup.remove();
       prevNoteToFocus?.focus();

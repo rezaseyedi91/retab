@@ -33,11 +33,10 @@ export default class Section extends MeiTag {
         instance.info = {
             staves: stavesInfo || []
         }
+        instance.setXmlId(arg.xmlId || arg.attributes?.find(at => at.title == 'xml:id' )?.value)
         if (arg.children) instance.initializeMeasures(arg.children);
         setTimeout(() => {
             instance.updateChildren();
-            
-
         }, 1000)
         return instance;
     }
@@ -96,8 +95,9 @@ export default class Section extends MeiTag {
         
     }
     initializeMeasures(measureJsonXmlElements: TMeiTagFactoryArgs[]) {
+                
         this.measures = measureJsonXmlElements.map(mje => Measure.fromMeiFactoryArgs(this, mje))
-        return this;
+                return this;
     }
    setTuning(tuning: TabCourseTuningInfo[], staffIndex: number) {
         this.info.staves[staffIndex].tuning = tuning
@@ -126,8 +126,6 @@ export default class Section extends MeiTag {
         return this
     }
     addMeasure(index?: number): Measure {
-
-        
         const m = new Measure(this, (index || 0) + 1 ||  this.measures[this.measures.length-1]?.n + 1 );
         if (index == undefined) {
             this.measures.push(m)
@@ -148,9 +146,9 @@ export default class Section extends MeiTag {
     cleanupChildren() {
         this.measures.forEach(m => m.cleanupTabGroups())
     }
-    toJsonXmlElement(): MeiJsonElem {
-        this.cleanupChildren();
-        return super.toJsonXmlElement()
+    toJsonXmlElement(options = {keepEmptyNotes: false}): MeiJsonElem {
+        if  (!options.keepEmptyNotes) this.cleanupChildren();
+        return super.toJsonXmlElement(options)
     }
 
     removeMeasure(m: Measure) {

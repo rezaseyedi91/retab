@@ -10,6 +10,7 @@ export type TMeiTagFactoryArgs = {
     selfClosing?: boolean
     textContent?: string
     id?: number
+    xmlId?: string
 }
 export default abstract class MeiTag {
     xmlId?: string;
@@ -26,30 +27,39 @@ export default abstract class MeiTag {
         })
         
         instance.indexAmongSiblings = indexAmongSiblings;
-        instance.xmlId = el.getAttribute('xml:id')|| undefined
+        // instance.xmlId = el.getAttribute('xml:id')|| undefined
+        instance.setXmlId(el.getAttribute('xml:id')!)
 
         return instance;
 
     }
 
-    toJsonXmlElement(): MeiJsonElem {
-        this.updateChildren();
+    toJsonXmlElement(options = {keepEmptyNotes: false}): MeiJsonElem {
+        this.updateChildren(options);
         this.setAttributes();
-
+        
         return new MeiJsonElem({
             indexAmongSiblings: this.indexAmongSiblings,
             tagTitle: this.tagTitle,
             attributes: this.attributes,
-            children: this.children.map(ch => ch.toJsonXmlElement()),
+            children: this.children.map(ch => ch.toJsonXmlElement(options)),
             textContent: this.textContent,
             selfClosing: this.selfClosing,
             id: this.id,
-            xmlId: this.xmlId
+            xmlId: this.xmlId || this.getAttribute('xml:id')?.value
         })
     }
     selfClosing?: boolean
     children: MeiTag[] = []
     abstract tagTitle: string
+    setXmlId(xmlId?: string) {
+        
+        if (xmlId) {
+            this.xmlId = xmlId;
+            this.setAttribute(new MeiAttribute('xml:id', xmlId))
+        }
+         
+    }
     attributes: MeiAttribute[] = [];
     // abstract setAttributes(): void;
     setAttributes(): void {
@@ -57,7 +67,7 @@ export default abstract class MeiTag {
             this.setAttribute(new MeiAttribute('xml:id', this.xmlId))
         }
     }
-    abstract updateChildren(): MeiTag;
+    abstract updateChildren(options?: {keepEmptyNotes?: boolean}): MeiTag;
     textContent?: string;
     setAttribute(att: MeiAttribute) {
         const alreadySameTitleAtt = this.attributes.find(a => a.title == att.title)

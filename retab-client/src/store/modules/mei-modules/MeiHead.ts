@@ -9,7 +9,8 @@ export default class MeiHead extends MeiTag {
     constructor(info: TMeiTagFactoryArgs) {
         super()
         this.id = info.id
-        this.xmlId = info.attributes?.find(at => at.title == 'xml:id')?.value
+        // this.xmlId = 
+        this.setXmlId(info.attributes?.find(at => at.title == 'xml:id')?.value)
         this.children = info.children?.map(ch => ch instanceof MeiTag ? ch : MeiTag.makeTagsTree(ch)) || []
         this.textContent = info.textContent
     }
@@ -36,8 +37,6 @@ export default class MeiHead extends MeiTag {
     }
     static async getUserEncoderHeaders() {
         const result = await axios.get(store.state.apiUrl + '/retab/user/encoder-headers')
-        console.log(result.data);
-        
         return result.data
     }
     async setLastUserEncoderHeader() {

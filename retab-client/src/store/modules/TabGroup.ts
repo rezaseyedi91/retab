@@ -1,10 +1,12 @@
 import Layer from "./Layer";
 import Measure from "./Measure";
 import MeiAttribute from "./mei-modules/MeiAttribute";
+import MeiJsonElem from "./mei-modules/MeiJsonXmlElement";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
 import Note from "./Note";
 import Staff from "./Staff";
 import { DurNum, TabType, TNoteInfo } from "./types";
+import { generateId } from "./utils";
 class TabDurSym extends MeiTag {
     setAttributes(): void {
         return
@@ -13,7 +15,7 @@ class TabDurSym extends MeiTag {
         return this;
     }
     tagTitle = 'tabDurSym';
-    setId(id?: number):this {
+    setId(id?: number): this {
         this.id = id
         return this
     }
@@ -30,12 +32,12 @@ export default class TabGroup extends MeiTag {
     private includeDurAttribute = TabGroup.INCLUDE_DUR_ATTRIBUTE
     showTabDurSym = false
     containerElId?: string
-tabDurSymId?: number;
-    get staff() {return this.layer.staff}
+    tabDurSymId?: number;
+    get staff() { return this.layer.staff }
 
     setAttributes(): void {
         if (this.includeDurAttribute) {
-            this.attributes.push(new MeiAttribute('dur', this.dur))
+            this.setAttribute(new MeiAttribute('dur', this.dur))
         }
     }
     getContainerEl() {
@@ -82,10 +84,8 @@ tabDurSymId?: number;
         if (durNum < 1 || durNum > 64) return;
         this.dur = durNum
     }
-    updateChildren(): MeiTag {
-
-        this.children = this.notes.filter(n => (n.fret != undefined) && (n.course != undefined));
-
+    updateChildren(options = { keepEmptyNotes: false }): MeiTag {
+        this.children = this.notes.filter(n => options.keepEmptyNotes ||  ((n.fret != undefined) && (n.course != undefined)));
         if (this.showTabDurSym && !this.children.find(ch => ch instanceof TabDurSym)) {
             // add <tabDurSym/> element to the children
             this.children.unshift(new TabDurSym().setId(this.tabDurSymId))
@@ -107,12 +107,13 @@ tabDurSymId?: number;
 
     private init() {
         // this.measure.lines.forEach(l => this.addNote({course: l.courseInfo.number}))
+        if (!this.xmlId) this.setXmlId(generateId())
         this.staff.lines.forEach(l => {
             this.addNote({ course: l.courseInfo.number })
         })
     }
     addNote(info: TNoteInfo) {
-        const alreadyThere = this.notes.find(i => i.course == info.course);
+        const alreadyThere = this.getNoteOnCourse(info.course || 0) // this.notes.find(i => i.course == info.course);
         const n = new Note(this, info);
         if (alreadyThere) this.notes.splice(this.notes.indexOf(alreadyThere), 1, n)
         else this.notes.push(n)
@@ -198,7 +199,9 @@ tabDurSymId?: number;
     remove() {
         this.staff.removeTabgroup(this)
     }
-
+    getDoc() {
+        return this.staff.getDoc();
+    }
     insertTabgroupBefore(newTg?: TabGroup) {
         const newOne = newTg || this.staff.insertTabgroupBefore(this);
         if (!newTg) {
@@ -230,7 +233,8 @@ tabDurSymId?: number;
             const sameCourse = this.getNoteOnCourse(course!);
             if (sameCourse) {
                 sameCourse.fret = fret
-                sameCourse.xmlId = xmlId!
+                // sameCourse.xmlId = xmlId!
+                sameCourse.setXmlId(xmlId)
                 sameCourse.id = nje.id
                 nje.attributes?.forEach(at => sameCourse.setAttribute(new MeiAttribute(at.title, at.value)))
             }
@@ -243,8 +247,9 @@ tabDurSymId?: number;
         arg.attributes?.forEach(at => {
             if (at.title == 'dur') instance.setDur(Number(at.value) as DurNum)
             else if (at.title == 'dots' && Number(at.value) > 0) instance.setDurDots(Number(at.value))
-            else if (at.title == 'xml:id') instance.setAttribute(at)
+            else if (at.title == 'xml:id') instance.setXmlId(at.value)
         })
+
         const tabDurSymTag = arg.children?.find(ch => ch.tagTitle == 'tabDurSym')
         instance.showTabDurSym = !!tabDurSymTag
         instance.tabDurSymId = tabDurSymTag?.id
@@ -254,7 +259,7 @@ tabDurSymId?: number;
 
         return instance;
     }
-    
+
 
     showLedgerLines(untillCourseNumber: number): boolean {
         const tabType = this.staff.getTabType();
@@ -270,4 +275,7 @@ tabDurSymId?: number;
             return false
         }
     }
+
+
+ 
 }

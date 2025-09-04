@@ -38,19 +38,24 @@ export default class Staff extends MeiTag {
         this.measure = measure
         this.linesCount = info?.linesCount || this.linesCount;
         this.n = n
-        this.init()
+        this.initLines()
+        this.reorderLines(this.getTabType())
     }
     getAllNotes(justTheExistingOnes = true): Note[] {
           return this.tabGroups.reduce((sf: Note[], tg) => [...sf, ...tg.getAllNotes(justTheExistingOnes)], [])
+    }
+
+    getDoc() {
+        return this.measure.getDoc();
     }
     setTabgroupsIncludeDurAttribute(mode: boolean) {
         this.tabGroups.forEach(t => t.setIncludeDurAttribute(mode))
     }
     getLayer(index = 0) {
-        if (!this.layers[0]){
+        if (!this.layers[index]){
             this.layers.push(new Layer(this))
         }
-        return this.layers[0]
+        return this.layers[index]
     }
     get tabGroups(): TabGroup[] {
         return this.getLayer().tabGroups
@@ -141,37 +146,52 @@ export default class Staff extends MeiTag {
     }
 
     initializeTabgroups(tabGroupJsonXmlElements: TMeiTagFactoryArgs[]) {
-        if (!this.lines.length) this.initLines();
-        this.tabGroups = tabGroupJsonXmlElements.map(tje => {
-            return TabGroup.fromMeiFactoryArgs(this.getLayer(), tje)
-        })
+        return
+        
+        // if (!this.lines.length) this.initLines();
+        // this.tabGroups = tabGroupJsonXmlElements.map(tje => {
+        //     return TabGroup.fromMeiFactoryArgs(this.getLayer(), tje)
+        // })
 
     }
 
     static fromMeiFactoryArgs(measure: Measure, arg: TMeiTagFactoryArgs) {
-        const instance =  new Staff(measure, {
+                const instance =  new Staff(measure, {
             linesCount: measure.section.getDoc().docSettings.linesCount// measure.section.info.staves[0].linesCount
-        }).init();
-        instance.id = arg.id
+        });
+                instance.id = arg.id
         
-        instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value || generateId()))
+        // instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value || generateId()))
+        instance.setXmlId( arg.attributes?.find(a => a.title == 'xml:id')?.value || generateId())
         if (arg.children?.length) instance.layers = arg.children
             .map(lje => Layer.fromMeiFactoryArgs(instance, lje));
-        
         return instance;
     }
 
-
-
-    init() {
-        // this.linesCount = this.info.staves[0].linesCount
-        this.initLines()
-        //ITALIAN:
-        this.addTabGroup();
-        this.reorderLines(this.getTabType())
+    initEmptyStaff() {
+        this.initEmptyStaffLayer();
         return this;
     }
+    initEmptyStaffLayer() {
+        if (!this.layers.length)  {
+            this.layers.push(new Layer(this, 1))
+            this.layers[0].initEmptyLayerTabgroups()
+            
+        }
+        return this.layers[0]
+    }
 
+    
+    // init() {
+    //             // this.linesCount = this.info.staves[0].linesCount
+    //     // this.initLines()
+    //     //ITALIAN:
+    //     // this.addTabGroup();
+    //     this.initEmptyStaff()
+    //     // this.reorderLines(this.getTabType())
+    //     return this;
+    // }
+    
 
     addTabGroup(index?: number, tgToAdd?: TabGroup) {
         const newOne = tgToAdd ||  new TabGroup(this.getLayer())
@@ -180,12 +200,12 @@ export default class Staff extends MeiTag {
         else this.tabGroups.splice(index, 0, newOne)
         
         this.updateChildren();
-        this.measure.section.getDoc().updateUI()
+        this.getDoc().updateUI()
         return newOne
     }
 
     removeTabgroup(tg: TabGroup) {
-
+        this.getDoc().snapshot();
         const index = this.tabGroups.indexOf(tg)
         this.tabGroups.splice(index, 1)
         // this.tabGroups.splice(1, 1);
@@ -199,6 +219,8 @@ export default class Staff extends MeiTag {
     }
 
     cleanupTabGroups() {
+
+        
         this.tabGroups.forEach(tg => tg.cleanup());
     }
     // toJsonXmlElement(): MeiJsonElem {

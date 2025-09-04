@@ -4,12 +4,13 @@ import TabGroup from "./TabGroup";
 import { DurNum, TabType, TNoteInfo } from "./types";
 import { generateId } from "./utils";
 export default class Note extends MeiTag {
-    static FRENCH_TAB_LETTERS = ['a','b','c','d','e','f','g','h','i','k','l', 'm']
+    static FRENCH_TAB_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k', 'l', 'm']
     static FRENCH_TAB_UNICODES = ['\uEBC0', '\uEBC1', '\uEBC2', '\uEBC3', '\uEBC4', '\uEBC5', '\uEBC6', '\uEBC7', '\uEBC8', '\uEBC9', '\uEBCA', '\uEBCB', '\uEBCC']
     static FRENCH_TAB_DIAPAZONES_UNICODES = ['\uEBCD', '\uEBCE', '\uEBCF', '\uEBD0'] // 7 8 9 10
     static ITALIAN_TAB_UNICODES = ['\uEBE0', '\uEBE1', '\uEBE2', '\uEBE3', '\uEBE4', '\uEBE5', '\uEBE6', '\uEBE7', '\uEBE8', '\uEBE9', '\uEBE1\uEBE0', '\uEBE1\uEBE1', '\uEBE1\uEBE2', '\uEBE1\uEBE3', '\uEBE1\uEBE4']
     tagTitle = 'note';
     static MAX_FRET_INPUT = 14
+    getDoc() {return this.tabGroup.getDoc()}
     setAttributes(): void {
         this.setAttribute(new MeiAttribute('tab.course', (this.course || 0)))
         this.setAttribute(new MeiAttribute('tab.fret', this.fret!))
@@ -25,15 +26,15 @@ export default class Note extends MeiTag {
         if (!this.fret && this.fret != 0) return ''
         else if (tabType == TabType.FRENCH && this.course! >= 7 && this.fret == 0) return Note.FRENCH_TAB_DIAPAZONES_UNICODES[Number(this.course) - 7]
         else if (tabType == TabType.FRENCH && this.fret != undefined) return Note.FRENCH_TAB_UNICODES[Number(this.fret)]
-        
-        else  return  Note.ITALIAN_TAB_UNICODES[Number(this.fret)] //this.fret
+
+        else return Note.ITALIAN_TAB_UNICODES[Number(this.fret)] //this.fret
     }
     private _fret?: number;
     set fret(v: number | undefined | string) {
         const vNum = Number(v)
         if (v == undefined || v && isNaN(vNum)) {
             this._fret = Note.FRENCH_TAB_LETTERS.indexOf(v as string) > -1 ? Note.FRENCH_TAB_LETTERS.indexOf(v as string) : undefined
-        }else if (!v || v && vNum <= Note.MAX_FRET_INPUT) {
+        } else if (!v || v && vNum <= Note.MAX_FRET_INPUT) {
             this._fret = vNum
         }
     }
@@ -60,7 +61,7 @@ export default class Note extends MeiTag {
     focus() {
         this.setupEl()
         setTimeout(() => {
-            
+
             // const el = document.querySelector('#' + this.xmlId) as HTMLInputElement;
             // if (el) el.focus()
             this.el?.focus()
@@ -69,14 +70,15 @@ export default class Note extends MeiTag {
     el?: HTMLElement;
     tabGroup: TabGroup;
     // fret?: number
-    
+
     // id: number|string;
     course?: number;
     constructor(tabGroup: TabGroup, info?: TNoteInfo) {
         super();
         this.tabGroup = tabGroup
-        this.id  = Number(info?.id) || undefined
-        this.xmlId = info?.xmlId || generateId();
+        this.id = Number(info?.id) || undefined
+        // this.xmlId = info?.xmlId || generateId();
+        this.setXmlId(info?.xmlId || generateId());
         // this.id = this.xmlId
         this.fret = info?.fret;
         this.course = info?.course;
@@ -89,12 +91,13 @@ export default class Note extends MeiTag {
     static validCourseIndicator(someCourseNumber: string | undefined | number) {
         return !isNaN(Number(someCourseNumber))
     }
+    
     setupEl() {
         this.el = document.querySelector('.note-input#' + this.xmlId)!
         if (!this.el && !this.fret) return;
         if (!this.el) {
-            console.error('no el found for this id: ', this.xmlId, this.tabGroup.getIndexInPiece())
-            
+            // console.error('no el found for this id: ', this.xmlId, this.tabGroup.getIndexInPiece())
+
         }
     }
     isInSelectionHighliterRange(range: number[]) {
@@ -110,7 +113,7 @@ export default class Note extends MeiTag {
 
     getDebugElData() {
         if (!this.el) return;
-        this.setupEl()  
+        this.setupEl()
         const bcr = this.el.getBoundingClientRect();
         const { x: initialx, y: initialy } = bcr;
         const x = initialx + window.scrollX
@@ -120,7 +123,7 @@ export default class Note extends MeiTag {
     static validFretIndicator(somefret: string | undefined | number) {
         if ([0, '0'].includes(somefret!)) return true
         // if (somefret == '') somefret = undefined
-        return   (!!somefret && !isNaN(Number(somefret))) //(typeof somefret == 'number' ) ||  (somefret != undefined) && (typeof somefret == 'string' && somefret.trim())
+        return (!!somefret && !isNaN(Number(somefret))) //(typeof somefret == 'number' ) ||  (somefret != undefined) && (typeof somefret == 'string' && somefret.trim())
     }
 
     isThere() {
@@ -128,8 +131,7 @@ export default class Note extends MeiTag {
     }
     /**1 for nextCourse -1 for previous course */
     getNeighbour(courseDiff: number) {
-        const neighbour =  this.tabGroup.notes.find(n => n.course == (this.course || 0) + courseDiff);
-        
+        const neighbour = this.tabGroup.notes.find(n => n.course == (this.course || 0) + courseDiff);
         return neighbour
     }
 
@@ -137,19 +139,16 @@ export default class Note extends MeiTag {
         return this.getNeighbour(1);
     }
     getBelowNote() {
-        
+
         return this.getNeighbour(-1);
     }
 
     getRightNote() {
-        
-
         return this.tabGroup.getNeighbour(1)?.notes.find(n => n.course == this.course)
             || this.getNextMeasureFirstNote()
 
     }
     getLeftNote() {
-        
         return this.tabGroup.getNeighbour(-1)?.notes.find(n => n.course == this.course)
             || this.getPrevMeasureLastNote()
     }

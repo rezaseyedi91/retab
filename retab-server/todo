@@ -5,6 +5,6 @@
 - body tag for a doc must remain the same;
 - when a doc gets removed, remove the empty userEnocderHeaderPresets!
 - 
-- UNDO crap!
+- UNDO crap! work on newest undo bug!
 
 ---------use dbman to findout how we can connect tuning type (n, pname, oct, accid) to meiTag (xmlId...)

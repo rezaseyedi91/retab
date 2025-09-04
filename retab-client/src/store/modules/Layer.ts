@@ -22,21 +22,22 @@ export default class Layer extends MeiTag {
             new MeiAttribute('n', this.n || ''),
         )
     }
+
+    initEmptyLayerTabgroups() {
+        if (!this.tabGroups.length) return this.tabGroups.push(new TabGroup(this))
+    }
     updateChildren(): MeiTag {
         this.children = this.tabGroups.map(tg => tg.updateChildren());
         return this
     }
 
     static fromMeiFactoryArgs(staff: Staff, arg: TMeiTagFactoryArgs) {
-
         const instance = new Layer(staff, Number(arg.attributes?.find(at => at.title == 'n')?.value));
         instance.id = arg.id
-        
         
         instance.setAttribute(new MeiAttribute('xml:id', arg.attributes?.find(a => a.title == 'xml:id')?.value || generateId()))
         if (arg.children?.length) instance.tabGroups = arg.children
             .map(tje => TabGroup.fromMeiFactoryArgs(instance, tje));
-
         return instance;
     }
 

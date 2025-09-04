@@ -1,7 +1,5 @@
 import store from "..";
 import { TDbDocSettings, TUser } from "./db-types";
-import Measure from "./Measure";
-import MeiAttribute from "./mei-modules/MeiAttribute";
 import MeiDocGenerator from "./mei-modules/MeiDocGenerator";
 import MeiHead from "./mei-modules/MeiHead";
 import MeiTag, { TMeiTagFactoryArgs } from "./mei-modules/MeiTag";
@@ -83,14 +81,15 @@ export default class RezTabFile {
     this.section.info.staves[0].linesCount = this.docSettings.linesCount;
   }
   unfreeze() {
+
     this.section.measures.forEach((meausre) => {
       meausre.staves.forEach((staff) => {
         staff.tabGroups.forEach((tabgroup) => {
-          const currentNotes = tabgroup.notes;
           tabgroup.notes = staff.lines.map((l) => {
             const c = l.courseInfo.number;
+
             return (
-              currentNotes.find((n) => n.course == c) ||
+              tabgroup.getNoteOnCourse(c) ||
               new Note(tabgroup, { course: c })
             );
           });
@@ -98,7 +97,7 @@ export default class RezTabFile {
       });
     });
 
-    
+
   }
   init() {
     /**just testing for now */
@@ -152,7 +151,6 @@ export default class RezTabFile {
       docSettings: this.docSettings,
     };
 
-    console.log(reqBody);
     // return;
     const jsonResult = await axios.post(
       process.env.VUE_APP_API_URL + "/retab/doc/" + (this.id || "new"),
@@ -182,8 +180,7 @@ export default class RezTabFile {
     );
     doc.initializeHead(someResponse.headJsonXmlElement);
     doc.unfreeze();
-    
-    console.log(doc);
+
 
     if (someResponse.settings) doc.assignSettings(someResponse.settings);
     return doc;
@@ -249,7 +246,6 @@ export default class RezTabFile {
       // this.initializeHead(tempTest)
       // this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_ARGS);
       this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_EMPTY_ARGS);
-      console.log(this.head);
 
     } catch (err) {
       return;
@@ -260,19 +256,21 @@ export default class RezTabFile {
     fetchedSection?: TMeiTagFactoryArgs,
     stavesInfo?: TStaffInfo[]
   ) {
+
+
     if (fetchedSection) {
       this.section = Section.fromMeiFactoryArgs(
         this,
         fetchedSection,
         stavesInfo
       );
-      this.section.setAttribute(
-        new MeiAttribute(
-          "xml:id",
-          fetchedSection.attributes?.find((a) => a.title == "xml:id")?.value ||
-          generateId()
-        )
-      );
+      // this.section.setAttribute(
+      //   new MeiAttribute(
+      //     "xml:id",
+      //     fetchedSection.attributes?.find((a) => a.title == "xml:id")?.value ||
+      //     generateId()
+      //   )
+      // );
     } else {
       return;
       // this.section = this.section
@@ -336,7 +334,6 @@ export default class RezTabFile {
     document.body.appendChild(element);
 
     element.click();
-    console.log(element, filename);
 
     // document.body.removeChild(element)
   }
@@ -420,14 +417,12 @@ export default class RezTabFile {
   static async instanceFromXmlString(xmlString?: string) {
     if (!xmlString) throw new Error("there is no xml string");
     const parsed = parseXml(xmlString);
-    console.log(parsed);
     const title = parsed.querySelector('title[type=main]')?.textContent || '';
     const altTitle = parsed.querySelector('title[type=alternative]')?.textContent || '';
     const tabType = parsed.querySelector('staffDef')?.getAttribute('notationtype') as `tab.lute.${TabType}`
 
     const p: TabType = TabType.FRENCH;
     const head = MeiTag.instanceFromXmlElement(parsed.querySelector('meiHead')!) as MeiHead
-    console.log(head);
     const doc = new RezTabFile({
       title,
       createdAt: new Date(),
@@ -450,8 +445,6 @@ export default class RezTabFile {
       }))
     }])
 
-    console.log("making instance from mei file");
-    console.log(doc);
     store.state.currentDoc = doc;
     router.push('doc/imported')
     function parseXml(readResult: string) {
@@ -461,56 +454,71 @@ export default class RezTabFile {
     }
   }
 
-    
+
   snapshot() {
-    return;
-    const focusedNote = this.getFocusedNote();
-    console.log('\n----');
-    console.log('taking snapshot...');
+
+    console.log('snapshot');
+
     this.redoStack = [];
     this.undoStack.push(this.serialize())
     this.updateUI();
     this.unfreeze();
-    const newNote = this.getNoteById(focusedNote?.xmlId)?.focus();
-    console.log(
-      focusedNote?.toJsonXmlElement(), newNote, 
-    );
-    
   }
+
   getNoteById(xmlId?: string) {
     return this.getAllNotes().find(n => n.xmlId == xmlId)
-
   }
+
   private serialize() {
-     const head = this.head?.toJsonXmlElement();
-    const section = this.section.toJsonXmlElement();
+    const head = this.head?.toJsonXmlElement();
+    const section = this.section.toJsonXmlElement({ keepEmptyNotes: true });
     const sectionInfo = this.section.info
     const docSettings = this.docSettings
     const info = this.info;
     const state = JSON.stringify({
-      head, section, docSettings, info, sectionInfo
+      head, section, docSettings, info, sectionInfo, focusedNoteId: this.lastFocusedNote?.xmlId
     })
+    //  this.redoStack = [];
     return state;
   }
   undo() {
+
     if (this.undoStack.length == 0) return;
     const prevState = this.undoStack.pop();
+
     this.redoStack.push(this.serialize());
 
     this.restore(prevState!);
     this.updateUI();
+
+
   }
+
   private async restore(serialized: string) {
     const parsed = JSON.parse(serialized);
+
+
+    this.lastFocusedNote = this.getNoteById(parsed.focusedNoteId)
+
+    console.log(parsed.focusedNoteId);
+    
     this.info = parsed.info;
     this.docSettings = parsed.docSettings;
     await this.initializeHead(parsed.head)
     this.initializeSection(parsed.section, parsed.sectionInfo?.staves);
-
-
+    this.updateUI();
+    const focusedNote = this.getNoteById(parsed.focusedNoteId);
+        console.log(focusedNote);
+      
+    setTimeout(() => {
+      focusedNote?.setupEl()
+      focusedNote?.focus();
+    }, 50)
   }
 
   redo() {
+    console.log('redo', this.redoStack.length);
+
     if (this.redoStack.length === 0) return;
 
     const nextState = this.redoStack.pop()!;

@@ -1,7 +1,6 @@
 <template>
     <div class="tab-group" :id="tabGroup.containerElId">
         <div class="flex flex-col gap-y-2 ">
-            <!-- <DevTest>{{ tabGroup.staff.measure.n }}</DevTest> -->
             <DurationSymbol :show-tab-dur-sym="tabGroup.showTabDurSym" :durNum="(tabGroup.dur as DurNum)"
                 :dots="tabGroup.durDots" @toggleShowTabDurSym="tabGroup.toggleShowTabDurSym()"
                 @change-duration="d => tabGroup.setDur(d)"

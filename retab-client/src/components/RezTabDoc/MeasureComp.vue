@@ -1,6 +1,5 @@
 <template>
     <div class="measure">
-        <DevTest>{{ {['xmlid']:  getMeasure()?.xmlId} }}</DevTest>
         <StaffComp 
         :staff-index="index"
         v-for="(staff, index) in getMeasure()?.staves" :staffN="staff.n" :key="index * store.state.utils.keyCoefficient"
