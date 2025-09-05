@@ -24,8 +24,18 @@ router.get('/', authMiddleware, async (req, res) => {
 router.get('/dbman', authMiddleware, async (req, res) => {
     const prisma = DB.getInstance();
     //@ts-ignore
-    // const user = await RetabUser.getUser(req.userId!);
-    const coursesTunings = await prisma.tabCourseTuningInfo.findMany({})
+    const user = await RetabUser.getUser(1);// await RetabUser.getUser(req.userId!);
+    const latestUserEncoderHEaders =  await user.getEncoderHeaders();
+    const headers = latestUserEncoderHEaders.map(i => i.headerTag)
+    console.log(headers);
+    return res.send('')
+    // const doc = await  prisma.meiTag.findMany({
+    //     where :{
+    //         id: {in: headers}
+    //     },
+    //     select: {id: true}
+    // })
+    // return res.json(doc)
 })
 
 router.use('/retab', retabTestRouter)

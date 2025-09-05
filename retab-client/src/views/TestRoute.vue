@@ -2,7 +2,7 @@
     <DevTest>
         <div class="p-12">
             <br>
-            <va-button>
+            <va-button @click="test">
                 Test
             </va-button>
         </div>
@@ -19,7 +19,7 @@ const store = useStore();
 const doc = useDoc();
 
 async function test() {
-    doc.undo()
+    return 
 }
 
 </script>
