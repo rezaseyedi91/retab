@@ -9,7 +9,7 @@ import RetabUser from "../../modules/retab-modules/User";
 import authMiddleware from '../../middleware/auth'
 const router = Router();
 
-
+ 
 
 router.get('/', authMiddleware, async (req, res) => {
 
@@ -21,7 +21,7 @@ router.get('/dbman', authMiddleware, async (req, res) => {
     const user = await RetabUser.getUser(1);// await RetabUser.getUser(req.userId!);
     const latestUserEncoderHEaders =  await user.getEncoderHeaders();
 
-    return res.json(
+    return res.json( 
         latestUserEncoderHEaders
     )
 

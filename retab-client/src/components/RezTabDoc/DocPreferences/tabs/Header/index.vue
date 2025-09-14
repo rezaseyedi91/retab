@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { useStore } from 'vuex';
 import RezTabFile from '@/store/modules/RezTabFile';
-import { onUnmounted, ref, shallowRef, watch } from 'vue';
+import { onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
 import MeiAttribute from '@/store/modules/mei-modules/MeiAttribute';
 import ChoosePrevious from './ChoosePrevious.vue';
 const store = useStore();
@@ -179,7 +179,9 @@ workCreationInfo
 
 
 ]
-
+onMounted(() => {
+    doc.head?.setAllChildrenParent();
+})
 watch(title, val => {
     doc.head?.__('fileDesc')?.__('titleStmt')?.__('title')?.setTextContent(val)
     doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('title')?.setTextContent(val)
@@ -235,9 +237,4 @@ watch(workCreationSettlement, val => doc.head?.__('workList')?.__('work')?.__('c
 watch(workCreationCountry, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('country').setTextContent(val))
 
 
-onUnmounted(() => {
-    console.log(inputGroups.map(g => {
-        return g.inputs.map(i => i.vModel)
-    }))
-})
 </script>

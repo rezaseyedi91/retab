@@ -15,7 +15,10 @@ export type TMeiTagFactoryArgs = {
 }
 export default abstract class MeiTag {
 
-    setParent(p: MeiTag) {this.parent = p; return this;}
+    setParent(p: MeiTag) {
+        this.parent = p; 
+        return this;
+    }
 
     parent?: MeiTag;
     xmlId?: string;
@@ -41,7 +44,8 @@ export default abstract class MeiTag {
     setAllChildrenParent() {
         this.children.forEach(ch => {
             if (!ch.parent) ch.setParent(this)
-            ch.children.forEach(grandChild => grandChild.setAllChildrenParent())
+            ch.setAllChildrenParent()
+            // ch.children.forEach(grandChild => grandChild.setAllChildrenParent())
         })
     }
     toJsonXmlElement(options = {keepEmptyNotes: false}): MeiJsonElem {
@@ -191,6 +195,8 @@ title[type=desc][something=else]
     }
 
     remove() {
+        console.log('%cremoving ' + this.tagTitle + '| parent: ' + this.parent?.tagTitle, 'color: blue; font-weight: bold');
+        
         this.parent?.children.splice(this.parent.children.indexOf(this), 1);
     }
 }

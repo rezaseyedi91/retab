@@ -180,8 +180,6 @@ export default class RezTabFile {
     );
     doc.initializeHead(someResponse.headJsonXmlElement);
     doc.unfreeze();
-
-
     if (someResponse.settings) doc.assignSettings(someResponse.settings);
     return doc;
   }
@@ -238,15 +236,8 @@ export default class RezTabFile {
 
   async initializeHead(fetchedHead?: TMeiTagFactoryArgs) {
     try {
-      if (!fetchedHead) {
-        // const lastEncoderHeaders = await MeiHead.getUserEncoderHeaders();
-        // fetchedHead = lastEncoderHeaders[0]?.headerTag;
-      }
-      // downloadJsonDataAsFile(fetchedHead)
-      // this.initializeHead(tempTest)
-      // this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_ARGS);
       this.head = new MeiHead(fetchedHead || HARD_CODED_HEADER_EMPTY_ARGS);
-
+      this.head.setAllChildrenParent()
     } catch (err) {
       return;
     }
@@ -459,9 +450,6 @@ export default class RezTabFile {
 
 
   snapshot() {
-
-    console.log('snapshot');
-
     this.redoStack = [];
     this.undoStack.push(this.serialize())
     this.updateUI();
@@ -502,17 +490,12 @@ export default class RezTabFile {
 
 
     this.lastFocusedNote = this.getNoteById(parsed.focusedNoteId)
-
-    console.log(parsed.focusedNoteId);
-    
     this.info = parsed.info;
     this.docSettings = parsed.docSettings;
     await this.initializeHead(parsed.head)
     this.initializeSection(parsed.section, parsed.sectionInfo?.staves);
     this.updateUI();
     const focusedNote = this.getNoteById(parsed.focusedNoteId);
-        console.log(focusedNote);
-      
     setTimeout(() => {
       focusedNote?.setupEl()
       focusedNote?.focus();
@@ -520,8 +503,6 @@ export default class RezTabFile {
   }
 
   redo() {
-    console.log('redo', this.redoStack.length);
-
     if (this.redoStack.length === 0) return;
 
     const nextState = this.redoStack.pop()!;

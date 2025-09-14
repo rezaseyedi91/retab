@@ -21,22 +21,22 @@ export default class MeiHead extends MeiTag {
     //     return
     // }
     updateChildren(): MeiTag {
+        console.log('updating head children');
+        const cannotBeRemovedTagTitles = [
+            'pubStmt', 'titleStmt', 'title'
+        ]
         function removeEmptyChildrenNested(tag: MeiTag) {
-            if (tag.attributes.length <= 1 && !tag.children.length && !tag.textContent) {
+            tag.children.forEach(removeEmptyChildrenNested)
+            if (tag.attributes.length <= 1 && !tag.children.length && !tag.textContent && !cannotBeRemovedTagTitles.includes(tag.tagTitle)) {
                 tag.removeAttribute('xml:id');
                 tag.remove();
             }
-            if (tag.children.length < 1) {
-                return tag.children.forEach(removeEmptyChildrenNested) 
-            } else return tag.children.map(t => t.removeEmptyChildren())
+            return 
         }
         removeEmptyChildrenNested(this)
         return this
     }
 
-    cleanupEmptyTags() {
-        return 
-    }
     /**adds an <annot/> element to the [index = 0] <work/> in the <workList/> */
     addAnnot(workIndex = 0) {
         this.__('workList')?.getChildrenByTagName('work')?.[workIndex]?.__('notesStmt')?.pushChild({
