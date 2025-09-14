@@ -28,8 +28,7 @@ router.get('/get-all-saved', async (req, res) => {
         })
     } catch (err) {
         //@ts-ignore
-        console.log(err)
-        res.status(403).send({ message: 'Not authorized' })
+                res.status(403).send({ message: 'Not authorized' })
     }
 })
 router.get('/:id', async (req, res) => {

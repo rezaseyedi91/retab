@@ -82,7 +82,7 @@ export default class RetabUser implements TUser {
     }
 
 
-    async getEncoderHeaders(count = 100): Promise<TEncoderHeader[]> {
+    async getEncoderHeaders(count = 10): Promise<TEncoderHeader[]> {
         try {
 
             function selectNested(remainingLevel = 20): any {
@@ -109,7 +109,26 @@ export default class RetabUser implements TUser {
             }
             const result = await DB.getInstance().encoderHeader.findMany({
                 where: {
-                    userId: this.id || 0,
+                    AND: [
+                        {
+                            headerTag: {
+                                parents: {
+                                    some: {
+                                        doc: {
+                                            AND: [
+                                                {mainChildId: {not: null}},
+                                                {OR: [
+                                                    {altTitle: {not: null}},
+                                                ]}
+
+                                            ]
+                                        },
+                                    }
+                                }
+                            }
+                        },
+                        { userId: this.id || 0, }
+                    ],
                 },
                 orderBy: {
                     id: 'desc'
@@ -119,15 +138,22 @@ export default class RetabUser implements TUser {
                     id: true,
                     headerTag: {
                         select: {
+                            parents: {
+                                select: {
+                                    doc: true,
+                                    docId: true
+                                }
+                            },
                             indexAmongSiblings: true,
                             children: selectNested(10)
 
                         }
                     }
-                }
+                },
+
             })
 
-            return result
+            return result as TEncoderHeader[]
         } catch (error) {
             console.log(error);
             throw error
@@ -136,7 +162,8 @@ export default class RetabUser implements TUser {
 
     async saveEncoderHeader(enHeader: TEncoderHeader) {
         try {
-            
+            console.log('--- start saving encoder header', enHeader.headerTagId, this.id);
+
             const saveResult = await DB.getInstance().encoderHeader.upsert({
                 where: {
                     headerTagId_userId: {
@@ -159,10 +186,9 @@ export default class RetabUser implements TUser {
                     user: { connect: { id: this.id } }
                 }
             })
-
+            
         } catch (error) {
             console.log(error);
-
         }
     }
 }

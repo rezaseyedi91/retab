@@ -1,6 +1,5 @@
 <template>
     <div class="p-4" v-if="isLoaded" ref="retabDocContainer">
-        <!-- <va-button @click="debugSL">SL</va-button> -->
         <Toolbar />
          <DocTitle :key="store.state.utils.keyCoefficient"/>
         <div class="section flex max-w-full overflow-x-auto overflow-y-hidden">
@@ -14,18 +13,23 @@
                 <va-button icon="add" :outline="true" class="opacity-80" @click="addMeasure"></va-button>
             </div>
         </div>
-        <!-- <div class="my-3">
-            <va-button color="#a855f7" class="p-3 bg-purple-500 font-bold cursor-pointer" @click="addMeasure">Add Measure</va-button>
-        </div> -->
         <DevTest>
-            <div class="grid grid-cols-3 gap-3">
-                <!-- <va-button @click="() => {
-                    console.log(useDoc().getTuning())
-                }">Test</va-button>
-                <va-button @click="() => useDoc().redo()">REDO</va-button>-->
-                <va-button @click="() => useDoc().snapshot()">Snapshot</va-button>
-                <va-button @click="() => useDoc().redo()">redo</va-button>
-                <va-button @click="() => useDoc().unfreeze()">unfreeze</va-button>
+            <div class="grid grid-cols-3 gap-3 py-5">
+                <va-card>
+                    <va-card-content>
+                        {{ useDoc().head?.children.length }}
+
+                        <div class="grid gap-3 grid-cols-3 ">
+
+                            <va-button @click="() => useDoc().snapshot()">Snapshot</va-button>
+                            <va-button @click="() => useDoc().redo()">redo</va-button>
+                            <va-button @click="() => useDoc().unfreeze()">unfreeze</va-button>
+                        </div>
+                        <div>
+
+                        </div>
+                    </va-card-content>
+                </va-card>
             </div>
 
         </DevTest>
@@ -50,7 +54,6 @@ const store = useStore();
 const props = defineProps<{
     id: string
 }>();
-
 
 const retabDocContainer = ref<HTMLElement>();
 

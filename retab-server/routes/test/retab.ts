@@ -11,8 +11,7 @@ router.get('/', async (req, res) => {
 
         })
     } catch (err) {
-        console.log(err)
-        res.send('error loged')
+                res.send('error loged')
     }
 })
 function includeChildrenRecursively(n = 1): any {

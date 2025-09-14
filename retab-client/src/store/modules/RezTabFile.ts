@@ -432,6 +432,9 @@ export default class RezTabFile {
       altTitle,
     })
     const section = MeiTag.instanceFromXmlElement(parsed.querySelector('section')!) as Section;
+    head.setAllChildrenParent();
+    section.setAllChildrenParent();
+    
     await doc.initializeHead(head);
     await doc.initializeSection(section, [{
       linesCount: parsed.querySelector('tuning')?.children.length || 0,

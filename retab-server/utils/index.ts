@@ -40,8 +40,7 @@ export const debug = {
 
         const relativePath = __dirname.replace('utils', '')
         const output = str?.replaceAll(relativePath, './').replaceAll('\\', '/').replace(/\:\d+$/, '')
-        console.log('\x1b[36m%s\x1b[0m', output)
-    },
+            },
     timespanStarted: [false],
     initialTimestamp: [0],
     logFontColors: [
@@ -77,10 +76,8 @@ export const debug = {
         if (!this.timespanStarted[serie]) {
             this.initialTimestamp[serie] = Date.now();
             this.timespanStarted[serie] = true
-            console.log(colored, 'starting timestamp');
-        } else {
-            console.log(colored, '---' + (Date.now() - this.initialTimestamp[serie]) + 'ms')
-            this.timespanStarted[serie] = false
+                    } else {
+                        this.timespanStarted[serie] = false
         }
 
     }

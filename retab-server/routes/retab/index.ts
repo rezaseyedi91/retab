@@ -12,8 +12,7 @@ router.use('/tuning-presets', tuningPresetsRouter)
 router.use('/auth', authRouter)
 router.use('/user', userRouter)
 router.get('/test', async (req, res) => {
-    console.log('listen! see also /test/retab.')
-
+    
     res.json('meiMainTag')
 })
 export default router

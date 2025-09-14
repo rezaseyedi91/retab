@@ -6,7 +6,8 @@ export default class Authenticator {
     static SALT_SIZE = 10;
     async login(username: string, password: string): Promise<RetabUser> {
         try {
-
+            
+            await DB.getInstance().$connect().catch(e => {throw new Error('No Connection To Database')})
             const existingUser = await DB.getInstance().user.findUnique({
                 where: {username},
                 
@@ -17,8 +18,8 @@ export default class Authenticator {
             existingUser.password = ''
             const user = new RetabUser().setInfo(existingUser)
             return user
-        } catch(mostLikelyConnectionError) {
-            throw new Error('No Connection To Database')
+        } catch(err) {
+            throw err
         }
     }
 

@@ -16,7 +16,7 @@
                                 color="primary" />
                         </template>
                     </VaInput>
-                    <va-button @click="login">Login</va-button>
+                    <va-button @click="login" :disabled="reqSent" :loading="reqSent">Login</va-button>
                 </div>
             </va-card-content>
         </va-card>
@@ -55,9 +55,11 @@ const username = ref('')
 const password = ref('')
 const store = useStore();
 const toast = useToast();
+const reqSent = ref(false)
+
 const router = useRouter();
 async function login() {
-
+    reqSent.value = true
     const formData = new FormData();
 
 
@@ -66,6 +68,7 @@ async function login() {
     
     axios.post(store.state.apiUrl + '/retab/auth/login', formData, {withCredentials: true})
     .then(r => {
+        reqSent.value = false
         toast.init({
             message: 'Logged in successfully',
             color: 'success',
@@ -76,7 +79,7 @@ async function login() {
         router.push({path: '/doc'})
     })
     .catch(err => {
-        
+        reqSent.value = false
         toast.init({
             color: 'danger',
             position: 'bottom-right',

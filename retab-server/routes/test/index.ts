@@ -7,12 +7,6 @@ import Authenticator from "../../modules/Authenticator";
 import DB from "../../modules/DB";
 import RetabUser from "../../modules/retab-modules/User";
 import authMiddleware from '../../middleware/auth'
-import RetabDoc from "../../modules/retab-modules/RetabDoc";
-import { log } from "console";
-import { TMeiTag } from "../../modules/db-types";
-import { some } from "lodash";
-import { debug, includeMeiTagChildrenRecursively } from "../../utils";
-import TabNote, { AccidedNotePname } from "../../modules/mei-tags/TabNote";
 const router = Router();
 
 
@@ -26,16 +20,11 @@ router.get('/dbman', authMiddleware, async (req, res) => {
     //@ts-ignore
     const user = await RetabUser.getUser(1);// await RetabUser.getUser(req.userId!);
     const latestUserEncoderHEaders =  await user.getEncoderHeaders();
-    const headers = latestUserEncoderHEaders.map(i => i.headerTag)
-    console.log(headers);
-    return res.send('')
-    // const doc = await  prisma.meiTag.findMany({
-    //     where :{
-    //         id: {in: headers}
-    //     },
-    //     select: {id: true}
-    // })
-    // return res.json(doc)
+
+    return res.json(
+        latestUserEncoderHEaders
+    )
+
 })
 
 router.use('/retab', retabTestRouter)
