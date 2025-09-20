@@ -1,5 +1,5 @@
 <template>
-
+  something {{ url }}
     <router-view />
     
 
@@ -13,6 +13,7 @@ import { useStore } from 'vuex';
 import DevTest from './components/utils/DevTest.vue';
 import { useDoc } from './composables/useDoc';
 test()
+const url = process.env.VUE_APP_API_URL
 async function test() {
   // const result = await axios.get(useStore().state.apiUrl + '/test/dbman')
   
