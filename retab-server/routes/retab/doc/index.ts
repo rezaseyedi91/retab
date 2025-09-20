@@ -41,6 +41,8 @@ router.get('/:id', async (req, res) => {
     else return res.json(retabDoc?.getDataToEdit())
 })
 router.delete('/:id', async (req, res) => { 
+    console.log('wanna delete ', req.params.id);
+    
     const docId = Number(req.params.id || 0)
     const doc = new RetabDoc().setInfo({ id: docId });
     try {
@@ -48,6 +50,7 @@ router.delete('/:id', async (req, res) => {
         return res.send(result)
         
     } catch (error) {
+        console.log(error)
         return res.status(400).send(error)
     }
 })
