@@ -171,13 +171,13 @@ export default class RetabDoc implements TRetabDoc {
     async saveStavesInfo() {
         if (!this.id) throw new Error('RetabDoc Must be savedFirst')
         const saveResults = await Promise.all(this.stavesInfo.map(si => si.save(this.id!)))
-        const relatedXmlIdsCoursesUnNested = saveResults.map(si => si.tuning).reduce((sf, c) => [...sf, ...c] , []) as TTabCourseTuningInfo[]
+        const relatedXmlIdsCoursesUnNested = saveResults.map(si => si.tuning).reduce((sf, c) => [...sf, ...c], []) as TTabCourseTuningInfo[]
         for (const staffIndex in this.stavesInfo) {
             this.mainChild?.getStaffDefMeiTag(Number(staffIndex || 0) + 1)
             const courses = this.mainChild?.getTuningTag(Number(staffIndex || 0) + 1).children.filter(ch => ch instanceof Course) as Course[];
             courses?.forEach(c => c.correctXmlId(relatedXmlIdsCoursesUnNested))
         }
-        
+
 
     }
 
@@ -261,8 +261,7 @@ export default class RetabDoc implements TRetabDoc {
         }
         if (nestedTags) pushChildrenIds(nestedTags)
         else console.log('no meiTag found');
-
-        await prisma.meiTag.deleteMany({
+        const idsSafeToDelete = (await prisma.meiTag.findMany({
             where: {
                 AND: [
                     { id: { in: idsToDelete } },
@@ -275,6 +274,11 @@ export default class RetabDoc implements TRetabDoc {
                     }
                 ]
             },
+        })).map(i => i.id);
+        await prisma.meiTag.deleteMany({
+            where:{
+                id: {in: idsSafeToDelete}
+            }
         })
 
         return;
