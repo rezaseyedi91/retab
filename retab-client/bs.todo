@@ -28,6 +28,9 @@ Hey there! we are fixating measures in RéTab now!
 
 - todo NEXT:
     - implement TIEs!
-BUGS:
+BUGS: 
     - `→` arrow key for focusing next note does not work properly. sometimes it sticks, sometimes it goes back all the way to the previous measure's first tabgroup. @done
     - adding measure adds one in the beginning! @done
+    - research hosting!
+    - pressing space jumps to next measure (with fixedMeasures off) and jumps to two notes after (with fixedMeasures on)
+  

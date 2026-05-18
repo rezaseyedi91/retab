@@ -178,6 +178,11 @@ export default class TabGroup extends MeiTag {
         const lastIndex = prevMeasure?.staves[staffIndex].tabGroups?.length - 1
         return prevMeasure?.staves[staffIndex].tabGroups?.[lastIndex]?.getNoteOnCourse(courseNumber)
     }
+    getIndexInMeasure() {
+        const found = this.layer.tabGroups.indexOf(this);
+        console.log({found});
+        return found
+    }
 
     getDurDots() {
 

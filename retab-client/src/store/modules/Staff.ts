@@ -195,16 +195,12 @@ export default class Staff extends MeiTag {
 
     insertTabGroup(index?: number, tgToAdd?: TabGroup) {
         
-        console.log('staff is Adding Tabgroup', tgToAdd);
-  
-        console.log(this.measure.wrongSize);
         let newOne: TabGroup;
-        if (this.measure.wrongSize < 0) {
+        if (this.measure.wrongSize < 0 || !this.getDoc().docSettings.fixedMeasures) {
                   newOne = tgToAdd ||  new TabGroup(this.getLayer())
             this.addTabGroup(newOne, index)
         } else {
             // /next measure push to first/
-            console.log(this.measure.getNeighbour(1)?.n);
             const nextMeasure = this.measure.getNeighbour(1) || this.measure.section.addMeasure(this.measure.section.measures.indexOf(this.measure) + 1);
             
             newOne = tgToAdd ||  new TabGroup(nextMeasure.getStaffFromN(this.n)?.getLayer() as Layer)
@@ -216,6 +212,8 @@ export default class Staff extends MeiTag {
     }
 
     addTabGroup(tgToAdd: TabGroup, index?: number) {
+        
+        
         if (!index && index != 0) this.tabGroups.push(tgToAdd);
         else this.tabGroups.splice(index, 0, tgToAdd)
         

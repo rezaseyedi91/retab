@@ -15,7 +15,7 @@ import RezTabFile from "@/store/modules/RezTabFile";
 import { StaffLine } from "@/store/modules/Staff";
 import TabGroup from "@/store/modules/TabGroup";
 import { DurNum, TabType } from "@/store/modules/types";
-import { computed, defineProps, onMounted, onUpdated, ref, ComputedRef, watch, shallowRef } from "vue";
+import { computed,  onMounted, onUpdated, ref, ComputedRef, watch, shallowRef } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
 const props = defineProps<{
@@ -70,10 +70,15 @@ function setFret(val: any) {//: string | number) {
 function onSpace() {
   useDoc().snapshot();
   event?.preventDefault();
+  console.log('we are adding');
+  
   // useDoc().snapshot();
-  const newTabGroup = props.tabGroup.staff.insertTabGroup();
+  const newIndex = props.tabGroup.getIndexInMeasure() + 1;
+  const newTabGroup = props.tabGroup.staff.insertTabGroup(newIndex);
   newTabGroup.setDur(props.tabGroup.dur)
   const newNoteOnTheSameCourse = newTabGroup.notes.find(n => n.course == note.value.course)
+  console.log(newNoteOnTheSameCourse);
+  
   setTimeout(() => {
     newNoteOnTheSameCourse?.focus()
   }, 50)

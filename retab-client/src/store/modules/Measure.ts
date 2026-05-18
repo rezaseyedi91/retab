@@ -30,6 +30,8 @@ export default class Measure extends MeiTag {
         const exec = /(\d+)-(\d+)/.exec(this.timeSignature)
         const timeSinatureToWholeNote = Number(exec?.[1] || 0) / Number(exec?.[2] || 1)
         const diff =this.totalDuration - timeSinatureToWholeNote 
+        console.log({wrongSize:  diff == 0 ? 0: diff>0 ?  1 : -1, fixedMeasures: this.getDoc().docSettings});
+        
         return diff == 0 ? 0: diff>0 ?  1 : -1
     }
     setAttributes(): void {
