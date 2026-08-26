@@ -32,6 +32,12 @@ docker-compose.prod.yaml
 ---
 
 ## First Deployment
+One small recommendation: I would also add this sentence near the top of the deployment section:
+
+The production deployment uses two compose files:
+- `docker-compose.prod.yaml` for normal operation
+- `docker-compose.bootstrap.yaml` for first-time database initialization
+
 
 ### 1. Clone repository
 
@@ -75,17 +81,7 @@ SECRET_KEY=...
 
 
 ### 3. Database Initialization / Start MySQL
----
 
-
-
-The initial database dump is provided separately:
-
-```
-initial-db/retab-initial-data.sql
-```
-This file is not stored in the public repository.
-The initial database dump is transferred separately because it contains application data.
 
 ```bash
 docker compose -f docker-compose.prod.yaml up -d mysql
@@ -108,9 +104,18 @@ docker compose -f docker-compose.prod.yaml run --rm migrate
 ---
 
 ### 5. Import initial data
+---
+
+The initial database dump is provided separately: `initial-db/retab-initial-data.sql`
+This file is not stored in the public repository.
+The initial database dump is transferred separately because it contains application data.
+
 
 ```bash
-docker compose -f docker-compose.prod.yaml run --rm init-data
+docker compose \
+  -f docker-compose.prod.yaml \
+  -f docker-compose.bootstrap.yaml \
+  run --rm init-data
 ```
 
 Successful output:
