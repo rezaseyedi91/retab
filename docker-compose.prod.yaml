@@ -1,26 +1,21 @@
 services:
-
   mysql:
     image: mysql:8.4
     restart: unless-stopped
-
     env_file:
       - .env
-
     volumes:
       - mysql_data:/var/lib/mysql
-
+    expose:
+      - "3306"
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
       timeout: 5s
       retries: 20
-      start_period: 10s
-    expose:
-    - "3306"
+
   create-user:
     image: mysql:8.4
-
     env_file:
       - .env
 
@@ -32,31 +27,19 @@ services:
       - sh
       - -c
       - |
-        until mysqladmin ping \
-          -h mysql \
-          -P 3306 \
-          -u root \
-          -p"$${MYSQL_ROOT_PASSWORD}" \
-          --protocol=tcp \
-          --silent
-        do
-          echo "Waiting for MySQL..."
-          sleep 2
-        done
-
         mysql \
           -h mysql \
-          -P 3306 \
           -u root \
           -p"$${MYSQL_ROOT_PASSWORD}" \
-          --protocol=tcp \
           -e "
-            CREATE DATABASE IF NOT EXISTS \`$${MYSQL_DATABASE}\`;
-            CREATE USER IF NOT EXISTS '$${MYSQL_USER}'@'%' IDENTIFIED BY '$${MYSQL_PASSWORD}';
-            ALTER USER '$${MYSQL_USER}'@'%' IDENTIFIED BY '$${MYSQL_PASSWORD}';
-            GRANT ALL PRIVILEGES ON \`$${MYSQL_DATABASE}\`.* TO '$${MYSQL_USER}'@'%';
-            FLUSH PRIVILEGES;
+          CREATE DATABASE IF NOT EXISTS $${MYSQL_DATABASE};
+          CREATE USER IF NOT EXISTS '$${MYSQL_USER}'@'%'
+          IDENTIFIED BY '$${MYSQL_PASSWORD}';
+          GRANT ALL PRIVILEGES ON $${MYSQL_DATABASE}.*
+          TO '$${MYSQL_USER}'@'%';
+          FLUSH PRIVILEGES;
           "
+
   migrate:
     build:
       context: ./retab-server
@@ -67,71 +50,33 @@ services:
     depends_on:
       create-user:
         condition: service_completed_successfully
+
     command: npx prisma migrate deploy
-
-  init-data:
-    image: mysql:8.4
-
-    env_file:
-      - .env
-
-    depends_on:
-      mysql:
-        condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
-
-    command:
-      - sh
-      - -c
-      - |
-        set -e
-        echo "Importing ReTab initial data..."
-        echo "SQL file size:"
-        wc -c /retab-initial-data.sql
-
-        mysql \
-          -h mysql \
-          -u "$$MYSQL_USER" \
-          -p"$$MYSQL_PASSWORD" \
-          "$$MYSQL_DATABASE" \
-            < /retab-initial-data.sql
-
-          echo "Initial data imported successfully."
-    volumes:
-      - ./initial-db/retab-initial-data.sql:/retab-initial-data.sql:ro
 
   server:
     build:
       context: ./retab-server
-      dockerfile: Dockerfile.prod
 
     restart: unless-stopped
 
     env_file:
       - .env
 
-    expose:
-      - "4000"
-    ports:
-      - "${RETAB_SERVER_PORT:-4000}:4000"
     depends_on:
-      mysql:
-        condition: service_healthy
-
+      migrate:
+        condition: service_completed_successfully
 
   client:
     build:
       context: ./retab-client
-      dockerfile: Dockerfile.prod
 
     restart: unless-stopped
 
-    ports:
-    - "${RETAB_CLIENT_PORT:-8080}:80"
+    env_file:
+      - ./retab-client/.env
+
     depends_on:
-      - server
-
-
+      server:
+        condition: service_started
 volumes:
   mysql_data:
