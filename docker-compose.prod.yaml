@@ -16,7 +16,8 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
-
+    expose:
+    - "3306"
   create-user:
     image: mysql:8.4
 
