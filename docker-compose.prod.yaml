@@ -17,6 +17,45 @@ services:
       retries: 20
       start_period: 10s
 
+  create-user:
+    image: mysql:8.4
+
+    env_file:
+      - .env
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    command:
+      - sh
+      - -c
+      - |
+        until mysqladmin ping \
+          -h mysql \
+          -P 3306 \
+          -u root \
+          -p"$${MYSQL_ROOT_PASSWORD}" \
+          --protocol=tcp \
+          --silent
+        do
+          echo "Waiting for MySQL..."
+          sleep 2
+        done
+
+        mysql \
+          -h mysql \
+          -P 3306 \
+          -u root \
+          -p"$${MYSQL_ROOT_PASSWORD}" \
+          --protocol=tcp \
+          -e "
+            CREATE DATABASE IF NOT EXISTS \`$${MYSQL_DATABASE}\`;
+            CREATE USER IF NOT EXISTS '$${MYSQL_USER}'@'%' IDENTIFIED BY '$${MYSQL_PASSWORD}';
+            ALTER USER '$${MYSQL_USER}'@'%' IDENTIFIED BY '$${MYSQL_PASSWORD}';
+            GRANT ALL PRIVILEGES ON \`$${MYSQL_DATABASE}\`.* TO '$${MYSQL_USER}'@'%';
+            FLUSH PRIVILEGES;
+          "
   migrate:
     build:
       context: ./retab-server
@@ -28,7 +67,7 @@ services:
       create-user:
         condition: service_completed_successfully
     command: npx prisma migrate deploy
-  create-user:
+
   init-data:
     image: mysql:8.4
 
