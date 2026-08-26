@@ -1,3 +1,6 @@
+declare module '*.css'
+declare module '*.scss'
+declare module '*.sass'
 /* eslint-disable */
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'

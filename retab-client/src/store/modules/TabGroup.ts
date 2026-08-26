@@ -180,7 +180,6 @@ export default class TabGroup extends MeiTag {
     }
     getIndexInMeasure() {
         const found = this.layer.tabGroups.indexOf(this);
-        console.log({found});
         return found
     }
 

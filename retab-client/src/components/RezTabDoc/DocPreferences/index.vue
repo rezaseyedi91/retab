@@ -37,7 +37,7 @@
             </div>
         </template>
         <template #footer>
-            <va-button @click="store.state.ui.showPreferencesModal = false" color="success">Save</va-button>
+            <va-button @click="saveAndClose" color="success">Save</va-button>
         </template>
     </VaModal>
 
@@ -53,6 +53,7 @@ import { type Component, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import Tuning from './tabs/Tuning/index.vue'
 import Header from './tabs/Header/index.vue'
 import Advanced from './tabs/Advanced/index.vue'
+import { useDoc } from '@/composables/useDoc';
 
 
 const tabs: { title: string, component: Component, key: number }[] = [
@@ -69,10 +70,12 @@ const store = useStore();
 const escListener = (e: KeyboardEvent) => {
     if (e.key == 'Escape') store.state.ui.showPreferencesModal = false
 }
-onMounted(() => {
-    // const headerSettingsEl = document.getElementById('header-settings-form');
-    // if (headerSettingsEl) maxHeight.value = headerSettingsEl.getBoundingClientRect().height + 'px'
-})
+
+
+async function saveAndClose() {
+    store.state.ui.showPreferencesModal = false
+    await useDoc().save();
+}
 </script>
 
 <style scoped>
@@ -80,7 +83,6 @@ onMounted(() => {
     --va-modal-dialog-min-height: 1000px
 }
 input {
-
     color: black !important;
 }
 </style>

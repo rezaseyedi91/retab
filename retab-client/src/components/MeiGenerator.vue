@@ -31,8 +31,8 @@ async function generate() {
     // we can use doc.generateAndDownloadMei() instead of all this;
     const doc = store.state.currentDoc as RezTabFile;
     const result = await doc.generateMEI();
-    const altTitle = doc.getAltTitle()
-    RezTabFile.download(result, altTitle ? altTitle + '.mei' : undefined);
+    const fileTitle = doc.getAltTitle() || doc.getTitle();
+    RezTabFile.download(result, fileTitle ? fileTitle + '.mei' : undefined);
     doc.unfreeze()
 
 }

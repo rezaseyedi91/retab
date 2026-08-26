@@ -1,0 +1,33 @@
+# Build stage
+FROM node:20-alpine AS build
+
+WORKDIR /retab-server
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+RUN npx tsc
+
+
+# Production stage
+FROM node:20-alpine AS production
+
+WORKDIR /retab-server
+
+COPY package*.json ./
+
+RUN npm ci --omit=dev
+
+COPY --from=build /retab-server/dist ./dist
+COPY --from=build /retab-server/prisma ./prisma
+
+RUN npx prisma generate
+
+EXPOSE 4000
+
+CMD ["node", "dist/index.js"]

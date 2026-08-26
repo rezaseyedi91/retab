@@ -13,9 +13,7 @@ import {
   TStaffInfo,
 } from "./types";
 import axios from "axios";
-import { downloadJsonDataAsFile, generateId } from "./utils";
 import {
-  HARD_CODED_HEADER_ARGS,
   HARD_CODED_HEADER_EMPTY_ARGS,
 } from "./mei-modules/head-args";
 import router from "@/router";
@@ -410,9 +408,8 @@ export default class RezTabFile {
   
   async generateAndDownloadMei() {
     const result = await this.generateMEI();
-    const altTitle = this.getAltTitle();
-
-    RezTabFile.download(result, altTitle ? altTitle + ".mei" : undefined);
+    const fileTitle = this.getAltTitle() || this.getTitle();
+    RezTabFile.download(result, fileTitle ? fileTitle + '.mei' : undefined);
     this.unfreeze();
   }
 

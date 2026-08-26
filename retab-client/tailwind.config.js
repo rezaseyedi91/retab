@@ -3,7 +3,14 @@ module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   content: [],
   theme: {
-    extend: {},
+    
+
+    extend: {
+    colors: {
+      // Vuestic Defautl primary.
+      'primary': '#154EC1'
+    },  
+    },
   },
   plugins: [],
 }

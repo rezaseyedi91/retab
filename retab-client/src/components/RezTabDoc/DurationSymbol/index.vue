@@ -100,7 +100,6 @@
 
 <script setup lang="ts">
 import { DurNum } from '@/store/modules/types';
-import { defineProps } from 'vue'
 const props = defineProps<{ durNum: 1 | 2 | 4 | 8 | 16 | 32 | 64, dots: number, showTabDurSym: boolean, empty?: boolean }>();
 const viewBox = "0 0 1000 1000";
 const y = 500;

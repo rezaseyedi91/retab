@@ -1,3 +1,6 @@
 cmd
+.env
+.env.*
 */*/todo
-./retab-server/todo
+todo
+initial-db

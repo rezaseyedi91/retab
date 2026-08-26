@@ -25,62 +25,102 @@ const store = useStore();
 const doc = store.state.currentDoc as RezTabFile;
 
 
+const title = shallowRef<string>();
+const composer = shallowRef<string>();
+const altTitle = shallowRef<string>();
+const subtitle = shallowRef<string>();
+const description = shallowRef<string>();
+const encoderName = shallowRef<string>();
+const encoderAuth = shallowRef<string>();
+const encoderAuthUri = shallowRef<string>();
+const encoderXmlId = shallowRef<string>();
+const biblScopeWorkposition = shallowRef<string>();
+const locusFolioFrom = shallowRef<string>();
+const locusFolioTo = shallowRef<string>();
+const locusFolioContent = shallowRef<string>();
+const termGenre = shallowRef<string>();
+const corpOneName = shallowRef<string>();
+const corpTwoName = shallowRef<string>();
+const street = shallowRef<string>();
+const postBox = shallowRef<string>();
+const postCode = shallowRef<string>();
+const settlement = shallowRef<string>();
+const country = shallowRef<string>();
+const funderCorpOneName = shallowRef<string>();
+const funcderCorpTwoName = shallowRef<string>();
+const funcderCorpTwoAuth = shallowRef<string>();
+const funcderCorpTwoUri = shallowRef<string>();
+const pubAvailability = shallowRef<string>();
+const physLocRepoCorpName = shallowRef<string>();
+const projectDescHead = shallowRef<string>();
+const projectDescP = shallowRef<string>();
+const workCreationDateFrom = shallowRef<string>();
+const workCreationDateTo = shallowRef<string>();
+const workCreationDateSpan = shallowRef<string>();
+const workCreationSettlement = shallowRef<string>();
+const workCreationCountry = shallowRef<string>();
 
 
-const title = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=main]')?.textContent);
-const composer = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('composer')?.__add('persName')?.textContent)
 
-const altTitle = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=Alternative]')?.textContent);
-const subtitle = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=subtitle]')?.textContent);
-
-
-const description = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=desc]')?.textContent);
-const encoderName = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName')?.textContent)
-const encoderAuth = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('auth')?.value)
-const encoderAuthUri = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('auth.uri')?.value)
-const encoderXmlId = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('xml:id')?.value)
+onMounted(() => {
+    doc.head?.setAllChildrenParent();
+    title.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=main]')?.textContent
+    composer.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('composer')?.__add('persName')?.textContent
 
 
-const biblScopeWorkposition = shallowRef(doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('biblScope')?.__add('num[label=workposition]')?.textContent)
-const locusFolioFrom = shallowRef(doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('locus[label=folio]').getAttribute('from')?.value);
-const locusFolioTo = shallowRef(doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('locus[label=folio]').getAttribute('to')?.value);
-const locusFolioContent = shallowRef(doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('locus[label=folio]')?.textContent);
-
-const termGenre = shallowRef(doc.head?.__add('workList')?.__add('work')?.__add('classification')?.__add('termList')?.__add('term[label=genre]')?.textContent)
-
-//Corporation Information:
-const corpOneName = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('name')?.textContent)
-const corpTwoName = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('name')?.textContent)
-//address
-const street = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('street')?.textContent)
-const postBox = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('postBox')?.textContent)
-const postCode = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('postCode')?.textContent)
-const settlement = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('settlement')?.textContent)
-const country = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('country')?.textContent)
-
-//Funder
-const funderCorpOneName = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName')?.textContent)
-const funcderCorpTwoName = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName[auth]')?.textContent)
-const funcderCorpTwoAuth = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName[auth]').getAttribute('auth')?.value)
-const funcderCorpTwoUri = shallowRef(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName[auth.uri]').getAttribute('auth.uri')?.value)
+    altTitle.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=Alternative]')?.textContent
+    subtitle.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=subtitle]')?.textContent
 
 
-//Pub
-const pubAvailability = shallowRef(doc.head?.__add('fileDesc')?.__add('pubStmt')?.__add('availability')?.textContent)
-const physLocRepoCorpName = shallowRef(doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('physLoc')?.__add('repository')?.__add('corpName')?.textContent)
+    description.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=desc]')?.textContent
+    encoderName.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName')?.textContent
+    encoderAuth.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('auth')?.value
+    encoderAuthUri.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('auth.uri')?.value
+    encoderXmlId.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('xml:id')?.value
 
 
-// encodingDesc:
-const projectDescHead = shallowRef(doc.head?.__add('encodingDesc')?.__add('projectDesc')?.__add('head')?.textContent)
-const projectDescP = shallowRef(doc.head?.__add('encodingDesc')?.__add('projectDesc')?.__add('p')?.textContent)
+    biblScopeWorkposition.value = doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('biblScope')?.__add('num[label=workposition]')?.textContent
+    locusFolioFrom.value = doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('locus[label=folio]').getAttribute('from')?.value
+    locusFolioTo.value = doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('locus[label=folio]').getAttribute('to')?.value
+    locusFolioContent.value = doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('locus[label=folio]')?.textContent
 
-// workCreationInfo:
-const workCreationDateFrom = shallowRef(doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('date').getAttribute('notbefore')?.value)
-const workCreationDateTo = shallowRef(doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('date').getAttribute('notafter')?.value)
-const workCreationDateSpan = shallowRef(doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('date')?.textContent) //workCreationDateFrom.value + '-' + workCreationDateTo.value
-const workCreationSettlement = shallowRef(doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('settlement')?.textContent)
-const workCreationCountry = shallowRef(doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('country')?.textContent)
-// const inputGroups: any[] = []//
+    termGenre.value = doc.head?.__add('workList')?.__add('work')?.__add('classification')?.__add('termList')?.__add('term[label=genre]')?.textContent
+
+    //Corporation Information:
+    corpOneName.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('name')?.textContent
+    corpTwoName.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('name')?.textContent
+    //address
+    street.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('street')?.textContent
+    postBox.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('postBox')?.textContent
+    postCode.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('postCode')?.textContent
+    settlement.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('settlement')?.textContent
+    country.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('corpName')?.__add('corpName')?.__add('address')?.__add('country')?.textContent
+
+    //Funder
+    funderCorpOneName.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName')?.textContent
+    funcderCorpTwoName.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName[auth]')?.textContent
+    funcderCorpTwoAuth.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName[auth]').getAttribute('auth')?.value
+    funcderCorpTwoUri.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('funder')?.__add('corpName[auth.uri]').getAttribute('auth.uri')?.value
+
+
+    //Pub
+    pubAvailability.value = doc.head?.__add('fileDesc')?.__add('pubStmt')?.__add('availability')?.textContent
+    physLocRepoCorpName.value = doc.head?.__add('fileDesc')?.__add('sourceDesc')?.__add('source')?.__add('bibl')?.__add('physLoc')?.__add('repository')?.__add('corpName')?.textContent
+
+
+    // encodingDesc:
+    projectDescHead.value = doc.head?.__add('encodingDesc')?.__add('projectDesc')?.__add('head')?.textContent
+    projectDescP.value = doc.head?.__add('encodingDesc')?.__add('projectDesc')?.__add('p')?.textContent
+
+    // workCreationInfo:
+    workCreationDateFrom.value = doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('date').getAttribute('notbefore')?.value
+    workCreationDateTo.value = doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('date').getAttribute('notafter')?.value
+    workCreationDateSpan.value = doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('date')?.textContent //workCreationDateFrom.value + '-' + workCreationDateTo.valu
+    workCreationSettlement.value = doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('settlement')?.textContent
+    workCreationCountry.value = doc.head?.__add('workList')?.__add('work')?.__add('creation')?.__add('country')?.textContent
+})
+
+
 const inputGroups = [
     {
         title: 'Piece Information',
@@ -179,9 +219,9 @@ workCreationInfo
 
 
 ]
-onMounted(() => {
-    doc.head?.setAllChildrenParent();
-})
+
+
+
 watch(title, val => {
     doc.head?.__('fileDesc')?.__('titleStmt')?.__('title')?.setTextContent(val)
     doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('title')?.setTextContent(val)
@@ -189,14 +229,27 @@ watch(title, val => {
 
 })
 watch(composer, val => {
-    doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__('persName').setTextContent(val)
-    doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('composer')?.__('persName').setTextContent(val)
+    try {
+
+        doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__add('persName').setTextContent(val)
+        doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('composer')?.__('persName').setTextContent(val)
+    }catch (err) {
+        console.log(err);
+        console.log(doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer'));
+        console.log(doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__('persName'));
+        console.log(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('composer').__add('persName'));
+        console.log(doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__('persName'));
+        
+        
+        
+    }
 })
 
 watch(altTitle, val => {
     doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=Alternative]').setTextContent(val)
     doc.info.altTitle = val
 });
+
 watch(description, val => { doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=desc]').setTextContent(val) });
 watch(encoderName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName').setTextContent(val))
 watch(encoderAuth, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName').setAttribute(new MeiAttribute('auth', val + '')))
@@ -221,16 +274,16 @@ watch(funcderCorpTwoName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('
 watch(funcderCorpTwoAuth, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName[auth]').setAttribute(new MeiAttribute('auth', val!)))
 watch(funcderCorpTwoUri, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName[auth.uri]').setAttribute(new MeiAttribute('auth.uri', val!)))
 watch(pubAvailability, val => doc.head?.__('fileDesc')?.__('pubStmt')?.__('availability').setTextContent(val))
-watch(physLocRepoCorpName, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('physLoc')?.__('repository')?.__('corpName').setTextContent(val))
-watch(projectDescHead, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__('head').setTextContent(val))
+watch(physLocRepoCorpName, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('physLoc')?.__('repository')?.__add('corpName').setTextContent(val))
+watch(projectDescHead, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__add('head').setTextContent(val))
 watch(projectDescP, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__('p').setTextContent(val))
 watch(workCreationDateFrom, val => {
     doc.head?.__('workList')?.__('work')?.__('creation')?.__('date').setAttribute(new MeiAttribute('notbefore', val!))
-    workCreationDateSpan.value = workCreationDateFrom.value + '-' + workCreationDateTo.value
+    workCreationDateSpan.value = (workCreationDateFrom.value || '') + '-' + (workCreationDateTo.value|| '')
 })
 watch(workCreationDateTo, val => {
     doc.head?.__('workList')?.__('work')?.__('creation')?.__('date').setAttribute(new MeiAttribute('notafter', val!))
-    workCreationDateSpan.value = workCreationDateFrom.value + '-' + workCreationDateTo.value
+    workCreationDateSpan.value = (workCreationDateFrom.value || '') + '-' + (workCreationDateTo.value|| '')
 })
 watch(workCreationDateSpan, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('date').setTextContent(val)) //workCreationDateFrom.value + '-' + workCreationDateTo.value
 watch(workCreationSettlement, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('settlement').setTextContent(val))

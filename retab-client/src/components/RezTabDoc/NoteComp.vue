@@ -70,14 +70,14 @@ function setFret(val: any) {//: string | number) {
 function onSpace() {
   useDoc().snapshot();
   event?.preventDefault();
-  console.log('we are adding');
+  
   
   // useDoc().snapshot();
   const newIndex = props.tabGroup.getIndexInMeasure() + 1;
   const newTabGroup = props.tabGroup.staff.insertTabGroup(newIndex);
   newTabGroup.setDur(props.tabGroup.dur)
   const newNoteOnTheSameCourse = newTabGroup.notes.find(n => n.course == note.value.course)
-  console.log(newNoteOnTheSameCourse);
+  
   
   setTimeout(() => {
     newNoteOnTheSameCourse?.focus()
@@ -119,7 +119,7 @@ function onNoteInputFocus() {
 
 function keyup(event: KeyboardEvent) {
   if (event.key == 'D') {
-    console.log(note.value.getDebugData())
+    return // debug data (note.value.getDebugData())
   }
   // change the durSym:
   if (event.altKey) {

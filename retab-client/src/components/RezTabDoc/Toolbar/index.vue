@@ -67,9 +67,6 @@ const docTools: Ref<Tool[]> = ref([
 ])
 
 
-onMounted(() => {
-    // console.log('mounted ' + Date.now())
-})
 const store = useStore();
 const isSaving = ref(false)
 const toast = useToast();
@@ -129,28 +126,18 @@ const noteTools = shallowRef<Tool[]>([
     {
         tooltipText: 'dot',
         cb() {
-            console.log('dot cb');
-                        
             if (selectedNotes.value?.length) {
                 const tabgroups = selectedNotes.value.map(n => n.tabGroup).filter((tg, index, arr) => arr.indexOf(arr.find(i => i.xmlId == tg.xmlId)!) == index);
-                console.log(tabgroups);
                 const someAreNotDotted = tabgroups.find(tg => tg.durDots == 0);
 
                 if (someAreNotDotted) tabgroups.forEach(t => t.dot(1))
                 else tabgroups.forEach(t => t.dot(0))
-                console.log(tabgroups.map(t => t.durDots));
                 
             } else focusedNote.value?.tabGroup.dot();
             focusedNote.value?.focus()
         },
         component: DotToolComp
     },
-    // {
-    //     tooltipText: 'dot',
-    //     cb() {
-    //         console.log(selectedNotes.value);
-    //     },
-    //     component: TestTool
-    // },
+
 ])
 </script>

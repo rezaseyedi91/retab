@@ -2,7 +2,7 @@
 Vue/Express.js web application for encoding early music tablature
 
 
-## Experience the ReTab
+# Experience the ReTab
 Try ReTab https://tab.rezaseyedi.com
  with a guest account:
 -    username: guest
@@ -12,9 +12,232 @@ or contact reza.seyedi010@gmail.com if you want to use ReTab with a personal acc
 
 
 
-## Development
+# ReTab Deployment Guide
+
+## Overview
+
+ReTab is deployed using Docker Compose.
+
+Production services:
+- MySQL database
+- ReTab API server (Node.js + Prisma)
+- ReTab frontend (Vue + nginx)
+
+The production stack is defined in:
+
+```
+docker-compose.prod.yaml
+```
+
+---
+
+## First Deployment
+
+### 1. Clone repository
+
+```bash
+git clone https://github.com/rezaseyedi91/retab.git
+cd retab
+```
+
+---
+
+### 2. Configure environment variables
+
+Create the production environment file:
+
+```bash
+nano .env
+```
+
+Required variables:
+
+```env
+MODE=production
+PORT=4000
+
+DATABASE_URL=mysql://USER:PASSWORD@mysql:3306/DATABASE
+
+MYSQL_ROOT_PASSWORD=...
+MYSQL_DATABASE=retab
+MYSQL_USER=retab
+MYSQL_PASSWORD=...
+
+TAB_CLIENT_URL=https://your-domain.com
+
+RETAB_SERVER_PORT=4000
+RETAB_CLIENT_PORT=8080
+
+
+SECRET_KEY=...
+```
+
+
+
+### 3. Database Initialization / Start MySQL
+---
+
+
+
+The initial database dump is provided separately:
+
+```
+initial-db/retab-initial-data.sql
+```
+
+This file is not stored in the public repository.
+---
+```bash
+docker compose -f docker-compose.prod.yaml up -d mysql
+```
+
+Wait until MySQL is healthy:
+
+```bash
+docker compose -f docker-compose.prod.yaml ps
+```
+
+---
+
+### 4. Run Prisma migrations
+
+```bash
+docker compose -f docker-compose.prod.yaml run --rm migrate
+```
+
+---
+
+### 5. Import initial data
+
+```bash
+docker compose -f docker-compose.prod.yaml run --rm init-data
+```
+
+Successful output:
+
+```
+Initial data imported successfully.
+```
+
+---
+
+## Build and Start ReTab
+
+Build production images:
+
+```bash
+docker compose -f docker-compose.prod.yaml build
+```
+
+Start services:
+
+```bash
+docker compose -f docker-compose.prod.yaml up -d
+```
+
+Check status:
+
+```bash
+docker compose -f docker-compose.prod.yaml ps
+```
+
+Expected:
+
+```
+mysql     running
+server    running
+client    running
+```
+
+---
+
+## Updating ReTab
+
+After a new version is pushed:
+
+```bash
+git pull
+```
+
+Rebuild:
+
+```bash
+docker compose -f docker-compose.prod.yaml build
+```
+
+Restart:
+
+```bash
+docker compose -f docker-compose.prod.yaml up -d
+```
+
+---
+
+## Logs
+
+Server logs:
+
+```bash
+docker compose -f docker-compose.prod.yaml logs -f server
+```
+
+Client logs:
+
+```bash
+docker compose -f docker-compose.prod.yaml logs -f client
+```
+
+Database logs:
+
+```bash
+docker compose -f docker-compose.prod.yaml logs -f mysql
+```
+
+---
+
+## Backup Database
+
+Create a backup:
+
+```bash
+docker compose exec mysql \
+mysqldump -u root -p retab > retab-backup.sql
+```
+
+---
+
+## Stopping ReTab
+
+Stop services:
+
+```bash
+docker compose -f docker-compose.prod.yaml down
+```
+
+The database volume is preserved.
+
+To remove everything including database data:
+
+```bash
+docker compose -f docker-compose.prod.yaml down -v
+```
+
+Warning: this deletes the database.
+
+
+
+
+
+
+
+
+
+
+
+
+# Development
 clone the repository:
-### client:
+## client:
 create .env file:
 
     VUE_APP_API_URL="http://localhost:4000"
@@ -26,7 +249,7 @@ create .env file:
 
 
 
-### server:
+## server:
     cd ./retab-server
 
 

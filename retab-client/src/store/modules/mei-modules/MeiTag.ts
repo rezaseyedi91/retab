@@ -102,7 +102,7 @@ export default abstract class MeiTag {
         return newTag
     }
     addChildIfNotExists(child: MeiTag, index?: number): MeiTag {
-        console.log('adding ', child)
+        
         const found = this.children.find(ch => ch.tagTitle == child.tagTitle)
         if (!found) this.pushChild(child, index)
         return found ? found instanceof MeiTag ? found : new MeiTagInstance(found).setParent(this) :  child //this.addChildIfNotExists(child, index)
@@ -154,24 +154,12 @@ export default abstract class MeiTag {
         const attributes = [...rest.matchAll(/\[([^\]=]+)=([^\]]+)\]/g)].map(m => ({ title: m[1], value: m[2] }));
         return {tagTitle, attributes}
 
-        /**
-title[type=desc][something=else]
-
-
-         */
-
-        return {
-            tagTitle: '',
-            attributes: []
-        }
-
-    }
+     }
 
     setTextContent(str?: string) {
         this.textContent = str
     }
     pushChild(args: TMeiTagFactoryArgs, index?: number) { 
-        console.log(args);
         
         if (index == undefined) this.children.push(MeiTag.makeTagsTree(args, this)) 
         else this.children.splice(index, 0, MeiTag.makeTagsTree(args, this))
@@ -195,7 +183,7 @@ title[type=desc][something=else]
     }
 
     remove() {
-        // console.log('%cremoving ' + this.tagTitle + '| parent: ' + this.parent?.tagTitle, 'color: blue; font-weight: bold');
+        // 
         
         this.parent?.children.splice(this.parent.children.indexOf(this), 1);
     }

@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { StaffLine } from '@/store/modules/Staff';
 import NoteComp from './NoteComp.vue';
-import { computed, defineProps, ref } from 'vue';
+import { computed,  ref } from 'vue';
 import TabGroup from '@/store/modules/TabGroup';
 import { useStore } from 'vuex';
 import { TabType } from '@/store/modules/types';

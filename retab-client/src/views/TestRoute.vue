@@ -1,12 +1,5 @@
 <template>
-    <DevTest>
-        <div class="p-12">
-            <br>
-            <va-button @click="test">
-                Test
-            </va-button>
-        </div>
-    </DevTest>
+<div></div>
 </template>
 
 <script setup lang="ts">

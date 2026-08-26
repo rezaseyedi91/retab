@@ -15,7 +15,7 @@
 
 <script lang="ts" setup>
 import TabGroup from '@/store/modules/TabGroup';
-import { defineProps, onMounted, onUpdated, toRef } from 'vue';
+import {  onMounted, onUpdated, toRef } from 'vue';
 import StaffLineComp from './StaffLineComp.vue';
 
 import DurationSymbol from '@/components/RezTabDoc/DurationSymbol/index.vue'

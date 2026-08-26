@@ -41,7 +41,6 @@ defineProps<{
 }>()
 
 function toShow(n: number) {
-    console.log({ n });
     return Note.ITALIAN_TAB_UNICODES[n] || 0
 
 }

@@ -44,8 +44,27 @@ const routes: Array<RouteRecordRaw> = [
     path: '/error/500',
     name: '500',
     component: () => import('@/views/error/500.vue')
+  },
+  {
+    path: '/admin/Login',
+    name: 'admin-login',
+    component: () => import('@/views/admin/Login.vue')
+  },
+  {
+    path: '/admin/dashboard',
+    name: 'admin-dashboard',
+    component: () => import('@/views/admin/Dashboard.vue')
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    redirect: {name: 'admin-dashboard'}
+  },
+  {
+    path: '/admin/users-management',
+    name: 'admin-users-management',
+    component: () => import('@/views/admin/UsersManagement.vue')
   }
-
 ]
 
 const router = createRouter({
@@ -53,20 +72,22 @@ const router = createRouter({
   routes
 })
 router.beforeEach(async (to, from) => {
-  if (to.name == 'login' || to.path.startsWith('/error')) return true;
+  if (['login', 'admin-login'].includes(to.name as string) || to.path.startsWith('/error')) return true;
   try {
-    const response = await axios.get(store.state.apiUrl + '/retab/auth', {withCredentials: true})
+    const checkAdmin = to.path.includes('admin')
+    const response = await axios.get(store.state.apiUrl + '/retab/auth' , {withCredentials: true, params: {checkAdmin}})
     const authenticatedUser = response.data
     
+
     
     
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
-      router.push('/Login')
+      alert('You have to log in first')
+      router.push(!checkAdmin ? '/Login' : '/admin/login')
     }
     else {
       Object.assign(store.state, {currentUser: authenticatedUser})
-      
       return true
     }
   } catch(err: any) {

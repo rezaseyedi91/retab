@@ -3,12 +3,12 @@
         <Toolbar :key="useDoc().noteFocusKey * toolCompKey" :selected-notes="(sl.selectedNotes as Note[])" />
         <DocTitle :key="store.state.utils.keyCoefficient" />
         <div class="section flex max-w-full overflow-x-auto overflow-y-hidden">
-        <TimeSignature/>
+        <!-- <TimeSignature /> -->
             
             <MeasureComp :measure-n="(measure as Measure).n"
                 v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure"
-                :key="(index + 1) * store.state.utils.keyCoefficient * 10"
-                :keyK="(index + 1) * store.state.utils.keyCoefficient * 10">
+                :key="(Number(index) + 1) * store.state.utils.keyCoefficient * 10"
+                :keyK="(Number(index) + 1) * store.state.utils.keyCoefficient * 10">
             </MeasureComp>
             <div class="px-2">
                 <va-button icon="add" :outline="true" class="opacity-80" @click="addMeasure"></va-button>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps, onMounted, onUnmounted, ref, shallowRef, toRefs } from 'vue';
+import { computed,  onMounted, onUnmounted, ref, shallowRef, toRefs } from 'vue';
 import RezTabFile from '@/store/modules/RezTabFile'
 import Measure from '@/store/modules/Measure';
 import { useStore } from 'vuex';
@@ -31,6 +31,7 @@ import TabGroup from '@/store/modules/TabGroup';
 import { useDoc } from '@/composables/useDoc';
 import DocTitle from './DocTitle.vue';
 import Toolbar from './Toolbar/index.vue';
+import TimeSignature from './TimeSignature.vue';
 const store = useStore();
 const props = defineProps<{
     id: string
@@ -88,8 +89,7 @@ class SelectionListener {
     };
 
     onPlus(e: KeyboardEvent) {
-        console.log(e);
-
+        return //
     }
     initSelectionHighlighterEl() {
         this.selectionEl = document.createElement('div');
@@ -161,7 +161,7 @@ class SelectionListener {
     }
     selectedNotesKeyupListener(event: KeyboardEvent) {
         if (event.key.toLowerCase() == 'shift') return; 
-        // return console.log('-------selectedNotesKeyupListener---------', event.key == 'Shift');
+        // return 
         event.preventDefault();
         const shift = event.shiftKey;
         const ctrl = event.ctrlKey;
@@ -253,7 +253,7 @@ class SelectionListener {
         this.selectionEl?.remove()
         this.setSelectedNotesListeners()
         updateChildComponents();
-        console.log(this.selectedNotes.length);
+        
 
     }
     onMouseDown(e: MouseEvent) {

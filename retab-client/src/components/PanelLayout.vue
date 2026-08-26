@@ -2,7 +2,7 @@
   <div>
     <va-layout>
       <template #top>
-        <VaNavbar color="primary" class="items-center">
+        <VaNavbar color="primary" class="items-center ">
           <template #left>
             <VaNavbarItem>
               <Logo />
@@ -21,18 +21,11 @@
             </router-link>
           </template>
           <template #right>
-            <div class="flex items-baseline gap-x-0">
-              <DevTest>
-                <VaNavbarItem>
-                  <router-link :to="'/dev-test'">
-                    <CodeBracketSquareIcon class="fill-white w-8"/>
-                  </router-link>
-                </VaNavbarItem>
-                
-              </DevTest>
+            <div class="flex items-baseline  gap-x-0">
+     
               <VaNavbarItem>
                 <router-link :to="'/import'">
-                  <DocumentArrowUpIcon class="fill-white w-8"/>
+                  <DocumentArrowUpIcon class="fill-white w-8" />
 
                 </router-link>
               </VaNavbarItem>
@@ -63,6 +56,9 @@
                 </va-button>
               </VaNavbarItem>
               <VaNavbarItem class="self-center">
+                <va-button @click="logout"><va-icon name="logout" size="large" /></va-button>
+              </VaNavbarItem>
+              <!-- <VaNavbarItem class="self-center">
                 <router-link class="h-full" to="/doc/new" target="_blank">
                   <va-button color="info">
                     <va-icon name="add">
@@ -70,7 +66,16 @@
                   </va-button>
                 </router-link>
               </VaNavbarItem>
-   
+    -->
+
+              <VaNavbarItem class="self-center">
+                <router-link class="h-full" to="/doc/new" target="_blank">
+                  <va-icon>
+                  </va-icon>
+                </router-link>
+              </VaNavbarItem>
+
+
 
               <!-- <VaNavbarItem>
                 <ConnectionChecker class="mx-2" />
@@ -100,7 +105,7 @@ import RezTabFile from '@/store/modules/RezTabFile';
 import { useToast } from 'vuestic-ui/web-components';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { DocumentArrowUpIcon, CodeBracketSquareIcon} from '@heroicons/vue/24/solid';
+import { DocumentArrowUpIcon, CodeBracketSquareIcon } from '@heroicons/vue/24/solid';
 import DevTest from './utils/DevTest.vue';
 const store = useStore();
 const isSaving = ref(false)
@@ -127,4 +132,16 @@ async function save() {
   } else return doc.unfreeze();
 
 }
+
+
+async function logout() {
+  const result = await store.dispatch('logout');
+  toast.init({
+    message: result.data.message,
+    color: 'success',
+    position: 'bottom-right'
+  })
+  router.push('/Login')
+}
+
 </script>

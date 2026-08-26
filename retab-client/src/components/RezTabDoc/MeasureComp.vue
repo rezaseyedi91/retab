@@ -2,12 +2,7 @@
     <div class="measure" :class="{
         'size-exceeded': getMeasure()?.wrongSize == 1
     }">
-            <DevTest>
-                <span class="bar-number">{{ measureN }}</span>
-                        <va-button @click="useDoc().updateUI()">
-            <va-icon name="refresh"></va-icon>
-        </va-button>
-            </DevTest>
+  
         <StaffComp 
         :staff-index="index"
         v-for="(staff, index) in getMeasure()?.staves" :staffN="staff.n" :key="index * store.state.utils.keyCoefficient"
@@ -19,7 +14,6 @@
 
 <script lang="ts" setup>
 import Measure from '@/store/modules/Measure';
-import {defineProps} from 'vue'
 import StaffLineComp from './StaffLineComp.vue';
 import TabGroupComp from './TabGroupComp.vue';
 import { useStore } from 'vuex';
