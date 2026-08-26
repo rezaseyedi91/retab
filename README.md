@@ -84,9 +84,8 @@ The initial database dump is provided separately:
 ```
 initial-db/retab-initial-data.sql
 ```
-
 This file is not stored in the public repository.
----
+
 ```bash
 docker compose -f docker-compose.prod.yaml up -d mysql
 ```
