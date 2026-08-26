@@ -17,6 +17,49 @@ services:
       retries: 20
       start_period: 10s
 
+  migrate:
+    build:
+      context: ./retab-server
+
+    env_file:
+      - .env
+
+    depends_on:
+      create-user:
+        condition: service_completed_successfully
+    command: npx prisma migrate deploy
+  create-user:
+  init-data:
+    image: mysql:8.4
+
+    env_file:
+      - .env
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        echo "Importing ReTab initial data..."
+        echo "SQL file size:"
+        wc -c /retab-initial-data.sql
+
+        mysql \
+          -h mysql \
+          -u "$$MYSQL_USER" \
+          -p"$$MYSQL_PASSWORD" \
+          "$$MYSQL_DATABASE" \
+            < /retab-initial-data.sql
+
+          echo "Initial data imported successfully."
+    volumes:
+      - ./initial-db/retab-initial-data.sql:/retab-initial-data.sql:ro
 
   server:
     build:
