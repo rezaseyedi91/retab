@@ -56,7 +56,7 @@ services:
   server:
     build:
       context: ./retab-server
-
+      dockerfile: Dockerfile.prod
     restart: unless-stopped
 
     env_file:
@@ -69,7 +69,8 @@ services:
   client:
     build:
       context: ./retab-client
-
+      dockerfile: Dockerfile.prod
+      
     restart: unless-stopped
 
     env_file:

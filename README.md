@@ -115,7 +115,7 @@ The initial database dump is transferred separately because it contains applicat
 docker compose \
   -f docker-compose.prod.yaml \
   -f docker-compose.bootstrap.yaml \
-  run --rm init-data
+  up init-data
 ```
 
 Successful output:
