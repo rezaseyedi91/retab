@@ -60,7 +60,6 @@ Required variables:
 
 ```env
 MODE=production
-PORT=4000
 
 DATABASE_URL=mysql://USER:PASSWORD@mysql:3306/DATABASE
 
@@ -68,8 +67,6 @@ MYSQL_ROOT_PASSWORD=...
 MYSQL_DATABASE=retab
 MYSQL_USER=retab
 MYSQL_PASSWORD=...
-
-TAB_CLIENT_URL=https://your-domain.com
 
 RETAB_SERVER_PORT=4000
 RETAB_CLIENT_PORT=8080

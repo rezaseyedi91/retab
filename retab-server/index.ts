@@ -9,7 +9,7 @@ import bodyParser from 'body-parser'
 import multer from 'multer';
 import cookieParser from 'cookie-parser';
 dotenv.config();
-const port = Number(process.env.PORT) as number  
+const port = Number(process.env.RETAB_SERVER_PORT) || 4000
 const app = express();
 
 (async () => {
