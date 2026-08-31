@@ -1,7 +1,0 @@
-node_modules
-.env
-.env*
-cmd
-dist/*
-./retab-server/dist/
-.poster-playground
