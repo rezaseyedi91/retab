@@ -73,7 +73,7 @@ services:
     build:
       context: ./retab-client
       dockerfile: Dockerfile.prod
-    -labels:
+    labels:
       - "traefik.enable=true"
       - "traefik.http.routers.retab.rule=Host(`musica.huma-num.fr`) && PathPrefix(`/retab`)"
       - "traefik.http.routers.retab.entrypoints=websecure"
