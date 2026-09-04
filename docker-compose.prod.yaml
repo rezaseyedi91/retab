@@ -79,8 +79,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.retab.rule=Host(`musica.huma-num.fr`) && PathPrefix(`/retab`)"
       - "traefik.http.routers.retab.entrypoints=websecure"
-#      - "traefik.http.middlewares.retab-strip.stripprefix.prefixes=/retab"
-#      - "traefik.http.routers.retab.middlewares=retab-strip"
+      - "traefik.http.middlewares.retab-strip.stripprefix.prefixes=/retab"
+      - "traefik.http.routers.retab.middlewares=retab-strip"
       - "traefik.http.services.retab.loadbalancer.server.port=80"
       - "traefik.http.routers.retab.tls.certresolver=prod"
     restart: unless-stopped

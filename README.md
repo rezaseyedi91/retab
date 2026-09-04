@@ -120,7 +120,9 @@ Successful output:
 ```
 Initial data imported successfully.
 ```
-
+if it gave the error, maybe we could try it in two steps:
+`docker compose -f docker-compose.prod.yaml -f docker-compose.bootstrap.yaml create init-data`
+`docker start -a retab-init-data-1`
 ---
 
 ## Build and Start ReTab
