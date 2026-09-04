@@ -86,9 +86,17 @@ services:
     env_file:
       - ./retab-client/.env
     ports:
-    - "${RETAB_CLIENT_PORT:-8080}:80"
+      - "${RETAB_CLIENT_PORT:-8080}:80"
+    networks:
+      - default
+      - portail-musica_default
     depends_on:
       server:
         condition: service_started
+
+
+networks:
+  portail-musica_default:
+    external: true
 volumes:
   mysql_data:

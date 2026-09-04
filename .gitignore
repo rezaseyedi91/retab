@@ -1,5 +1,7 @@
 cmd
 .env
+./*/.env
+./*/.env.*
 .env.*
 */*/todo
 todo
