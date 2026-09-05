@@ -72,25 +72,24 @@ const router = createRouter({
   routes
 })
 router.beforeEach(async (to, from) => {
-  if (['login', 'admin-login'].includes(to.name as string) || to.path.startsWith('/error')) return true;
+  if (['login', 'admin-login'].includes(to.name as string) || to.path.startsWith('/error') || to.name =='') return true;
   try {
     const checkAdmin = to.path.includes('admin')
     const response = await axios.get(store.state.apiUrl + '/retab/auth' , {withCredentials: true, params: {checkAdmin}})
     const authenticatedUser = response.data
-
-    
-    
     
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
       alert('You have to log in first')
-      router.push(process.env.VUE_APP_BASE_PATH +  (!checkAdmin ? '/Login' : '/admin/login'))
+      router.push(process.env.VUE_APP_BASE_PATH +  (!checkAdmin ? 'Login' : 'admin/login'))
     }
     else {
       Object.assign(store.state, {currentUser: authenticatedUser})
       return true
     }
   } catch(err: any) {
+    console.log(err);
+    
     if (!err.response) router.push('/error/500')
     // if (err.status == 403) router.push('Login')
     
