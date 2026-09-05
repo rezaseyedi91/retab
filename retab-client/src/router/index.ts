@@ -72,7 +72,9 @@ const router = createRouter({
   routes
 })
 router.beforeEach(async (to, from) => {
-  if (['login', 'admin-login'].includes(to.name as string) || to.path.startsWith('/error') || to.name =='') return true;
+  if (['login', 'admin-login'].includes((to.name as string)?.toLowerCase()) 
+    
+    || to.path.startsWith('/error') || to.name =='') return true;
   try {
     const checkAdmin = to.path.includes('admin')
     const apiAuthUrl = (store.state.apiUrl + '/retab/auth').replaceAll(/((?!:).)\/\//g, '$1/')
@@ -83,7 +85,7 @@ router.beforeEach(async (to, from) => {
     
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
-      alert('You have to log in first, ' + to.fullPath!)
+      alert('You have to log in first, ' + to.fullPath! + ' -- ' +  (to.name as string))
       router.push(process.env.VUE_APP_BASE_PATH +  (!checkAdmin ? 'Login' : 'admin/login'))
     }
     else {
