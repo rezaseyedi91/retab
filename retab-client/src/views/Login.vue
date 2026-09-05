@@ -36,6 +36,7 @@
 
         <va-card color="info">
             <va-card-content>
+
                 Try RéTab https://tab.rezaseyedi.com with a guest account:
                 <br>
                 <strong>
@@ -49,7 +50,7 @@
                 </strong>
                 retabguest@123
                 <br>
-                or contact reza.seyedi010@gmail.com if you want to use ReTab with a personal account.
+                or you can also sign up if you want to use ReTab with a personal account.
             </va-card-content>
         </va-card>
     </div>
