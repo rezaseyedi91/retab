@@ -66,7 +66,7 @@ services:
       - .env
     networks:
       - traefik
-
+      - default
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -94,7 +94,7 @@ services:
         condition: service_started
     networks:
       - traefik
-      - default
+      
 
 volumes:
   mysql_data:
