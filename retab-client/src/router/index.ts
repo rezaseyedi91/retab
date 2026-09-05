@@ -73,7 +73,7 @@ const router = createRouter({
 })
 router.beforeEach(async (to, from) => {
   if (['login', 'admin-login'].includes((to.name as string)?.toLowerCase()) 
-    
+    || /login/.test((to.path as string).toLowerCase())
     || to.path.startsWith('/error') || to.name =='') return true;
   try {
     const checkAdmin = to.path.includes('admin')
