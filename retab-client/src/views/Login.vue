@@ -36,7 +36,6 @@
 
         <va-card color="info">
             <va-card-content>
-
                 Try RéTab https://tab.rezaseyedi.com with a guest account:
                 <br>
                 <strong>
