@@ -75,15 +75,15 @@ router.beforeEach(async (to, from) => {
   if (['login', 'admin-login'].includes(to.name as string) || to.path.startsWith('/error') || to.name =='') return true;
   try {
     const checkAdmin = to.path.includes('admin')
-    const url = (store.state.apiUrl + '/retab/auth').replaceAll('//', '/')
-    console.log({url});
+    const apiAuthUrl = (store.state.apiUrl + '/retab/auth').replaceAll(/((?!:).)\/\//g, '$1/')
+    console.log({url: apiAuthUrl});
     
-    const response = await axios.get(url , {withCredentials: true, params: {checkAdmin}})
+    const response = await axios.get(apiAuthUrl , {withCredentials: true, params: {checkAdmin}})
     const authenticatedUser = response.data
     
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
-      alert('You have to log in first')
+      alert('You have to log in first, ' + to.fullPath!)
       router.push(process.env.VUE_APP_BASE_PATH +  (!checkAdmin ? 'Login' : 'admin/login'))
     }
     else {
