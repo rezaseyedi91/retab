@@ -75,9 +75,10 @@ router.beforeEach(async (to, from) => {
   if (['login', 'admin-login'].includes(to.name as string) || to.path.startsWith('/error') || to.name =='') return true;
   try {
     const checkAdmin = to.path.includes('admin')
-    console.log(store.state.apiUrl + '/retab/auth');
+    const url = store.state.apiUrl + '/retab/auth'
+    console.log({url});
     
-    const response = await axios.get(store.state.apiUrl + 'retab/auth' , {withCredentials: true, params: {checkAdmin}})
+    const response = await axios.get(url , {withCredentials: true, params: {checkAdmin}})
     const authenticatedUser = response.data
     
     if (!authenticatedUser || response.status == 403) {
