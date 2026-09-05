@@ -86,7 +86,7 @@ router.beforeEach(async (to, from) => {
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
       alert('You have to log in first, ' + to.fullPath! + ' -- ' +  (to.name as string))
-      router.push(process.env.VUE_APP_BASE_PATH +  (!checkAdmin ? 'Login' : 'admin/login'))
+      router.push(/**process.env.VUE_APP_BASE_PATH + */ (!checkAdmin ? 'Login' : 'admin/login'))
     }
     else {
       Object.assign(store.state, {currentUser: authenticatedUser})
