@@ -41,7 +41,7 @@
               <VaNavbarItem>
                 <va-button @click="() => useDoc().generateAndDownloadMei()">
                   <div class="cursor-pointer">
-                    <img src="/logos/mei-logo-simple-dark.png" class="w-14" alt="MEI LOGO">
+                    <img :src="`${store.state.baseUrl}logos/mei-logo-simple-dark.png`" class="w-14" alt="MEI LOGO">
                   </div>
                 </va-button>
               </VaNavbarItem>
@@ -107,7 +107,8 @@ import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { DocumentArrowUpIcon, CodeBracketSquareIcon } from '@heroicons/vue/24/solid';
 import DevTest from './utils/DevTest.vue';
-const store = useStore();
+import type {State} from '@/store'
+const store = useStore<State>();
 const isSaving = ref(false)
 const toast = useToast();
 const router = useRouter();

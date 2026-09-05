@@ -13,6 +13,7 @@ export type State = {
   },
   isDev: boolean,
   apiUrl: string,
+  baseUrl: string,
   currentDoc: RezTabFile,
   currentUser?: any,
   login: {
@@ -42,6 +43,7 @@ export default createStore<State>({
     },
     isDev: process.env.VUE_APP_ENV == 'development',
     apiUrl: process.env.VUE_APP_API_URL,
+    baseUrl: process.env.BASE_URL,
     currentDoc: <RezTabFile>new RezTabFile({
       createdAt: new Date(),
       filename: 'file-one.txt',
