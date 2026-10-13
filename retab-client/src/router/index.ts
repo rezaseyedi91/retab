@@ -71,6 +71,7 @@ const router = createRouter({
   history: createWebHistory(process.env.VUE_APP_BASE_PATH),
   routes
 })
+
 router.beforeEach(async (to, from) => {
   if (['login', 'admin-login'].includes((to.name as string)?.toLowerCase()) 
     || /login/.test((to.path as string).toLowerCase())
@@ -82,7 +83,7 @@ router.beforeEach(async (to, from) => {
     const authenticatedUser = response.data
     if (!authenticatedUser || response.status == 403) {
       // throw new Error('YOU HAVE TO LOG IN FIRST!');
-      alert('You have to log in first!')
+      // alert('You have to log in first!')
       router.push(/**process.env.VUE_APP_BASE_PATH + */ (!checkAdmin ? 'Login' : 'admin/login'))
     }
     else {

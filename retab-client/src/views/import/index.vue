@@ -25,7 +25,6 @@ function getTheFile(e: Event) {
         
     })
     fileReader.readAsText(file)
-
 }
 
 

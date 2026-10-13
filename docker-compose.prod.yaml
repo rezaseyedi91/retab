@@ -1,11 +1,12 @@
 services:
   mysql:
-    image: mysql:8.4
+    image: mariadb:10.11
     restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - mysql_data:/var/lib/mysql
+       - mariadb_data:/var/lib/mysql
+#      - mysql_data:/var/lib/mysql
     expose:
       - "3306"
     healthcheck:
@@ -15,7 +16,9 @@ services:
       retries: 20
 
   create-user:
-    image: mysql:8.4
+#    image: mysql:8.4
+    image: mariadb:10.11
+
     env_file:
       - .env
 
@@ -65,7 +68,7 @@ services:
     env_file:
       - .env
     networks:
-      - traefik
+#      - traefik
       - default
     depends_on:
       migrate:
@@ -75,30 +78,31 @@ services:
     build:
       context: ./retab-client
       dockerfile: Dockerfile.prod
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.retab.rule=Host(`musica.huma-num.fr`) && PathPrefix(`/retab`)"
-      - "traefik.http.routers.retab.entrypoints=websecure"
-      - "traefik.http.middlewares.retab-strip.stripprefix.prefixes=/retab"
-      - "traefik.http.routers.retab.middlewares=retab-strip"
-      - "traefik.http.services.retab.loadbalancer.server.port=80"
-      - "traefik.http.routers.retab.tls.certresolver=prod"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.retab.rule=Host(`musica.huma-num.fr`) && PathPrefix(`/retab`)"
+#      - "traefik.http.routers.retab.entrypoints=websecure"
+#      - "traefik.http.middlewares.retab-strip.stripprefix.prefixes=/retab"
+#      - "traefik.http.routers.retab.middlewares=retab-strip"
+#      - "traefik.http.services.retab.loadbalancer.server.port=80"
+#      - "traefik.http.routers.retab.tls.certresolver=prod"
     restart: unless-stopped
 
     env_file:
       - ./retab-client/.env
-#    ports:
-#    - "${RETAB_CLIENT_PORT:-8080}:80"
+    ports:
+    - "${RETAB_CLIENT_PORT:-8080}:80"
     depends_on:
       server:
         condition: service_started
-    networks:
-      - traefik
-      
+#    networks:
+#      - traefik
+
 
 volumes:
-  mysql_data:
+#  mysql_data:
+   mariadb_data:
 
-networks:
-  traefik:
-    external: true
+#networks:
+#  traefik:
+#    external: true

@@ -17,6 +17,7 @@ import {
   HARD_CODED_HEADER_EMPTY_ARGS,
 } from "./mei-modules/head-args";
 import router from "@/router";
+import Music from "./mei-modules/Music";
 
 type DocSetttings = {
   linesCount: number;
@@ -35,7 +36,7 @@ type DocSetttings = {
 export default class RezTabFile {
   private undoStack: string[] = [];
   private redoStack: string[] = [];
-
+  music?: Music
   info: TRezTabFileInfo;
   docSettings: DocSetttings = {
     linesCount: 6,
@@ -47,13 +48,14 @@ export default class RezTabFile {
   id?: number;
   head?: MeiHead;
   section: Section;
+
   private _lastFocusedNote: (Note | undefined);
   noteFocusKey = 0;
   set lastFocusedNote(n: Note | undefined) {
     this.noteFocusKey++;
     this._lastFocusedNote = n
   }
-  get lastFocusedNote() {return this._lastFocusedNote || undefined}
+  get lastFocusedNote() { return this._lastFocusedNote || undefined }
 
   // measures: Measure[] = []
   constructor(info: TRezTabFileInfo) {
@@ -155,8 +157,10 @@ export default class RezTabFile {
       headJsonXmlElement: headJsonXmlElement,
       docInfo,
       docSettings: this.docSettings,
+      musicJsonXmlElement: this.music?.toJsonXmlElement()
     };
-
+    console.log(reqBody);
+    
     // return;
     const jsonResult = await axios.post(
       process.env.VUE_APP_API_URL + "/retab/doc/" + (this.id || "new"),
@@ -180,7 +184,6 @@ export default class RezTabFile {
     });
     doc.id = someResponse.id;
     doc.setLinesCount(someResponse.stavesInfo[0].tuning.length);
-    
     doc.initializeSection(
       someResponse.sectionJsonXmlElement,
       someResponse.stavesInfo
@@ -256,8 +259,6 @@ export default class RezTabFile {
     fetchedSection?: TMeiTagFactoryArgs,
     stavesInfo?: TStaffInfo[]
   ) {
-
-
     if (fetchedSection) {
       this.section = Section.fromMeiFactoryArgs(
         this,
@@ -405,11 +406,11 @@ export default class RezTabFile {
       store.state.utils.keyCoefficient++;
     }
   }
-  
+
   async generateAndDownloadMei() {
     const result = await this.generateMEI();
     const fileTitle = this.getAltTitle() || this.getTitle();
-    RezTabFile.download(result, fileTitle ? fileTitle + '.mei' : undefined);
+    RezTabFile.download(result, fileTitle ? fileTitle + '.mei' : (this.getTitle() || this.getAltTitle() || undefined));
     this.unfreeze();
   }
 
@@ -420,7 +421,6 @@ export default class RezTabFile {
     const altTitle = parsed.querySelector('title[type=alternative]')?.textContent || '';
     const tabType = parsed.querySelector('staffDef')?.getAttribute('notationtype') as `tab.lute.${TabType}`
 
-    const p: TabType = TabType.FRENCH;
     const head = MeiTag.instanceFromXmlElement(parsed.querySelector('meiHead')!) as MeiHead
     const doc = new RezTabFile({
       title,
@@ -430,10 +430,17 @@ export default class RezTabFile {
       tabType,
       altTitle,
     })
-    const section = MeiTag.instanceFromXmlElement(parsed.querySelector('section')!) as Section;
+    doc.music = Music.instanceFromXmlElement(parsed.querySelector('music')!);
+      console.log(doc.music);
+      
+    // const section = MeiTag.instanceFromXmlElement(parsed.querySelector('section')!) as Section;
+
+      const section = doc.music.getGrandChildrenByTagName('section')?.[0] as Section;
+      
+      if (!section) throw new Error('Couldn\'t find section as a grandchild of <music/>')
     head.setAllChildrenParent();
     section.setAllChildrenParent();
-    
+
     await doc.initializeHead(head);
     await doc.initializeSection(section, [{
       linesCount: parsed.querySelector('tuning')?.children.length || 0,
@@ -489,8 +496,6 @@ export default class RezTabFile {
 
     this.restore(prevState!);
     this.updateUI();
-
-
   }
 
   private async restore(serialized: string) {

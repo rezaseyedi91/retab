@@ -22,7 +22,7 @@ export default class MeiHead extends MeiTag {
     // }
     updateChildren(): MeiTag {
         const cannotBeRemovedTagTitles = [
-            'pubStmt', 'titleStmt', 'title'
+            'pubStmt', 'titleStmt', 'title', 'p'
         ]
         function removeEmptyChildrenNested(tag: MeiTag) {
             tag.children.forEach(removeEmptyChildrenNested)

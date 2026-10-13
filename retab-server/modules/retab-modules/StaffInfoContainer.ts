@@ -96,7 +96,8 @@ export default class StaffInfoContainer implements TStaffInfo {
 
     async save(docId: number) {
         const prisma = DB.getInstance();
-
+        debug.log('saving staffInfo', this.n);
+        
         const exists = await DB.getInstance().staffInfo.findUnique({
             where: {
                 docId_n: { docId: docId || 0, n: this.n || 1 }

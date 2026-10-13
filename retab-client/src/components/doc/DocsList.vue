@@ -19,8 +19,8 @@
             { key: 'edit', label: 'edit', },
             { key: 'remove', label: 'remove', },
 
-        ]" hoverable :clickable="true" striped @row:click="({ item }) => rowClick(item)"
-         @row:contextmenu="(vaEvent) => toggleSelectRow(vaEvent)"
+        ]" hoverable :clickable="true" striped @row:click="({ item }: any) => rowClick(item)"
+         @row:contextmenu="(vaEvent: Event) => toggleSelectRow(vaEvent)"
         v-model="selectedItems">
 
             <template #cell(title)="{ rowData }">
@@ -58,7 +58,6 @@
 </template>
 
 <script setup lang="ts">
-import RezTabFile from '@/store/modules/RezTabFile';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';

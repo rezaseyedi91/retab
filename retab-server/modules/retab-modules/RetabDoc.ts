@@ -29,11 +29,10 @@ export default class RetabDoc implements TRetabDoc {
 
     static makeInstance(id?: number) {
         const instance = new RetabDoc();
-
         if (!id) return instance;
         else return this.getInstanceFromDb(id) || new RetabDoc()
     }
-
+    private constructor() {}
     async initializeMeiMainTag() {
         this.mainChild = await new MeiMainTag({ docId: this.id }).init()
     }
@@ -81,7 +80,7 @@ export default class RetabDoc implements TRetabDoc {
     appendSection(section: MeiTag | Section) {
         (this.mainChild as MeiMainTag).appendSection(section as MeiTag);
     }
-    static async getInstanceFromDb(id: number) {
+    static async getInstanceFromDb(id: number): Promise<RetabDoc> {
         
         try {
             const info = await DB.getInstance().retabDoc.findUniqueOrThrow({
@@ -102,7 +101,7 @@ export default class RetabDoc implements TRetabDoc {
             return instance;
         } catch (error) {
             console.log(error);
-            
+            throw error
             console.log('Err: No Doc Record Found.')
         }
 

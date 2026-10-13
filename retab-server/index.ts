@@ -32,7 +32,7 @@ const app = express();
         app.get('/', (req, res) => {
             res.send('retab server api')
         })
-
+        
         app.listen(port, () => {
             console.log('we are listening on port ' + port + '...')
         })

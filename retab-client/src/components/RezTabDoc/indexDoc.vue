@@ -3,8 +3,11 @@
         <Toolbar :key="useDoc().noteFocusKey * toolCompKey" :selected-notes="(sl.selectedNotes as Note[])" />
         <DocTitle :key="store.state.utils.keyCoefficient" />
         <div class="section flex max-w-full overflow-x-auto overflow-y-hidden">
-        <!-- <TimeSignature /> -->
-            
+            <!-- <TimeSignature /> -->
+            <DevTest>
+                <VaButton @click="useDoc().section.addStaff()">Add Staff </VaButton>
+                
+            </DevTest>
             <MeasureComp :measure-n="(measure as Measure).n"
                 v-for="(measure, index) in store.state.currentDoc.section.measures" :measure="measure"
                 :key="(Number(index) + 1) * store.state.utils.keyCoefficient * 10"
@@ -20,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed,  onMounted, onUnmounted, ref, shallowRef, toRefs } from 'vue';
+import { computed, onMounted, onUnmounted, ref, shallowRef, toRefs } from 'vue';
 import RezTabFile from '@/store/modules/RezTabFile'
 import Measure from '@/store/modules/Measure';
 import { useStore } from 'vuex';
@@ -32,6 +35,7 @@ import { useDoc } from '@/composables/useDoc';
 import DocTitle from './DocTitle.vue';
 import Toolbar from './Toolbar/index.vue';
 import TimeSignature from './TimeSignature.vue';
+import DevTest from '../utils/DevTest.vue';
 const store = useStore();
 const props = defineProps<{
     id: string
@@ -160,7 +164,7 @@ class SelectionListener {
         document.removeEventListener(listener.eventType, listener.method)
     }
     selectedNotesKeyupListener(event: KeyboardEvent) {
-        if (event.key.toLowerCase() == 'shift') return; 
+        if (event.key.toLowerCase() == 'shift') return;
         // return 
         event.preventDefault();
         const shift = event.shiftKey;
@@ -187,10 +191,10 @@ class SelectionListener {
         else {
             const tgs = this.selectedNotes.map(n => n.tabGroup).filter((tg, index, arr) => {
                 const found = arr.find(i => i.xmlId == tg.xmlId)
-                return found && ( arr.indexOf(found) == index)
+                return found && (arr.indexOf(found) == index)
             })
             tgs.forEach(tg => tg.remove())
-            
+
         }
         useDoc().updateUI()
         return
@@ -214,7 +218,7 @@ class SelectionListener {
         if (selectedIndex > -1) {
             // const spliced = this.selectedNotes.splice(this.selectedNotes.indexOf(n), 1)
             this.selectedNotesDuringCurrentDrag.splice(this.selectedNotes.indexOf(n), 1)
-            
+
         } else {
             //
         }
@@ -253,7 +257,7 @@ class SelectionListener {
         this.selectionEl?.remove()
         this.setSelectedNotesListeners()
         updateChildComponents();
-        
+
 
     }
     onMouseDown(e: MouseEvent) {
@@ -388,8 +392,8 @@ async function addMeasure() {
     const measure = tg?.staff.measure;
     const lastTg = tg?.getCurrentMeasureLastTabgroup();
     const index = doc.section.measures.indexOf(measure!);
-    
-    
+
+
     const newMeasure = doc.section.addMeasure((index + 1) || undefined);
     newMeasure.staves.forEach(staff => {
         staff.tabGroups[0].setDur(lastTg?.dur || 4);

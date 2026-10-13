@@ -1,5 +1,5 @@
 <template>
-  <PanelLayout>
+  <PanelLayout >
     <RezTabDoc :id="($router.currentRoute.value.params.id as string)" />
     <MeiGenerator />
   </PanelLayout>

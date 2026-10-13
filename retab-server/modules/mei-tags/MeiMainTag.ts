@@ -7,6 +7,7 @@ import { IMeiTag, MeiAttribute } from "./interfaces";
 import { writeFileSync } from "fs";
 import { debug, includeMeiTagChildrenRecursively } from "../../utils";
 import Course from "./Course";
+import TabIdeaDocGenerator, { TMeiJsonXmlElementInput } from "../mei-adapters/TabIdeaDocGenerator";
 
 export default class MeiMainTag extends MeiTag implements TMeiTag {
     static XMLNS = 'http://www.music-encoding.org/ns/mei'
@@ -16,7 +17,9 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
     constructor(payload?: TMeiTag) {
         super({ ...payload, tagTitle: MeiMainTag.TAG_TITLE });
     }
-
+    setMusicElement(musicJsonXmlElement: TMeiJsonXmlElementInput) {
+        this.children.push(TabIdeaDocGenerator.meiTagInstanceFromJsonXmlElement(musicJsonXmlElement))
+    }
     async init() {
         await this.initalizeSelfAndChildrenCurrentId(this.doc?.id || this.docId)
         return this
@@ -75,7 +78,6 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
 
     getScoreDefMeiTag() {
         const scoreTag = this.getScoreMeiTag();
-
         if (!scoreTag.__('scoreDef')) scoreTag.addChildIfNotExists(new MeiTag({ tagTitle: 'scoreDef' }))
         return scoreTag.__('scoreDef')
     }
@@ -124,12 +126,12 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
             if (!info?.mainChild) return;
 
             const mainChild = info?.mainChild as TMeiTag
-            const musicTag = mainChild.children?.[0] as TMeiTag
-            const bodyTag = musicTag.children?.[0] as TMeiTag
-            const mdivTag = bodyTag.children?.[0] as TMeiTag
-            const scoreTag = mdivTag.children?.[0] as TMeiTag
-            const scoreDefTag = scoreTag.children?.[0] as TMeiTag
-            const staffGrpTag = scoreDefTag.children?.[0] as TMeiTag
+            const musicTag = mainChild.children?.find(t => t.tagTitle == 'music') as TMeiTag
+            const bodyTag = musicTag.children?.find(t => t.tagTitle == 'body') as TMeiTag
+            const mdivTag = bodyTag.children?.find(t => t.tagTitle == 'mdiv') as TMeiTag
+            const scoreTag = mdivTag.children?.find(t => t.tagTitle == 'score') as TMeiTag
+            const scoreDefTag = scoreTag.children?.find(t => t.tagTitle == 'scoreDef') as TMeiTag
+            const staffGrpTag = scoreDefTag.children?.find(t => t.tagTitle == 'staffGrp') as TMeiTag
 
             this.id = info.mainChild?.id
             this.xmlId = info.mainChild?.xmlId
@@ -191,10 +193,6 @@ export default class MeiMainTag extends MeiTag implements TMeiTag {
                     }
                 })
             }
-
-
-
-
             debug.getTimepan(4)
 
             // this.id = undefined//?.mainChildId || undefined;

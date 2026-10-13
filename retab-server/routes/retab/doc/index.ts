@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => { 
     
     const docId = Number(req.params.id || 0)
-    const doc = new RetabDoc().setInfo({ id: docId });
+    const doc = (await RetabDoc.makeInstance()).setInfo({ id: docId });
     try {
         const result = await doc.remove();
         return res.send(result)
@@ -57,7 +57,7 @@ router.post('/:id', async (req, res) => {
     try {
 
 
-        const retabDoc = new RetabDoc();
+        const retabDoc = await RetabDoc.makeInstance();
         //@ts-ignore
         const userId = req.userId
 
@@ -74,6 +74,9 @@ router.post('/:id', async (req, res) => {
         
         retabDoc.assignDocSettings(req.body.docSettings)
         await retabDoc.initializeMeiMainTag()
+        if (req.body.musicJsonXmlElement) {
+            retabDoc.mainChild?.setMusicElement(req.body.musicJsonXmlElement)
+        }
         const section = TabIdeaDocGenerator.jsonXmlElementToSection(req.body.sectionJsonXmlElement);
         retabDoc?.appendSection(section)
         const head = req.body.headJsonXmlElement ? MeiTag.makeTagsTree(req.body.headJsonXmlElement) : undefined;
@@ -86,9 +89,6 @@ router.post('/:id', async (req, res) => {
         return res.json({ id: retabDoc.id })
 
     } catch (err) {
-
-        //@ts-ignore
-
     }
 })
 export default router

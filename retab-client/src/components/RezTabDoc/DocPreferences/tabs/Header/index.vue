@@ -25,7 +25,11 @@ const store = useStore();
 const doc = store.state.currentDoc as RezTabFile;
 
 
-const title = shallowRef<string>();
+const title_main = shallowRef<string>();
+const title_subordinate = shallowRef<string>();
+const title_abbreviated = shallowRef<string>();
+const title_translated = shallowRef<string>();
+const title_uniform = shallowRef<string>();
 const composer = shallowRef<string>();
 const altTitle = shallowRef<string>();
 const subtitle = shallowRef<string>();
@@ -60,18 +64,29 @@ const workCreationDateSpan = shallowRef<string>();
 const workCreationSettlement = shallowRef<string>();
 const workCreationCountry = shallowRef<string>();
 
-
+console.log(doc.head?.getGrandChildrenByTagName('title'));
 
 onMounted(() => {
     doc.head?.setAllChildrenParent();
-    title.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=main]')?.textContent
+    // title_main.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=main]')?.textContent
+    // title_subordinate.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=subordinate]')?.textContent
+    // title_abbreviated.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=abbreviated]')?.textContent
+    // title_translated.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=translated]')?.textContent
+
+    console.log({
+        title_main: title_main.value,
+        title_subordinate: title_subordinate.value,
+        title_abbreviated: title_abbreviated.value,
+        title_translated: title_translated.value,
+        
+    }, doc.head);
+
+
+    title_uniform.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=uniform]')?.textContent
     composer.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('composer')?.__add('persName')?.textContent
 
-
-    altTitle.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=Alternative]')?.textContent
+    altTitle.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=alternative]')?.textContent
     subtitle.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=subtitle]')?.textContent
-
-
     description.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=desc]')?.textContent
     encoderName.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName')?.textContent
     encoderAuth.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('respStmt')?.__add('persName').getAttribute('auth')?.value
@@ -125,7 +140,9 @@ const inputGroups = [
     {
         title: 'Piece Information',
         inputs: [
-            { label: "Title", vModel: title },
+            { label: "Title (Main)", vModel: title_main },
+            { label: "Title (Abbreviated)", vModel: title_abbreviated },
+            { label: "Title (Subordinate)", vModel: title_subordinate },
             { label: "Composer", vModel: composer },
             { label: "alt Title", vModel: altTitle },
             { label: "description", vModel: description },
@@ -192,13 +209,6 @@ const inputGroups = [
     /**
      //Corporation Information:
 
-
-
-
-
-
-
-
 Funder
 
 
@@ -222,72 +232,75 @@ workCreationInfo
 
 
 
-watch(title, val => {
+watch(title_main, val => {
+
     doc.head?.__('fileDesc')?.__('titleStmt')?.__('title')?.setTextContent(val)
     doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('title')?.setTextContent(val)
-    doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('title[type=alternative]').setTextContent(val)
-
 })
+
+
+
+
+
+
 watch(composer, val => {
     try {
 
-        doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__add('persName').setTextContent(val)
-        doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('composer')?.__('persName').setTextContent(val)
-    }catch (err) {
+        doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__add('persName')?.setTextContent(val)
+        doc.head?.__('workList')?.getChildrenByTagName('work')?.[0]?.__('composer')?.__('persName')?.setTextContent(val)
+    } catch (err) {
         console.log(err);
         console.log(doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer'));
         console.log(doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__('persName'));
         console.log(doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('composer').__add('persName'));
         console.log(doc.head?.__('fileDesc')?.__('titleStmt')?.__('composer')?.__('persName'));
-        
-        
-        
     }
 })
 
 watch(altTitle, val => {
-    doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=Alternative]').setTextContent(val)
+    doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('title[type=alternative]')?.setTextContent(val)
+    doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=alternative]')?.setTextContent(val)
     doc.info.altTitle = val
 });
 
-watch(description, val => { doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=desc]').setTextContent(val) });
-watch(encoderName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName').setTextContent(val))
+watch(description, val => { doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=desc]')?.setTextContent(val) });
+watch(encoderName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName')?.setTextContent(val))
 watch(encoderAuth, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName').setAttribute(new MeiAttribute('auth', val + '')))
 watch(encoderAuthUri, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName').setAttribute(new MeiAttribute('auth.uri', val + '')))
-watch(biblScopeWorkposition, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('biblScope')?.__('num[label=workposition]').setTextContent(val))
+watch(biblScopeWorkposition, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('biblScope')?.__('num[label=workposition]')?.setTextContent(val))
 watch(locusFolioFrom, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('locus[label=folio]').setAttribute(new MeiAttribute('from', val + '')))
 watch(locusFolioTo, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('locus[label=folio]').setAttribute(new MeiAttribute('to', val + '')))
 watch(locusFolioContent, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('locus[label=folio]')?.setTextContent(val));
-watch(termGenre, val => doc.head?.__('workList')?.__('work')?.__('classification')?.__('termList')?.__('term[label=genre]').setTextContent(val))
+watch(termGenre, val => doc.head?.__('workList')?.__('work')?.__('classification')?.__('termList')?.__('term[label=genre]')?.setTextContent(val))
 
-watch(subtitle, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=subtitle]').setTextContent(val));
+watch(subtitle, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('title[type=subtitle]')?.setTextContent(val));
 watch(encoderXmlId, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('persName').setAttribute(new MeiAttribute('xml:id', val!)))
-watch(corpOneName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('name').setTextContent(val))
-watch(corpTwoName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('name').setTextContent(val))
-watch(street, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('street').setTextContent(val))
-watch(postBox, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('postBox').setTextContent(val))
-watch(postCode, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('postCode').setTextContent(val))
-watch(settlement, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('settlement').setTextContent(val))
-watch(country, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('country').setTextContent(val))
-watch(funderCorpOneName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName').setTextContent(val))
-watch(funcderCorpTwoName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName[auth]').setTextContent(val))
+watch(corpOneName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('name')?.setTextContent(val))
+watch(corpTwoName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('name')?.setTextContent(val))
+watch(street, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('street')?.setTextContent(val))
+watch(postBox, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('postBox')?.setTextContent(val))
+watch(postCode, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('postCode')?.setTextContent(val))
+watch(settlement, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('settlement')?.setTextContent(val))
+watch(country, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('respStmt')?.__('corpName')?.__('corpName')?.__('address')?.__('country')?.setTextContent(val))
+watch(funderCorpOneName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName')?.setTextContent(val))
+watch(funcderCorpTwoName, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName[auth]')?.setTextContent(val))
 watch(funcderCorpTwoAuth, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName[auth]').setAttribute(new MeiAttribute('auth', val!)))
 watch(funcderCorpTwoUri, val => doc.head?.__('fileDesc')?.__('titleStmt')?.__('funder')?.__('corpName[auth.uri]').setAttribute(new MeiAttribute('auth.uri', val!)))
-watch(pubAvailability, val => doc.head?.__('fileDesc')?.__('pubStmt')?.__('availability').setTextContent(val))
-watch(physLocRepoCorpName, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('physLoc')?.__('repository')?.__add('corpName').setTextContent(val))
-watch(projectDescHead, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__add('head').setTextContent(val))
-watch(projectDescP, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__('p').setTextContent(val))
+watch(pubAvailability, val => doc.head?.__('fileDesc')?.__('pubStmt')?.__('availability')?.setTextContent(val))
+watch(physLocRepoCorpName, val => doc.head?.__('fileDesc')?.__('sourceDesc')?.__('source')?.__('bibl')?.__('physLoc')?.__('repository')?.__add('corpName')?.setTextContent(val))
+watch(projectDescHead, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__add('head')?.setTextContent(val))
+watch(projectDescP, val => doc.head?.__('encodingDesc')?.__('projectDesc')?.__('p')?.setTextContent(val))
 watch(workCreationDateFrom, val => {
     doc.head?.__('workList')?.__('work')?.__('creation')?.__('date').setAttribute(new MeiAttribute('notbefore', val!))
-    workCreationDateSpan.value = (workCreationDateFrom.value || '') + '-' + (workCreationDateTo.value|| '')
+    workCreationDateSpan.value = (workCreationDateFrom.value || '') + '-' + (workCreationDateTo.value || '')
 })
 watch(workCreationDateTo, val => {
     doc.head?.__('workList')?.__('work')?.__('creation')?.__('date').setAttribute(new MeiAttribute('notafter', val!))
-    workCreationDateSpan.value = (workCreationDateFrom.value || '') + '-' + (workCreationDateTo.value|| '')
+    workCreationDateSpan.value = (workCreationDateFrom.value || '') + '-' + (workCreationDateTo.value || '')
 })
-watch(workCreationDateSpan, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('date').setTextContent(val)) //workCreationDateFrom.value + '-' + workCreationDateTo.value
-watch(workCreationSettlement, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('settlement').setTextContent(val))
-watch(workCreationCountry, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('country').setTextContent(val))
+watch(workCreationDateSpan, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('date')?.setTextContent(val)) //workCreationDateFrom.value + '-' + workCreationDateTo.value
+watch(workCreationSettlement, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('settlement')?.setTextContent(val))
+watch(workCreationCountry, val => doc.head?.__('workList')?.__('work')?.__('creation')?.__('country')?.setTextContent(val))
 
 
 </script>

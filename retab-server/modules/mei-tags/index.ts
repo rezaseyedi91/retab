@@ -36,10 +36,6 @@ export class MeiTag implements TMeiTag {
     constructor(payload?: TMeiTag, options: TMeiTagConstructorOptions = { nest: true }) {
 
         const payloadXmlId = payload?.attributes?.find(at => at.title == 'xml:id')?.value || payload?.xmlId
-
-
-
-
         this.id = payload?.id
         this.xmlId = payloadXmlId || this.generateId();
         // ensuring that the payload xmlId is set:
@@ -223,8 +219,6 @@ export class MeiTag implements TMeiTag {
         //removing extra children
         try {
             const updatedChildrenIds = this.children.map(ch => ch.id!).filter(id => id);
-
-
             const extraChidlren = (await prisma.meiTag.findUnique({
                 where: { id: this.id },
                 select: {
@@ -332,6 +326,7 @@ export class MeiTag implements TMeiTag {
 
         throw new Error("Method not implemented.");
     }
+
     wrapChildTags(): string {
         return this.children.map(ch => ch.getXML()).join('\n')
     }
@@ -386,7 +381,6 @@ export class MeiTag implements TMeiTag {
             }
         }
     }
-
 }
 
 

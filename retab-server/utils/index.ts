@@ -6,7 +6,6 @@ export async function xmlToSvg(str: string) {
     const verovioToolkit = await getVerovioToolkitInstance();
     verovioToolkit.setOptions({
         adjustPageHeight: true,
-
     })
     if (!verovioToolkit) return 'no'
     verovioToolkit.loadData(str);
@@ -80,7 +79,8 @@ export const debug = {
                         this.timespanStarted[serie] = false
         }
 
-    }
+    },
+    log: console.log
 }
 
 

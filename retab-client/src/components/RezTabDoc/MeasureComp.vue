@@ -2,12 +2,12 @@
     <div class="measure" :class="{
         'size-exceeded': getMeasure()?.wrongSize == 1
     }">
-  
-        <StaffComp 
-        :staff-index="index"
-        v-for="(staff, index) in getMeasure()?.staves" :staffN="staff.n" :key="index * store.state.utils.keyCoefficient"
-        :measureN="measureN"
-        ></StaffComp>
+        <DevTest>
+            {{ getMeasure()?.children.length }}
+            <VaButton size="small" color="secondary" @click="Debugger.log(getMeasure())">log Measure</VaButton>
+        </DevTest>
+        <StaffComp :staff-index="index" v-for="(staff, index) in getMeasure()?.staves" :staffN="staff.n"
+            :key="index * store.state.utils.keyCoefficient" :measureN="measureN"></StaffComp>
     </div>
 
 </template>
@@ -23,8 +23,9 @@ import RezTabFile from '@/store/modules/RezTabFile';
 import TimeSignature from './TimeSignature.vue';
 import DevTest from '../utils/DevTest.vue';
 import { useDoc } from '@/composables/useDoc';
+import { Debugger } from '@/store/modules/utils';
 const store = useStore();
-const props = defineProps<{measureN: number, keyK: number}>()
+const props = defineProps<{ measureN: number, keyK: number }>()
 function getMeasure() {
     return (store.state.currentDoc as RezTabFile).section.getMeasureFromN(props.measureN)
 }
@@ -41,6 +42,6 @@ function getMeasure() {
 }
 
 .bar-number {
-    @apply bg-blue-400/40 p-2 text-center flex items-center font-bold h-8 w-8 justify-center rounded-[50%] shadow-sm ;
+    @apply bg-blue-400/40 p-2 text-center flex items-center font-bold h-8 w-8 justify-center rounded-[50%] shadow-sm;
 }
 </style>

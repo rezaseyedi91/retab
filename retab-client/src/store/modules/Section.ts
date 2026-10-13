@@ -7,6 +7,7 @@ import Note from "./Note";
 import RezTabFile from "./RezTabFile";
 import Staff, { StaffLine } from "./Staff";
 import { TabCourseTuningInfo, TCourseInfo, TSectionInfo, TStaffInfo, TTimeSignature } from "./types";
+import { Debugger } from "./utils";
 
 export default class Section extends MeiTag {
     tagTitle = 'section';
@@ -32,6 +33,7 @@ export default class Section extends MeiTag {
         this.info.staves[staffIndex].tuning = [...Staff.DEFAULT_TUNING.slice(0, 6)]
     }
     static fromMeiFactoryArgs( doc: RezTabFile, arg: TMeiTagFactoryArgs, stavesInfo?: TStaffInfo[]) {
+        Debugger.log(stavesInfo)
         
         const instance = new Section(doc, [], {staves: stavesInfo || [] })
         instance.id = arg.id
@@ -39,10 +41,10 @@ export default class Section extends MeiTag {
             staves: stavesInfo || []
         }
         instance.setXmlId(arg.xmlId || arg.attributes?.find(at => at.title == 'xml:id' )?.value)
-        if (arg.children) instance.initializeMeasures(arg.children);
+        if (arg.children) instance.initializeMeasures(arg.children.filter(ch => ch.tagTitle == 'measure'));
         setTimeout(() => {
             instance.updateChildren();
-        }, 1000)
+        }, 200)
         return instance;
     }
     setAttributes(): void {
@@ -163,5 +165,36 @@ export default class Section extends MeiTag {
 
     showRawTabGroups() {
         return this.measures.map(m => m.staves.map(s => s.tabGroups.map(tg => tg.notes.map(n => n.course + ':' + n.fret))))
+    }
+
+
+    addStaff(staffInfo: TStaffInfo = Staff.DEFAULT_INFO )  {
+        staffInfo.n = staffInfo.n || this.info.staves.length + 1;
+        Debugger.log("adding staff ", staffInfo);
+        this.info.staves.push(staffInfo);
+        this.measures.forEach(m => m.addEmptyStaff(staffInfo.n));
+    }
+
+    removeStaff(n: number) {
+        if (!n) throw new Error('We have to provide the N of the Staff!')
+        /**staff Info */
+        const si = this.info.staves.find(i => i.n == n);
+        if (si) this.info.staves.splice(this.info.staves.indexOf(si), 1);
+        this.measures.forEach(m => m.getStaffFromN(n)?.remove())
+        this.rearrangeStavesNs();
+
+    }
+
+    private rearrangeStavesNs() {
+        const oldNewNs = new Map<number, number>();
+
+        this.info.staves.sort((s1, s2) => s1.n! - s2.n!).forEach((s, idx) => {
+            oldNewNs.set(s.n || 0, idx+1)
+            s.n = idx + 1
+        });
+        this.measures.forEach(m => {
+            m.staves.forEach(s => s.n = oldNewNs.get(s.n!))
+        })
+
     }
 }

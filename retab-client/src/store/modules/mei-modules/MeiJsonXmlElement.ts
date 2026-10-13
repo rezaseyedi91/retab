@@ -36,3 +36,10 @@ export default class MeiJsonElem {
         this.children.push(...children)
     }
 }
+
+
+export class MeiTextJsonElem extends MeiJsonElem {
+    pushChildren(...children: MeiJsonElem[]): void {
+        this.textContent    
+    }
+}

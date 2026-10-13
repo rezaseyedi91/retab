@@ -5,14 +5,13 @@
         <div class="xl:w-1/2 justify-start flex-col">
             <!-- <StaffLineTuning v-for="(staffLine, index) in store.state.currentDoc.section.measures[0].staves[0].lines" -->
             <StaffLineTuning v-for="(staffLine, index) in store.state.currentDoc.section.measures[0].staves[0].lines"
-                :key="index + updateKey" :staffIndex="0"
+                :key="(index as number) + updateKey" :staffIndex="0"
                 :tuning="getSection().info.staves[0].tuning?.find(l => l.n == (staffLine as StaffLine).courseInfo.number)"
                 :staffLineN="(staffLine as StaffLine).courseInfo.number" @remove-staff-line="removeStaffLine" />
 
             <va-button :disabled="store.state.currentDoc.section.measures[0].staves[0].lines.length >= 14"
                 class="bg-sky-950 w-32 h-12 mt-3 rounded-xl  text-white shadow-lg bg-gradient-to-t   py-2  text-6xl"
                 type="button" @click="addStaffLine">+</va-button>
-
         </div>
 
 

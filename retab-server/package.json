@@ -22,7 +22,7 @@
     "@types/multer": "^1.4.12",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
-    "@types/verovio": "^3.13.0",
+    "@types/verovio": "^5.1.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
@@ -37,7 +37,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "ts-node": "^10.9.1",
-    "verovio": "^3.16.0",
+    "verovio": "^6.3.0",
     "xml-formatter": "^3.6.3",
     "xslt": "^0.9.1"
   },

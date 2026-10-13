@@ -6,15 +6,15 @@ import Staff, { StaffLine } from "./Staff";
 import { TTimeSignature } from "./types";
 
 export default class Measure extends MeiTag {
-    getDoc() {
-        return this.section.getDoc();
+    
+    get staves() {
+        return this.children.filter(ch => ch instanceof Staff)
     }
-
-    updateChildren(): MeiTag {
-        this.children = this.staves.map(s => s.updateChildren());
-        return this;
+    set staves(staves: Staff[]) {
+        this.children = this.children.filter(ch => !(ch instanceof Staff))
+        this.pushChildren(staves)
+        
     }
-    staves: Staff[] = []
     tagTitle = 'measure';
     n: number;
 
@@ -25,13 +25,32 @@ export default class Measure extends MeiTag {
     get totalDuration(): number {
         return this.staves[0].tabGroups.reduce((sum, t) => sum + t.durationToWholeNote, 0)
     }
-    get wrongSize(): 0|-1|1 {
+    get wrongSize(): 0 | -1 | 1 {
         if (!this.getDoc().docSettings.fixedMeasures || !this.timeSignature) return 0
         const exec = /(\d+)-(\d+)/.exec(this.timeSignature)
         const timeSinatureToWholeNote = Number(exec?.[1] || 0) / Number(exec?.[2] || 1)
-        const diff =this.totalDuration - timeSinatureToWholeNote 
-        return diff == 0 ? 0: diff>0 ?  1 : -1
+        const diff = this.totalDuration - timeSinatureToWholeNote
+        return diff == 0 ? 0 : diff > 0 ? 1 : -1
     }
+    constructor(section: Section, n: number) {
+
+        super();
+        
+        this.section = section
+        this.init();
+        this.setN(n)
+        this.n = n
+    }
+    getDoc() {
+        return this.section.getDoc();
+    }
+
+    updateChildren(): MeiTag {
+        // this.children = this.staves.map(s => s.updateChildren());
+        this.children = this.children.map(s => s.updateChildren());
+        return this;
+    }
+
     setAttributes(): void {
         this.attributes.push(
             new MeiAttribute('n', this.n)
@@ -52,41 +71,41 @@ export default class Measure extends MeiTag {
         this.staves.forEach(s => s.setTabgroupsIncludeDurAttribute(mode))
     }
 
-    constructor(section: Section, n: number) {
-
-        super();
-        this.section = section
-        this.init();
-        this.setN(n)
-        this.n = n
-    }
     initializeEmptyMeasureStaff() {
         this.addEmptyStaff();
     }
     initializeStaves(staffJsonXmlElements: TMeiTagFactoryArgs[]) {
-        // if (!staffJsonXmlElements) this.addStaff();
-        // else {
-        this.staves = staffJsonXmlElements.map(sje => Staff.fromMeiFactoryArgs(this, sje))
-        // }
+        // this.staves = staffJsonXmlElements.map(sje => Staff.fromMeiFactoryArgs(this, sje))
+        const staves = staffJsonXmlElements.map(sje => Staff.fromMeiFactoryArgs(this, sje))
+        this.pushChildren(staves)
+        
         return this;
 
     }
     static fromMeiFactoryArgs(section: Section, arg: TMeiTagFactoryArgs) {
-
         const instance = new Measure(section, Number(arg.attributes?.find(a => a.title == 'n')?.value))//.initializeStaves(arg.children)
         instance.id = arg.id;
         const argXmlId = arg.attributes?.find(a => a.title == 'xml:id')?.value || 'XMLIDNOTFOUND'
         // instance.xmlId = argXmlId
         // instance.setAttribute(new MeiAttribute('xml:id', argXmlId))
         instance.setXmlId(argXmlId)
-        if (arg.children?.length) instance.initializeStaves(arg.children);
+        const [staffChildren, otherChildren] = arg.children?.reduce((sf: TMeiTagFactoryArgs[][], cr) => {
+            if (cr.tagTitle == 'staff') sf[0].push(cr) 
+                else  sf[1].push(cr)
+            return sf
+        }, [[], []] ) || [[],[]];
+        
+        instance.pushChildren(otherChildren)
+        if (arg.children?.length) instance.initializeStaves(staffChildren);
+
+        
+        
+
         return instance;
     }
     findCurrentStaff(note: Note) {
         // this will be implemented later; we are returning the only staff our measure has, for now.
         return this.staves[0]
-
-
     }
     setN(n: number) {
         this.n = n;
@@ -112,7 +131,7 @@ export default class Measure extends MeiTag {
         this.section.removeMeasure(this)
     }
     addEmptyStaff(n = 1) {
-        const linesCount = this.section.getDoc().getLinesCount()// this.section.info.staves[n-1].linesCount  //this.section.getDoc().docSettings // previously: 
+        const linesCount = this.section.getDoc().getLinesCount(n - 1)// this.section.info.staves[n-1].linesCount  //this.section.getDoc().docSettings // previously: 
         this.staves.push(new Staff(this, {
             linesCount
             // linesCount: this.section.getDoc().docSettings.linesCount // this.section.info.staves[0].linesCount
