@@ -40,6 +40,6 @@ export default class MeiJsonElem {
 
 export class MeiTextJsonElem extends MeiJsonElem {
     pushChildren(...children: MeiJsonElem[]): void {
-        this.textContent    
+        this.textContent += children.map(ch => ch.textContent).join(' ')
     }
 }

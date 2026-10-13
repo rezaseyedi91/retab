@@ -19,27 +19,48 @@ export default abstract class MeiTag {
         this.parent = p;
         return this;
     }
-
+    set textContent(tc: string) {
+        const someTextChild = this.children.find(ch => ch instanceof MeiText)
+        if (someTextChild) someTextChild.setTextContent(tc)
+            else  {
+        const newChild = new MeiText(tc, Math.max(...this.children.map(ch => ch.indexAmongSiblings || 0))+1);
+        this.pushChild(newChild)
+        }
+    }
+    get textContent(): string {
+        return this.children.filter(ch => ch instanceof MeiText).map(ch => ch.textContent).join('\n')
+    }
     parent?: MeiTag;
     xmlId?: string;
     indexAmongSiblings?: number
     id?: number;
+        selfClosing?: boolean
+    children: MeiTag[] = []
+    abstract tagTitle: string
+    static instanceFromXmlElement(childNode: ChildNode, indexAmongSiblings = 0, parent?: MeiTag): MeiTag {
+        if (childNode.nodeName == '#text' || !(childNode instanceof Element)) {
 
-    static instanceFromXmlElement(el: Element, indexAmongSiblings = 0, parent?: MeiTag): MeiTag {
-      
-        const instance = MeiTag.makeTagsTree({
-            tagTitle: el.tagName,
-            attributes: Array.from(el.attributes).map(at => ({ title: at.name, value: at.value })),
-            children: Array.from(el.children).map((ch, index) => MeiTag.instanceFromXmlElement(ch, index, parent)),
-            selfClosing: el.children.length == 0 && !el.textContent,
-            textContent: el.textContent?.trim()//el.children.length == 0 ? el.textContent?.trim() : undefined,
-        }, parent)
-        // console.log(instance.tagTitle + ': ', instance.children.map(ch =>ch.tagTitle).join(', '));
+            const instance = new MeiText(childNode.nodeValue?.trim() || '', indexAmongSiblings)
+            return instance
+        } else {
+            const el = childNode as Element
+            if (el.tagName == 'title') {
+                console.log(el.childNodes);
+            }
+            const instance = MeiTag.makeTagsTree({
+                tagTitle: el.tagName,
+                attributes: Array.from(el.attributes).map(at => ({ title: at.name, value: at.value })),
+                children: Array.from(el.childNodes).filter(chNode => chNode.nodeType != childNode.TEXT_NODE || chNode.nodeValue?.trim()).map((ch, index) => MeiTag.instanceFromXmlElement(ch, index, parent)),
+                selfClosing: el.children.length == 0 && !el.textContent,
+                textContent: el.textContent?.trim()//el.children.length == 0 ? el.textContent?.trim() : undefined,
+            }, parent)
+            // console.log(instance.tagTitle + ': ', instance.children.map(ch =>ch.tagTitle).join(', '));
 
-        instance.indexAmongSiblings = indexAmongSiblings;
-        // instance.xmlId = el.getAttribute('xml:id')|| undefined
-        instance.setXmlId(el.getAttribute('xml:id')!)
-        return instance;
+            instance.indexAmongSiblings = indexAmongSiblings;
+            // instance.xmlId = el.getAttribute('xml:id')|| undefined
+            instance.setXmlId(el.getAttribute('xml:id')!)
+            return instance;
+        }
     }
     setAllChildrenParent() {
         this.children.forEach(ch => {
@@ -50,7 +71,7 @@ export default abstract class MeiTag {
     }
 
     sortChildren() {
-        this.children = this.children.sort((a, b) => (a.indexAmongSiblings || 0) - (b.indexAmongSiblings || 0)) 
+        this.children = this.children.sort((a, b) => (a.indexAmongSiblings || 0) - (b.indexAmongSiblings || 0))
     }
     toJsonXmlElement(options = { keepEmptyNotes: false }): MeiJsonElem {
         this.updateChildren(options);
@@ -67,9 +88,7 @@ export default abstract class MeiTag {
             xmlId: this.xmlId || this.getAttribute('xml:id')?.value
         })
     }
-    selfClosing?: boolean
-    children: MeiTag[] = []
-    abstract tagTitle: string
+
     setXmlId(xmlId?: string) {
 
         if (xmlId) {
@@ -86,7 +105,7 @@ export default abstract class MeiTag {
         }
     }
     abstract updateChildren(options?: { keepEmptyNotes?: boolean }): MeiTag;
-    textContent?: string;
+
     setAttribute(att: MeiAttribute) {
         const alreadySameTitleAtt = this.attributes.find(a => a.title == att.title)
         if (alreadySameTitleAtt) alreadySameTitleAtt.value = att.value;
@@ -169,10 +188,10 @@ export default abstract class MeiTag {
     }
 
     setTextContent(str?: string) {
-        this.textContent = str
+        this.textContent = str || ''
     }
     pushChild(args: TMeiTagFactoryArgs | MeiTag, index?: number) {
-        const toPush = args instanceof MeiTag? args : MeiTag.makeTagsTree(args, this)
+        const toPush = args instanceof MeiTag ? args : MeiTag.makeTagsTree(args, this)
         if (index == undefined) this.children.push(toPush)
         else this.children.splice(index, 0, toPush)
         if (args instanceof MeiTag) args.setParent(this)
@@ -211,7 +230,7 @@ export class MeiTagInstance extends MeiTag {
         super();
         this.id = args.id
         this.tagTitle = args.tagTitle
-        this.textContent = args.textContent
+        this.textContent = args.textContent || ''
         this.selfClosing = args.selfClosing
         args.attributes?.forEach(att => this.setAttribute(new MeiAttribute(att.title, att.value)))
         this.children = args.children?.map(ch => ch instanceof MeiTag ? ch : new MeiTagInstance(ch)) || []
@@ -223,6 +242,29 @@ export class MeiTagInstance extends MeiTag {
 
 
 
+
+
+}
+
+
+export class MeiText extends MeiTag {
+    tagTitle = '';
+    set textContent(tc: string ) {
+        this._textContent = tc || ''
+    }
+    get textContent(){return this._textContent}
+    constructor(private  _textContent: string  ,public indexAmongSiblings: number) {
+        super()
+    }
+    updateChildren(options?: { keepEmptyNotes?: boolean; }): MeiTag {
+        return this;
+    }
+    toJsonXmlElement(options?: { keepEmptyNotes: boolean; }): MeiJsonElem {
+        return new MeiJsonElem({
+            attributes: [], children: [], tagTitle: '', textContent: this._textContent, indexAmongSiblings: this.indexAmongSiblings,
+            
+        })
+    }
 
 
 }

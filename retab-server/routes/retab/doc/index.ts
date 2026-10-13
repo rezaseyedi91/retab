@@ -77,6 +77,7 @@ router.post('/:id', async (req, res) => {
         if (req.body.musicJsonXmlElement) {
             retabDoc.mainChild?.setMusicElement(req.body.musicJsonXmlElement)
         }
+        
         const section = TabIdeaDocGenerator.jsonXmlElementToSection(req.body.sectionJsonXmlElement);
         retabDoc?.appendSection(section)
         const head = req.body.headJsonXmlElement ? MeiTag.makeTagsTree(req.body.headJsonXmlElement) : undefined;

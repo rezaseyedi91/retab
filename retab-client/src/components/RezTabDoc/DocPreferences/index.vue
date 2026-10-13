@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { Cog6ToothIcon, LockClosedIcon, XCircleIcon } from '@heroicons/vue/24/solid'
 import { useStore } from 'vuex';
-import { type Component, onMounted, onUnmounted, ref, shallowRef } from 'vue';
+import { type Component,  ref, shallowRef } from 'vue';
 import Tuning from './tabs/Tuning/index.vue'
 import Header from './tabs/Header/index.vue'
 import Advanced from './tabs/Advanced/index.vue'

@@ -68,10 +68,10 @@ console.log(doc.head?.getGrandChildrenByTagName('title'));
 
 onMounted(() => {
     doc.head?.setAllChildrenParent();
-    // title_main.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=main]')?.textContent
-    // title_subordinate.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=subordinate]')?.textContent
-    // title_abbreviated.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=abbreviated]')?.textContent
-    // title_translated.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=translated]')?.textContent
+    title_main.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=main]')?.textContent
+    title_subordinate.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=subordinate]')?.textContent
+    title_abbreviated.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=abbreviated]')?.textContent
+    title_translated.value = doc.head?.__add('fileDesc')?.__add('titleStmt')?.__add('title[type=translated]')?.textContent
 
     console.log({
         title_main: title_main.value,

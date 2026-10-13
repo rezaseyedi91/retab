@@ -34,14 +34,11 @@ export class MeiTag implements TMeiTag {
     selfClosing = false;
     private indent = 0
     constructor(payload?: TMeiTag, options: TMeiTagConstructorOptions = { nest: true }) {
-
         const payloadXmlId = payload?.attributes?.find(at => at.title == 'xml:id')?.value || payload?.xmlId
         this.id = payload?.id
         this.xmlId = payloadXmlId || this.generateId();
         // ensuring that the payload xmlId is set:
         payload && (payload.xmlId = this.xmlId)
-
-
         if (payload && Object.keys(payload)?.[0]) {
             // cleanup payload attributes:
             payload.attributes = payload.attributes?.filter(a => a.value);
@@ -76,16 +73,13 @@ export class MeiTag implements TMeiTag {
             }
             this.addChild(child)
         }
-
     }
     addChildren(...children: MeiTag[]) {
         for (const ch of children) this.addChild(ch)
     }
     addChild(ch: MeiTag, index?: number) {
-
         if (index != undefined) this.children.splice(index, 0, ch)
         else this.children.push(ch);
-
         ch.setIndent(this.getIndent() + 1)
         return ch
     }
@@ -176,7 +170,7 @@ export class MeiTag implements TMeiTag {
     // getParentId() { return this.parentId || this.parent?.id }
 
     async save(doc: RetabDoc) {
-        
+
         this.setAttributes();
         const prisma = DB.getInstance();
         const saved = await prisma.meiTag.upsert({
@@ -328,7 +322,8 @@ export class MeiTag implements TMeiTag {
     }
 
     wrapChildTags(): string {
-        return this.children.map(ch => ch.getXML()).join('\n')
+        if (!this.tagTitle) return this.textContent || ''
+        else return this.children.map(ch => ch.getXML()).join('\n')
     }
 
     pushChildren(...children: MeiTag[]) {
@@ -337,6 +332,7 @@ export class MeiTag implements TMeiTag {
     }
 
     getXML(): string {
+        if (!this.tagTitle) return this.textContent || ''
         this.setAttributes();
         return '<' + this.tagTitle + ` ${this.getAttributesJoint()} ` +
             (this.selfClosing ? "/>" : (
@@ -361,6 +357,7 @@ export class MeiTag implements TMeiTag {
     getAttribute(key: string) {
         return this.attributes.find(at => at.title == key)
     }
+
     pushAttribute(att: MeiAttribute) {
         if (!this.hasSameAttributeKeyValue(att)) {
             this.attributes.push(new MeiAttribute(att.title, att.value || ""))
@@ -372,6 +369,7 @@ export class MeiTag implements TMeiTag {
             where: { tagTitle: tagTitles.shift() },
             select: { tagTitle: true, id: true, children: true, attributes: true, xmlId: true }
         }
+
         if (!tagTitles.length) return simpleSelect
         else return {
             ...simpleSelect,
@@ -389,6 +387,7 @@ export class MeiTagInstance extends MeiTag {
 
     constructor(args: TMeiTagFactoryArgs) {
         super(args);
+        
         this.xmlId = args.xmlId || ''
         this.id = args.id
         // this.tagTitle = args.tagTitle
@@ -396,12 +395,14 @@ export class MeiTagInstance extends MeiTag {
         this.selfClosing = args.selfClosing || false
         args.attributes?.forEach(att => this.setAttribute(new MeiAttribute(att.title, att.value || "")))
         this.children = args.children?.map(ch => ch instanceof MeiTag ? ch : new MeiTagInstance(ch)) || []
+        // if (!this.tagTitle) console.log(this.textContent);
         // this.id = args.id
-
     }
     // setAttributes(): void { return; }
     updateChildren(): MeiTag {
         return this;
     }
+
+    
 
 }

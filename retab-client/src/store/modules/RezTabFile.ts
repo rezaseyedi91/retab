@@ -160,7 +160,7 @@ export default class RezTabFile {
       musicJsonXmlElement: this.music?.toJsonXmlElement()
     };
     console.log(reqBody);
-    
+
     // return;
     const jsonResult = await axios.post(
       process.env.VUE_APP_API_URL + "/retab/doc/" + (this.id || "new"),
@@ -431,13 +431,10 @@ export default class RezTabFile {
       altTitle,
     })
     doc.music = Music.instanceFromXmlElement(parsed.querySelector('music')!);
-      console.log(doc.music);
-      
+    console.log(doc.music);
     // const section = MeiTag.instanceFromXmlElement(parsed.querySelector('section')!) as Section;
-
-      const section = doc.music.getGrandChildrenByTagName('section')?.[0] as Section;
-      
-      if (!section) throw new Error('Couldn\'t find section as a grandchild of <music/>')
+    const section = doc.music.getGrandChildrenByTagName('section')?.[0] as Section;
+    if (!section) throw new Error('Couldn\'t find section as a grandchild of <music/>')
     head.setAllChildrenParent();
     section.setAllChildrenParent();
 
@@ -453,7 +450,6 @@ export default class RezTabFile {
         oct: Number(el.getAttribute('oct') || 0),
       }))
     }])
-
     store.state.currentDoc = doc;
     router.push('doc/imported')
     function parseXml(readResult: string) {
@@ -462,7 +458,6 @@ export default class RezTabFile {
       return xml;
     }
   }
-
 
   snapshot() {
     this.redoStack = [];
